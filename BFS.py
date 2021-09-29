@@ -2,7 +2,7 @@
 from r_utils import *
 
 from Rotations import *
-from placement import *
+from level_Graph import *
 
 
 def Z_extraction(decomposition):
@@ -67,7 +67,7 @@ def Z_extraction(decomposition):
 # GLOBAL TREE == U, cost_max,  current_cost
 # INITIAL PLACEMENT
 
-def BFS(current_root, level = 0):
+def BFS(current_root, circ,  level = 0):
     
 
     #######################
@@ -93,7 +93,7 @@ def BFS(current_root, level = 0):
         print(current_root.U_of_level)
         print(current_root.key)
         
-        print("\n\n ARRIVATOOOOOOOOOOOOOOOOOOOOOOO\n\n")
+        print("\n\n ARRIVATO\n\n")
         
         current_root.finished = True
         
@@ -133,7 +133,7 @@ def BFS(current_root, level = 0):
                     
                     rotation_involved = R(theta, phi,r, r2, dimension)
                     
-                    U_temp = matmul(  rotation_involved.matrix, U_   )
+                    U_temp = matmul(  rotation_involved.matrix, U_ )
                     U_temp = U_temp.round(12)
 
                     
@@ -147,6 +147,7 @@ def BFS(current_root, level = 0):
 
                     next_step_cost = (estimated_cost + current_root.current_cost)
                     branch_condition = current_root.max_cost - next_step_cost
+
                     if(  branch_condition > 0 or abs(branch_condition) < 1.0e-12): #if cost is better can be only candidate otherwise try them all
                         #seed(current_root.key)
                         
@@ -162,7 +163,7 @@ def BFS(current_root, level = 0):
 
 
     for child in current_root.children:
-        BFS(child, level+1)
+        BFS(child, circ, level+1)
     #===================================================================================
     
     return

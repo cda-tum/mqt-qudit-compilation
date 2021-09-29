@@ -1,6 +1,6 @@
 
 import numpy as np
-from placement import distance_nodes
+
 
 
 
@@ -41,13 +41,30 @@ def eurlerComplex(phi,A=1):
 
     
 ###########################################################
-    
+
+def node_cost_minimization_greedy(placement, gate, node_a, node_b):
+    PI_UNIT = 1
+    PI_COST = (4 * PI_UNIT + 1 * abs(np.mod(PI_UNIT + 0.25, 0.5) - 0.25)) * 10.0e-04
+
+    g_cost = gate.cost
+
+    Sn_a = get_edge_sensitivity(G, node_a, node_b)
+
+
+#:#:##:#:##:#:##:#:##:#:##:#:##:#:##:#:##:#:##:#:##:#:##:#:#
+
+
+
 def cost_calculator(gate, placement, non_zeros):
     source = gate.lev_a
     target = gate.lev_b
-    dist = distance_nodes(placement, source, target)
-    
-    return ( gate.cost * dist * non_zeros)
+
+    #TODO ADD CALCULATION OF INEFFICIENCY OF S +1/2
+    #TODO COEFF = 2 ^...
+
+    dist = placement.distance_nodes( source, target )
+
+    return (number_pi_pulses, gate.cost * dist * non_zeros )
 
 ##########################################
 

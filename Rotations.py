@@ -20,7 +20,7 @@ class custom_Unitary:
 
 class R:
     
-    def __init__(self,theta,phi,lev_a,lev_b, dimension):
+    def __init__(self, theta, phi, lev_a, lev_b, dimension):
 
 
         self.theta = theta_corrector(theta)
@@ -92,3 +92,10 @@ class Rz:
         E = theta_on_units * 10.0e-04
         return E
 
+
+class PI_PULSE(R):
+
+    def __init__(self, lev_a, lev_b, additional_bookmark, dimension):
+        super(PI_PULSE, self).__init__(np.pi, 0, lev_a, lev_b, dimension)
+
+        self.bookmark = additional_bookmark

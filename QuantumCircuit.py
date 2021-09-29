@@ -7,6 +7,7 @@ import numpy as np
 from algorithm import  *
 from BFS import *
 from my_tree import *
+from level_Graph import *
 
 
 class QuantumCircuit:
@@ -18,10 +19,15 @@ class QuantumCircuit:
         self.qreg = [[] for x in range(qubits)] 
         self.reg = [[] for x in range(bits)] 
         self.dimension = dimension
+        self.energy_level_graph = None
         
     def R(self, qubit_line, theta, phi, lev_a, lev_b ):
         
         self.qreg[qubit_line].append( R(theta, phi, lev_a, lev_b , self.dimension))
+
+    def PI_PULSE(self, qubit_line, lev_a, lev_b, additional_bookmark):
+
+        self.qreg[qubit_line].append( PI_PULSE(lev_a, lev_b, additional_bookmark, self.dimension))
         
     def Rz(self, qubit_line, theta, lev):
         
@@ -30,32 +36,11 @@ class QuantumCircuit:
     def custom_unitary(self, qubit_line, unitary):
         
         self.qreg[qubit_line].append( custom_Unitary(unitary, self.dimension) )
-        
-    #-----------------------------------------------------------------------------
-    """
-    def adjacency_matrix(self, line):
-        
-        storage = [[[] for x in range(self.dimension)] for x in range(self.dimension)]
-        
-        for gate in line:
-            
-            if(gate[rtype]=='r'):
-                
-                storage[gate[lev_a]][gate[lev_b]].append([ 'r', gate[theta], gate[phi],gate[time] ])
-            
-            else:
-                
-                for row in storage:
-                    
-                    row[gate[lev]].append(['rz', None, gate[phi],gate[time] ])
-                    
-                for column in storage[gate[lev]]:
-                    
-                    column.append(['rz', None, gate[phi],gate[time] ])
-                
 
-        return 
-    """
+    def energy_level_graph(self, edges):
+        self.energy_level_graph = level_Graph( edges, self.dimension)
+    #-----------------------------------------------------------------------------
+
     
     def tag_generator(self, gates):
         tag_number = 0
@@ -176,7 +161,7 @@ class QuantumCircuit:
             
             for gate in line:
 
-                standard_decomposition, standard_cost = algorithm(gate.matrix, initial_placement)
+                standard_decomposition, standard_cost = algorithm(gate.matrix, self.energy_level_graph)
 
                 if(type_alg=="BFS"):
                     TREE = N_ary_Tree()

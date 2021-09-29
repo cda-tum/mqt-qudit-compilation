@@ -1,8 +1,7 @@
 from r_utils import *
-from placement import *
 from Rotations import *
 
-def algorithm(U , initial_placement):
+def algorithm(U , circ):
     
     decomp=[]
     total_cost = 0
@@ -48,12 +47,19 @@ def algorithm(U , initial_placement):
                 print()
                 
 
-                decomp.append( rotation_involved )
+
                 
                 non_zeros = np.count_nonzero(abs(U_)>1.0e-4)
                 print("non-zeros:   "+ str(non_zeros))
-                estimated_cost = cost_calculator(rotation_involved, initial_placement, non_zeros)
+
+                flag_pi_pulses, estimated_cost = cost_calculator(rotation_involved, circ.energy_level_graph, non_zeros)
                 print("estimated_cost :   "+str(estimated_cost))
+
+                #pi pulse append without checking if it could multiple ones
+
+                decomp.append(PI_PULSE())
+                decomp.append(rotation_involved)
+
                 total_cost += estimated_cost
 
                 
