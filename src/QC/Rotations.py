@@ -4,7 +4,7 @@ from Gellman import *
 
 import numpy as np
 
-from r_utils import theta_corrector
+from bin.src.utils.costs_utils import theta_corrector
 
 ####################### ROTATION MATRICES
 class custom_Unitary:

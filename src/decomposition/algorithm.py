@@ -1,5 +1,5 @@
-from r_utils import *
-from Rotations import *
+from bin.src.utils.r_utils import *
+from bin.src.QC.Rotations import *
 
 def algorithm(U , circ):
     
@@ -47,8 +47,6 @@ def algorithm(U , circ):
                 print()
                 
 
-
-                
                 non_zeros = np.count_nonzero(abs(U_)>1.0e-4)
                 print("non-zeros:   "+ str(non_zeros))
 

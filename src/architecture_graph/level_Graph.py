@@ -16,7 +16,8 @@ class level_Graph(nx.Graph):
 
 
 
-    def define__states(self, list_Sp_nodes, list_Sm_nodes, list_D_nodes): #TODO TO REFACTOR FOR SUPPORTING DIFFERENT QUANTUM NUMBERS IN THE FUTURE
+    def define__states(self, list_Sp_nodes, list_Sm_nodes, list_D_nodes):
+        #TODO TO REFACTOR FOR SUPPORTING DIFFERENT QUANTUM NUMBERS IN THE FUTURE
 
         Sp_dictionary = dict.fromkeys(list_Sp_nodes, "Sp")
         Sm_dictionary = dict.fromkeys(list_Sm_nodes, "Sm")

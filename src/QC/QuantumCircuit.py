@@ -2,12 +2,10 @@
 
 ###                  ALL THE CLASSES HAVE TO BE REFACTORED TO FOLLOW DESIGN PATTERNS
 
-from Rotations import *
-import numpy as np
-from algorithm import  *
-from BFS import *
-from my_tree import *
-from level_Graph import *
+from code.src.decomposition.algorithm import  *
+from code.src.decomposition.BFS import *
+from tree_struct import *
+from code.src.architecture_graph.level_Graph import *
 
 
 class QuantumCircuit:
@@ -28,6 +26,7 @@ class QuantumCircuit:
     def PI_PULSE(self, qubit_line, lev_a, lev_b, additional_bookmark):
 
         self.qreg[qubit_line].append( PI_PULSE(lev_a, lev_b, additional_bookmark, self.dimension))
+
         
     def Rz(self, qubit_line, theta, lev):
         
@@ -39,7 +38,14 @@ class QuantumCircuit:
 
     def energy_level_graph(self, edges):
         self.energy_level_graph = level_Graph( edges, self.dimension)
-    #-----------------------------------------------------------------------------
+
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    ####            Z GATES REMOVAL
+    ####################################################################
+    ####################################################################
+    ####################################################################
 
     
     def tag_generator(self, gates):
@@ -147,9 +153,17 @@ class QuantumCircuit:
 
             self.qreg[num_line] = self.propagate_Z(num_line)
 
-        
         return
-    #-------------------------------------------------------------------------------
+
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    #
+    #               DECOMPOSITION
+    #
+    ####################################################################
+    ####################################################################
+    ####################################################################
     
     def decompose(self, type_alg ="standard"): #### badly implemented to refactor with functional
 

@@ -63,6 +63,7 @@ class N_ary_Tree:
 		return 1 + max(children_max_depth)
 
 	def add(self, new_key, rotation, U_of_level, current_cost, max_cost, parent_key=None):
+		#TODO TO TEST FOR CORRECTNESS
 		new_node = Node(new_key, rotation, U_of_level, current_cost, max_cost, parent_key)
 
 		if parent_key == None:

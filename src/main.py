@@ -1,11 +1,7 @@
-import my_tree
-from my_tree import *
-
 from QuantumCircuit import *
 
-from level_Graph import*
-from BFS import *
-from algorithm import *
+from bin.src.decomposition.BFS import *
+from bin.src.decomposition.algorithm import *
 import timeit
 
 

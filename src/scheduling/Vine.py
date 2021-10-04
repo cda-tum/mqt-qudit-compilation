@@ -1,6 +1,3 @@
-import Rotations
-
-
 class Vine:
 
     def __init__(self, dimension):

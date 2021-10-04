@@ -1,8 +1,6 @@
 import numpy as np
 
 
-
-
 class GellMann:
     
     def __init__(self, lev_a,lev_b, type_m, d):
