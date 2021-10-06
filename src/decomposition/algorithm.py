@@ -1,5 +1,5 @@
-from bin.src.utils.r_utils import *
-from bin.src.QC.Rotations import *
+from binq.src.utils.r_utils import *
+from binq.src.QC.Rotations import *
 
 def algorithm(U , circ):
     
@@ -60,7 +60,9 @@ def algorithm(U , circ):
 
                 total_cost += estimated_cost
 
-                
+
+
+
     """Change of plans since the matrices now are sigle entry the linear system is just an identity matrix arg[diag(U)] 
     """
     diag_U = np.diag(U_)

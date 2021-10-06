@@ -34,6 +34,7 @@ class level_Graph(nx.Graph):
 
 
 
+
     def update_list(self, lst_, num_a, num_b):
         new_lst = []
 
@@ -94,6 +95,7 @@ class level_Graph(nx.Graph):
         return level_Graph(new_edge_list, len(nodes))
 
 
+
     def get_sensitivity_cost(self, node_a, node_b):
         path = nx.shortest_path(self, source = node_a, target = node_b)
 
@@ -106,3 +108,31 @@ class level_Graph(nx.Graph):
     def get_edge_sensitivity(self, node_a, node_b):
         return self[node_a][node_b]["sensitivity"]
 
+    @property
+    def Sp(self):
+        Sp_node = [x for x, y in self.nodes(data=True) if y['level'] == "Sp"]
+        return Sp_node
+    @property
+    def Sm(self):
+        Sm_node = [x for x, y in self.nodes(data=True) if y['level'] == "Sm"]
+        return Sm_node
+
+    def is_Sp(self, node):
+        sp_nodes = self.Sp
+        return (node in sp_nodes)
+
+    def is_Sm(self, node):
+        sm_nodes = self.Sm
+        return (node in sm_nodes)
+
+    def get_bookmark(self, lev_a, lev_b):
+        #TODO APPLY ROUTINE TO CALCULATE MOST EFFECTIVE BOOKMARK
+        if (lev_a in self.Sp and lev_b in self.Sm):
+            return lev_b
+        elif (lev_a not in self.Sp and lev_b in self.Sm):
+            return self.Sp
+        elif (lev_a  in self.Sp and lev_b  not in self.Sm):
+            return self.Sm
+        elif (lev_a not in self.Sp and lev_b not in self.Sm):
+            #COSTS LESS IN THEORY
+            return self.Sm

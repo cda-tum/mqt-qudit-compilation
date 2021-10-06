@@ -4,7 +4,7 @@ from Gellman import *
 
 import numpy as np
 
-from bin.src.utils.costs_utils import theta_corrector
+from binq.src.utils.costs_utils import theta_corrector
 
 ####################### ROTATION MATRICES
 class custom_Unitary:
@@ -53,7 +53,7 @@ class R:
     @property
     def cost(self):
         theta_on_units = self.theta/np.pi
-
+        
         E = ( 4*theta_on_units + 1*abs(np.mod(theta_on_units+0.25, 0.5) - 0.25) )*10.0e-04
         return E
 
@@ -95,7 +95,8 @@ class Rz:
 
 class PI_PULSE(R):
 
-    def __init__(self, lev_a, lev_b, additional_bookmark, dimension):
+    def __init__(self, lev_a, lev_b, additional_bookmark, sequence_flag,  dimension):
         super(PI_PULSE, self).__init__(np.pi, 0, lev_a, lev_b, dimension)
 
         self.bookmark = additional_bookmark
+        self.sequence_gate = sequence_flag

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/binq/python3
 
 
 
@@ -24,6 +24,8 @@ class Node:
 
 
 	def add(self, new_key, rotation, U_of_level, current_cost, max_cost):
+		#TODO refactor so that size is kept track also in the tree upper structure
+
 		new_node = Node(new_key, rotation, U_of_level, current_cost, max_cost, self.key)
 
 		self.children.append(new_node)

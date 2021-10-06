@@ -2,10 +2,10 @@
 
 ###                  ALL THE CLASSES HAVE TO BE REFACTORED TO FOLLOW DESIGN PATTERNS
 
-from code.src.decomposition.algorithm import  *
-from code.src.decomposition.BFS import *
-from tree_struct import *
-from code.src.architecture_graph.level_Graph import *
+from binq.src.decomposition.algorithm import  *
+from binq.src.decomposition.BFS import *
+from binq.src.decomposition.tree_struct import *
+from binq.src.architecture_graph.level_Graph import *
 
 
 class QuantumCircuit:
@@ -23,9 +23,9 @@ class QuantumCircuit:
         
         self.qreg[qubit_line].append( R(theta, phi, lev_a, lev_b , self.dimension))
 
-    def PI_PULSE(self, qubit_line, lev_a, lev_b, additional_bookmark):
+    def PI_PULSE(self, qubit_line, lev_a, lev_b, additional_bookmark, seq_flag):
 
-        self.qreg[qubit_line].append( PI_PULSE(lev_a, lev_b, additional_bookmark, self.dimension))
+        self.qreg[qubit_line].append( PI_PULSE(lev_a, lev_b, additional_bookmark, seq_flag, self.dimension))
 
         
     def Rz(self, qubit_line, theta, lev):
@@ -194,4 +194,34 @@ class QuantumCircuit:
 
             self.qreg = new_qreg
 
-##############################################
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    #
+    #               SWAPPING
+    #
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    def swap_route_levels(self, qubit_line, lev_a, lev_b):
+
+        if(lev_a == lev_b):
+            raise Exception
+
+        else:
+            dist = self.energy_level_graph.distance_nodes(lev_a, lev_b)
+
+            additional_bookmark = self.get_bookmark( lev_a, lev_b)
+
+            if(dist > 1):
+                path = self.energy_level_graph.shortest_path(self, lev_a, lev_b)
+                #TODO IN CASE TO REWRITE FOR ARBITRARY SORTING
+                self.PI_PULSE( qubit_line, path[0], path[1], additional_bookmark, True)
+                self.PI_PULSE( qubit_line, path[1], path[2], additional_bookmark, True)
+                self.PI_PULSE( qubit_line, path[0], path[1], additional_bookmark, True)
+
+            else:
+                self.PI_PULSE(qubit_line, lev_a, lev_b, additional_bookmark, False)
+
+            self.energy_level_graph.swap_nodes(lev_a, lev_b)
+

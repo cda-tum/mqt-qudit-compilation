@@ -1,6 +1,7 @@
 ###########################################################
 
 def node_cost_minimization_greedy(placement, gate, node_a, node_b):
+    #TODO MUST CALL COST CALCULATOR FROM INSIDE FOR DIFFERENTIATING
     PI_UNIT = 1
     PI_COST = (4 * PI_UNIT + 1 * abs(np.mod(PI_UNIT + 0.25, 0.5) - 0.25)) * 10.0e-04
 

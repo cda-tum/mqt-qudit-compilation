@@ -141,7 +141,7 @@ def BFS(current_root, circ,  level = 0):
                     print("number of non-zeros  :"+ str(non_zeros))
                     
                     
-                    estimated_cost = cost_calculator(rotation_involved, initial_placement, non_zeros)
+                    estimated_cost = node_cost_minimization_greedy(rotation_involved, initial_placement, non_zeros)
                     print("estimated_cost   :"+str(estimated_cost))
                     print("-------------------------------------------------------------------------")
 

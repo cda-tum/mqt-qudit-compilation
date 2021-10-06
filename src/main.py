@@ -1,7 +1,7 @@
 from QuantumCircuit import *
 
-from bin.src.decomposition.BFS import *
-from bin.src.decomposition.algorithm import *
+from binq.src.decomposition.BFS import *
+from binq.src.decomposition.algorithm import *
 import timeit
 
 
