@@ -24,5 +24,3 @@ def eurlerComplex(phi,A=1):
     return A * ( np.cos(phi) + np.sin(phi)*1j )
    
 
-    
-

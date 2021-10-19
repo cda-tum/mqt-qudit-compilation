@@ -2,6 +2,7 @@
 import networkx as nx
 
 
+
 class level_Graph(nx.Graph):
 
     def __init__(self,  edges, nodes_from, data=None, val=None, **attr):
@@ -13,6 +14,20 @@ class level_Graph(nx.Graph):
     def distance_nodes(self, source, target):
         path = nx.shortest_path(self, source, target)
         return len(path)-1
+
+    def distance_nodes_in_pi_pulses(self, source, target):
+
+        path = nx.shortest_path(self, source, target)
+        negs = 0
+        pos = 0
+        for n in path:
+            if(n >= 0):
+                pos += 1
+            else:
+                negs += 1
+        pulses = (2*negs)-1+(pos)-1
+
+        return pulses
 
 
 

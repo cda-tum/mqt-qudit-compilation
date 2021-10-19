@@ -11,7 +11,7 @@ class NodeNotFoundException(Exception):
 
 
 class Node:
-	def __init__(self, key, rotation, U_of_level, current_cost, max_cost, parent_key, children=None):
+	def __init__(self, key, rotation, U_of_level, graph_current, current_cost, max_cost, parent_key, pi_pulses, children=None):
 		self.key = key
 		self.children = []
 		self.rotation = rotation
@@ -21,12 +21,14 @@ class Node:
 		self.max_cost = max_cost
 		self.size =  0
 		self.parent_key = parent_key
+		self.graph = graph_current
+		self.PI_PULSES = pi_pulses
 
 
-	def add(self, new_key, rotation, U_of_level, current_cost, max_cost):
+	def add(self, new_key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses):
 		#TODO refactor so that size is kept track also in the tree upper structure
 
-		new_node = Node(new_key, rotation, U_of_level, current_cost, max_cost, self.key)
+		new_node = Node(new_key, rotation, U_of_level, graph_current, current_cost, max_cost, self.key, pi_pulses)
 
 		self.children.append(new_node)
 		self.size += 1
@@ -35,6 +37,7 @@ class Node:
 		return str(self.key)
 
 class N_ary_Tree:
+	#todo put method to refresh size when algortihm has finished
 
 	def __init__(self):
 		self.root = None
@@ -138,7 +141,8 @@ class N_ary_Tree:
 	def is_empty(self):
 		return self.size == 0
 
-	def lenght(self):
+	@property
+	def size(self):
 		return self.size
 
 	def __str__(self):
