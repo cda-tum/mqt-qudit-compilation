@@ -2,6 +2,7 @@ from unittest import TestCase
 
 
 class TestQuantumCircuit(TestCase):
+    # TODO FINISH adding methods WHEN INTEGRATING
     def test_r(self):
         self.fail()
 

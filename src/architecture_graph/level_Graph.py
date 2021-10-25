@@ -88,9 +88,16 @@ class level_Graph(nx.Graph):
 
 
     def swap_nodes(self, node_a, node_b):
+        #------------------------------------------------
+        level_a = self.nodes[node_a]["level"]
+        level_b = self.nodes[node_b]["level"]
+        self.nodes[node_a]["level"] = level_b
+        self.nodes[node_b]["level"] = level_a
+        nodes = list(self.nodes(data=True))
+        #------------------------------------------------
+        new_Graph = level_Graph([], nodes)
 
         edges = list(self.edges)
-        nodes = list(self.nodes)
 
         attribute_list = []
         for e in edges:
@@ -102,12 +109,9 @@ class level_Graph(nx.Graph):
         for i, e in enumerate(swapped_nodes_edges):
             new_edge_list.append((*e, attribute_list[i]))
 
-        level_a = self.nodes[node_a]["level"]
-        level_b = self.nodes[node_b]["level"]
-        self.nodes[node_a]["level"] = level_b
-        self.nodes[node_b]["level"] = level_a
+        new_Graph.add_edges_from(new_edge_list)
 
-        return level_Graph(new_edge_list, len(nodes))
+        return new_Graph
 
 
 
@@ -121,24 +125,27 @@ class level_Graph(nx.Graph):
         return totalsensibility
 
     def get_edge_sensitivity(self, node_a, node_b):
+        #todo add try catch in case not there
         return self[node_a][node_b]["sensitivity"]
 
     @property
     def Sp(self):
         Sp_node = [x for x, y in self.nodes(data=True) if y['level'] == "Sp"]
-        return Sp_node
+        return Sp_node[0]
     @property
     def Sm(self):
         Sm_node = [x for x, y in self.nodes(data=True) if y['level'] == "Sm"]
-        return Sm_node
+        return Sm_node[0]
 
     def is_Sp(self, node):
-        sp_nodes = self.Sp
-        return (node in sp_nodes)
+        sp_nodes = [x for x, y in self.nodes(data=True) if y['level'] == "Sp"]
+        r = (node in sp_nodes)
+        return r
 
     def is_Sm(self, node):
-        sm_nodes = self.Sm
-        return (node in sm_nodes)
+        sm_nodes = [x for x, y in self.nodes(data=True) if y['level'] == "Sm"]
+        r = (node in sm_nodes)
+        return r
 
     def get_bookmark(self, lev_a, lev_b):
         #TODO APPLY ROUTINE TO CALCULATE MOST EFFECTIVE BOOKMARK
@@ -151,3 +158,8 @@ class level_Graph(nx.Graph):
         elif (lev_a not in self.Sp and lev_b not in self.Sm):
             #COSTS LESS IN THEORY
             return self.Sm
+
+    def __str__(self):
+        description = str(self.nodes(data=True))+ "\n"+ str(self.edges(data=True))
+
+        return description

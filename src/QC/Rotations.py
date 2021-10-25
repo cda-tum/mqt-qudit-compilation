@@ -1,10 +1,19 @@
 
 from Gellman import *
 
+from binq.src.utils.costs_utils import *
 
-import numpy as np
 
-from binq.src.utils.costs_utils import theta_corrector
+
+
+
+# TODO:                             DISCLAIMER!!!!!!
+
+# TODO: WE CAN BUILD TEST CASES FOR THIS, BUT I SWEATED ALREADY TOO MUCH ON THIS.
+# TODO: BE CAREFUL IF YOU MAKE ANY CHANGES AND TEST IT CAREFULLY
+# TODO: -------------only the properties have been tested-------------
+
+
 
 ####################### ROTATION MATRICES
 class custom_Unitary:

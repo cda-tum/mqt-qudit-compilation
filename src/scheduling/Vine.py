@@ -1,5 +1,6 @@
 class Vine:
-
+    # TODO DATA STRUCTURE USEFUL FOR SIMPLE RESCHEDULING OF OPERATIONS
+    # TODO TO INTEGRATE IN CASE OF DAG SCEDULING STRATEGY
     def __init__(self, dimension):
         self.couplings = [[] for x in range(dimension-1)]
         self.dimension = dimension

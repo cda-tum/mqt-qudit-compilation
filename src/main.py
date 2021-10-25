@@ -1,5 +1,5 @@
-from QuantumCircuit import *
 
+from binq.src.QC.QuantumCircuit import QuantumCircuit
 from binq.src.decomposition.Adaptive_decomposition import *
 from binq.src.decomposition.QR_decomp import *
 import timeit

@@ -1,14 +1,9 @@
 
-from r_utils import *
-from copy import deepcopy
-import numpy as np
-
-from Rotations import *
-from level_Graph import *
-
+from binq.src.QC.Rotations import *
 from binq.src.decomposition.tree_struct import N_ary_Tree
-from binq.src.utils.costs_utils import cost_calculator
-from binq.src.utils.r_utils import matmul
+
+from binq.src.utils.costs_utils import *
+from binq.src.utils.r_utils import *
 
 
 class Adaptive_decomposition:
@@ -22,18 +17,18 @@ class Adaptive_decomposition:
         TREE = N_ary_Tree()
 
     def execute(self):
-        TREE.add(0, custom_Unitary(np.identity(3, dtype='complex'), 3), self.U, self.graph, 0, self.cost_limit, [])
+        self.TREE.add(0, custom_Unitary(np.identity(3, dtype='complex'), 3), self.U, self.graph, 0, self.cost_limit, [])
 
-        BFS(TREE.root)
-        decomp, best_cost = TREE.retrieve_decomposition(TREE.root)
-        matrices_decomposed = Z_extraction(decomp)
+        self.BFS(self.TREE.root)
+        decomp, best_cost = self.TREE.retrieve_decomposition(self.TREE.root)
+        matrices_decomposed = self.Z_extraction(decomp)
 
-        tree_print = TREE.print_tree(TREE.root, "TREE: ")
+        tree_print = self.TREE.print_tree(self.TREE.root, "TREE: ")
         print(tree_print)
 
         return matrices_decomposed
 
-    def Z_extraction(decomposition):
+    def Z_extraction(self, decomposition):
         print("Z EXTRACTION INITIATED")
         ###########################################################################################################
         matrices = []
@@ -95,7 +90,7 @@ class Adaptive_decomposition:
     # GLOBAL TREE == U, cost_max,  current_cost
     # INITIAL PLACEMENT
 
-    def BFS(current_root,   level = 0):
+    def BFS(self, current_root,   level = 0):
 
         #######################
 
@@ -197,7 +192,7 @@ class Adaptive_decomposition:
 
 
         for child in current_root.children:
-            BFS(child, circ, level+1)
+            self.BFS(child, level+1)
         #===================================================================================
 
         return

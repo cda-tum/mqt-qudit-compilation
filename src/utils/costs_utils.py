@@ -1,7 +1,7 @@
 import numpy as np
 
 #########################################
-from binq.src.QC.QuantumCircuit import route_states2rotate
+from binq.src.QC.swap_routines import *
 
 
 def rotation_cost_calc(gate, placement):

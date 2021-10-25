@@ -1,6 +1,7 @@
-from binq.src.utils.costs_utils import cost_calculator
-from binq.src.utils.r_utils import *
 from binq.src.QC.Rotations import *
+from binq.src.utils.costs_utils import *
+from binq.src.utils.r_utils import *
+
 
 class QR_decomp:
 

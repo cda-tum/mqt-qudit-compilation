@@ -1,7 +1,5 @@
 #!/usr/binq/python3
 
-
-
 class NodeNotFoundException(Exception):
 	def __init__(self, value):
 		self.value = value
@@ -11,9 +9,9 @@ class NodeNotFoundException(Exception):
 
 
 class Node:
-	def __init__(self, key, rotation, U_of_level, graph_current, current_cost, max_cost, parent_key, pi_pulses, children=None):
+	def __init__(self, key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses, parent_key, childs = None):
 		self.key = key
-		self.children = []
+		self.children = childs
 		self.rotation = rotation
 		self.U_of_level = U_of_level
 		self.finished = False
@@ -28,13 +26,23 @@ class Node:
 	def add(self, new_key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses):
 		#TODO refactor so that size is kept track also in the tree upper structure
 
-		new_node = Node(new_key, rotation, U_of_level, graph_current, current_cost, max_cost, self.key, pi_pulses)
+		new_node = Node(new_key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses, self.key)
+		if(self.children == None):
+			self.children = []
 
 		self.children.append(new_node)
 		self.size += 1
 	
 	def __str__(self):
 		return str(self.key)
+
+
+
+
+
+
+
+
 
 class N_ary_Tree:
 	#todo put method to refresh size when algortihm has finished
@@ -43,17 +51,35 @@ class N_ary_Tree:
 		self.root = None
 		self.size = 0
 
+	def add(self, new_key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses, parent_key=None):
+
+		# TODO TO TEST FOR CORRECTNESS
+
+
+		if parent_key == None:
+			self.root = Node(new_key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses, parent_key)
+			self.size = 1
+		else:
+			parent_node = self.find_node(self.root, parent_key)
+			if not (parent_node):
+				raise NodeNotFoundException('No element was found with the informed parent key.')
+			parent_node.add( new_key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses)
+			self.size += 1
+
 	def find_node(self, node, key):
 		if node == None or node.key == key:
-			return node		
-		for child in node.children:
-			return_node = self.find_node(child, key)
-			if return_node: 
-				return return_node
+			return node
+
+		if(node.children != None):
+			for child in node.children:
+				return_node = self.find_node(child, key)
+				if return_node:
+					return return_node
 		return None	
 
 
 	def depth(self, key):
+		## GIVES DEPTH FROM THE KEY NODE to LEAVES
 		node = self.find_node(self.root, key)
 		if not(node):
 			raise NodeNotFoundException('No element was found with the informed parent key.')
@@ -67,35 +93,6 @@ class N_ary_Tree:
 			children_max_depth.append(self.max_depth(child))
 		return 1 + max(children_max_depth)
 
-	def add(self, new_key, rotation, U_of_level, current_cost, max_cost, parent_key=None):
-		#TODO TO TEST FOR CORRECTNESS
-		new_node = Node(new_key, rotation, U_of_level, current_cost, max_cost, parent_key)
-
-		if parent_key == None:
-			self.root = new_node
-			self.size = 1
-		else:
-			parent_node = self.find_node(self.root, parent_key)
-			if not(parent_node):
-				raise NodeNotFoundException('No element was found with the informed parent key.')
-			parent_node.children.append(new_node)
-			self.size += 1
-	
-	def print_tree(self, node, str_aux):
-
-		if node == None: return "holahola"
-		f = ""
-		if(node.finished):
-			f = "f"
-		str_aux += str(node) +f+ "("
-		for i in range(len(node.children)):
-
-			child = node.children[i]
-			end = ',' if i < len(node.children) - 1 else ''
-			str_aux = self.print_tree(child, str_aux) + end
-			
-		str_aux += ')'
-		return str_aux
 
 
 	def found_checker(self, node):
@@ -112,7 +109,7 @@ class N_ary_Tree:
 
 	def min_cost_decomp(self, node):
 		if ( not(node.children) ) :
-			return [node], node.current_cost
+			return [node], node.current_cost, node.graph
 		else:
 			children_cost = []
 
@@ -121,9 +118,9 @@ class N_ary_Tree:
 					children_cost.append( self.min_cost_decomp(child) )
 
 
-			minimum_child, best_cost = min(children_cost, key=lambda t: t[1])
+			minimum_child, best_cost, final_graph = min(children_cost, key=lambda t: t[1])
 			minimum_child.insert(0, node)
-			return minimum_child, best_cost
+			return minimum_child, best_cost, final_graph
 
 	def retrieve_decomposition(self, node):
 		self.found_checker(node)
@@ -133,17 +130,35 @@ class N_ary_Tree:
 			from numpy import inf
 			best_cost = inf
 		else:
-			decomp, best_cost = self.min_cost_decomp(node)
+			decomp_nodes, best_cost, final_graph = self.min_cost_decomp(node)
 
-		return decomp, best_cost
+		return decomp_nodes, best_cost, final_graph
 
 
 	def is_empty(self):
 		return self.size == 0
 
 	@property
-	def size(self):
+	def total_size(self):
 		return self.size
+
+
+	def print_tree(self, node, str_aux):
+
+		if node == None: return "Empty tree"
+		f = ""
+		if (node.finished):
+			f = "-Finished-"
+		str_aux += "N"+str(node) + f + "("
+		if( node.children != None):
+			str_aux += "\n\t"
+			for i in range(len(node.children)):
+				child = node.children[i]
+				end = ',' if i < len(node.children) - 1 else ''
+				str_aux = self.print_tree(child, str_aux) + end
+
+		str_aux += ')'
+		return str_aux
 
 	def __str__(self):
 		return self.print_tree(self.root, "")
