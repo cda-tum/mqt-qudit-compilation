@@ -1,8 +1,5 @@
 
-from Gellman import *
-
-from binq.src.utils.costs_utils import *
-
+from binq.src.QC.Gellman import *
 
 
 
@@ -13,7 +10,8 @@ from binq.src.utils.costs_utils import *
 # TODO: BE CAREFUL IF YOU MAKE ANY CHANGES AND TEST IT CAREFULLY
 # TODO: -------------only the properties have been tested-------------
 
-
+## Pay attention : inputs to classes are always in radians
+## cost functions in this class take input radians but work on units of pi, the rest is taken care automatically
 
 ####################### ROTATION MATRICES
 class custom_Unitary:
@@ -28,28 +26,52 @@ class custom_Unitary:
         
 
 class R:
-    
-    def __init__(self, theta, phi, lev_a, lev_b, dimension):
 
+    @staticmethod
+    def theta_corrector(angle):
+        theta_in_units_of_pi = np.mod((angle / np.pi), 2)
+        if (theta_in_units_of_pi < 0.2):
+            theta_in_units_of_pi += 2.0
 
-        self.theta = theta_corrector(theta)
+        return (theta_in_units_of_pi * np.pi)
+
+    @staticmethod
+    def levels_setter(la, lb, dimension):
+        if(la == lb ):
+            raise Exception
+        if(la<0):
+            la = dimension+la
+        if(lb<0):
+            lb = dimension+lb
+
+        if(la < lb):
+            return la, lb
+        else:
+            return lb, la
+
+    def __init__(self, theta, phi, o_lev_a, o_lev_b, dimension):
+
+        self.original_lev_a = o_lev_a
+        self.original_lev_b = o_lev_b
+        self.lev_a, self.lev_b = self.levels_setter(o_lev_a, o_lev_b, dimension)
+
+        self.theta = self.theta_corrector(theta)
         self.phi = phi
-        self.lev_a = lev_a
-        self.lev_b = lev_b
+
         self.dimension = dimension
 
         Identity = np.identity(dimension, dtype='complex')
         
-        Identity[lev_a,lev_a] = np.cos(theta/2)*Identity[lev_a,lev_a]
-        Identity[lev_b,lev_b] = np.cos(theta/2)*Identity[lev_b,lev_b]
+        Identity[self.lev_a, self.lev_a] = np.cos(theta / 2) * Identity[self.lev_a, self.lev_a]
+        Identity[self.lev_b, self.lev_b] = np.cos(theta / 2) * Identity[self.lev_b, self.lev_b]
 
         cosine_matrix = Identity
         
         
         
-        self.matrix =  (cosine_matrix -1j*np.sin(theta/2)* 
-                        ( np.sin(phi)*GellMann(lev_a,lev_b,'s',dimension).matrix - 
-                          np.cos(phi)*GellMann(lev_a,lev_b,'a',dimension).matrix ) )
+        self.matrix =  (cosine_matrix - 1j * np.sin(theta/2) *
+                        (np.sin(phi) * GellMann(self.lev_a, self.lev_b, 's', dimension).matrix -
+                         np.cos(phi) * GellMann(self.lev_a, self.lev_b, 'a', dimension).matrix))
         
         """control if the matrix is actually correct because different from the slides of Martin, 
             but works as in example"""
@@ -72,17 +94,33 @@ class R:
 
 
 class Rz:
-    
-    def __init__(self,theta,lev, dimension):
+
+
+    @staticmethod
+    def theta_corrector(angle):
+        theta_in_units_of_pi = np.mod((angle / np.pi), 2)
+        if (theta_in_units_of_pi < 0.2):
+            theta_in_units_of_pi += 2.0
+
+        return (theta_in_units_of_pi * np.pi)
+
+    @staticmethod
+    def levels_setter(lev, dimension):
+        if(lev<0):
+            return dimension+lev
+        else:
+            return lev
+
+    def __init__(self,theta, o_lev, dimension):
         
-        self.theta = theta_corrector(theta) # TODO DISCUSS IF THIS SHOULD GO THROUGH THE CORRECTOR
-        self.lev = lev
+        self.theta = self.theta_corrector(theta) # TODO DISCUSS IF THIS SHOULD GO THROUGH THE CORRECTOR
+        self.lev = self.levels_setter(o_lev, dimension)
         
         self.dimension = dimension
         
-        Identity = np.identity(dimension,dtype='complex')
+        Identity = np.identity(dimension, dtype='complex')
         
-        Identity[lev,lev]= np.exp(-1j*theta)*Identity[lev,lev]
+        Identity[self.lev, self.lev]= np.exp(-1j * theta) * Identity[self.lev, self.lev]
         self.matrix = Identity
 
         self.shape = self.matrix.shape
@@ -109,3 +147,5 @@ class PI_PULSE(R):
 
         self.bookmark = additional_bookmark
         self.sequence_gate = sequence_flag
+
+

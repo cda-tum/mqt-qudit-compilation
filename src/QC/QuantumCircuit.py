@@ -1,6 +1,10 @@
-################## CIRCUIT
 
-###                  ALL THE CLASSES HAVE TO BE REFACTORED TO FOLLOW DESIGN PATTERNS
+
+
+
+
+
+###  TODO:       *****   ALL THE CLASS HAS TO BE REFACTORED FOR INTEGRATION + TO FOLLOW DESIGN PATTERNS ****
 
 
 from binq.src.decomposition.Adaptive_decomposition import *
@@ -211,7 +215,7 @@ class QuantumCircuit:
     ####################################################################
     ####################################################################
     #
-    #               SWAPPING ROUTINES (- integrated)
+    #               SWAPPING ROUTINES (- integrated version?)
     #
     ####################################################################
     ####################################################################

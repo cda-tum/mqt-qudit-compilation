@@ -1,19 +1,29 @@
-####################################################################
-####################################################################
-########################### OUT OF CLASS ###########################
-####################################################################
+
+
+
+
 # TODO TO INTEGRATE WITH QUANTUM CIRCUIT CLASS
+
+
 
 import networkx as nx
 import numpy as np
 
+
 from binq.src.QC.Rotations import R
-from binq.src.utils.costs_utils import rotation_cost_calc
+
+from binq.src.utils.r_utils import rotation_cost_calc
 
 
+def swap_elements(l, i, j):
+    a = l[i]
+    b = l[j]
+    l[i] = b
+    l[j] = a
+    return l
 
+def pi_swap_routine(path, i, next, placement, dimension):
 
-def pi_swap_routine(i, next, placement, dimension):
 
     swapping_list = []
     cost = 0
@@ -22,24 +32,28 @@ def pi_swap_routine(i, next, placement, dimension):
     trace.reverse()
     index = 0
 
+
     while(index < len(trace)-1):
-        pi_gate = R(np.pi, 0, trace[index] , trace[index+1] , dimension)
+        pi_gate = R(np.pi, 0, path[trace[index]] , path[trace[index+1]] , dimension)
         swapping_list.append(pi_gate)
         cost += rotation_cost_calc( pi_gate, placement )
 
-        placement = placement.swap_nodes(trace[index], trace[index+1])
+        placement = placement.swap_nodes(path[trace[index]], path[trace[index+1]])
 
+        path = swap_elements(path, trace[index], trace[index+1])
         index += 1
 
+    index -= 1
     while (index > 0):
-        pi_gate = R(np.pi, 0, trace[index-1], trace[index], dimension)
+        pi_gate = R(np.pi, 0, path[trace[index-1]], path[trace[index]], dimension)
         swapping_list.append(pi_gate)
         cost += rotation_cost_calc(pi_gate, placement)
 
-        placement = placement.swap_nodes(trace[index-1], trace[index])
+        placement = placement.swap_nodes(path[trace[index-1]], path[trace[index]])
+        path = swap_elements(path, trace[index-1], trace[index])
         index -= 1
 
-    return (cost, swapping_list, placement)
+    return (cost, swapping_list, placement, path)
 
 
 
@@ -48,7 +62,7 @@ def find_next_available(i, lista):
     while(counter > 0):
         if(lista[counter] >= 0):
             return counter
-        c = c-1
+        counter -= 1
 
     return -1
 
@@ -62,7 +76,7 @@ def route_states2rotate(gate, placement):
     source = gate.lev_a
     target = gate.lev_b
 
-    path = nx.shortest_path( source, target )
+    path = nx.shortest_path(placement, source, target )
 
     i = len(path)-2
 
@@ -74,20 +88,25 @@ def route_states2rotate(gate, placement):
             cost_of_pi_pulses += rotation_cost_calc( pi_gate, placement )
 
             placement = placement.swap_nodes(path[i+1], path[i])
+            path = swap_elements(path, i+1, i)
 
+            i -= 1
         elif(path[i] < 0):
             next_swap = find_next_available(i, path)
 
             if( next_swap > 0 ):
-                routine_cost, sequence, placement = pi_swap_routine(i, next_swap, placement, dimension)
+                routine_cost, sequence, placement, path = pi_swap_routine(path, i, next_swap, placement, dimension)
                 pi_pulses_routing += sequence
                 cost_of_pi_pulses += routine_cost
 
             else:
+                #worst case scenarion routing is not possible
                 pi_pulses_routing += []
                 cost_of_pi_pulses += np.inf
 
-
+            i = next_swap - 1
 
     return ( cost_of_pi_pulses, pi_pulses_routing, placement )
+
+
 
