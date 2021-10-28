@@ -23,7 +23,7 @@ class Adaptive_decomposition:
         except SequenceFoundException:
             pass
         finally:
-            decomp, best_cost = self.TREE.retrieve_decomposition(self.TREE.root)
+            decomp, best_cost, final_graph = self.TREE.retrieve_decomposition(self.TREE.root)
 
 
             matrices_decomposed = self.Z_extraction(decomp)
@@ -126,8 +126,11 @@ class Adaptive_decomposition:
 
             current_root.finished = True
 
+            raise SequenceFoundException(current_root.key)
+
+
             return
-            # SALVO UN FLAG SUL FIGLIO
+
 
 
         #----------------------------------
