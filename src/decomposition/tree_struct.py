@@ -1,4 +1,6 @@
 #!/usr/binq/python3
+from binq.src.Exceptions.Exceptions import NodeNotFoundException
+
 
 class Node:
 	def __init__(self, key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses, parent_key, childs = None):

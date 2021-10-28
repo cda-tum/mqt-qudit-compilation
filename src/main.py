@@ -8,7 +8,7 @@ import timeit
 ################################################
 
 
-dimension = 3
+dimension = 7
 
 
 # graph without ancillas
@@ -65,7 +65,7 @@ graph_3.define__states([1], [0], [ 2])
 
 H = H( dimension )
 
-QR = QR_decomp(H, graph_3)
+QR = QR_decomp(H, graph_7)
 
 
 start = timeit.timeit()
@@ -78,10 +78,10 @@ print(QR_time)
 
 ###############################################################
 
-Adaptive = Adaptive_decomposition(H, graph_3, total_cost)
+Adaptive = Adaptive_decomposition(H, graph_7, total_cost)
 
 start = timeit.timeit()
-matrices_decomposed, best_cost = Adaptive.execute()
+matrices_decomposed, best_cost, final_graph = Adaptive.execute()
 end = timeit.timeit()
 
 print("Adaptive elapsed time")

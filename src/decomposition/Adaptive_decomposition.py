@@ -19,7 +19,9 @@ class Adaptive_decomposition:
     def execute(self):
         self.TREE.add(0, custom_Unitary(np.identity(3, dtype='complex'), 3), self.U, self.graph, 0, self.cost_limit, [])
         try:
+            print("WAIT FOR ADAPTIVE...")
             self.BFS(self.TREE.root)
+            print("ADAPTIVE FINISHED\n")
         except SequenceFoundException:
             pass
         finally:
@@ -31,7 +33,7 @@ class Adaptive_decomposition:
             tree_print = self.TREE.print_tree(self.TREE.root, "TREE: ")
             print(tree_print)
 
-            return matrices_decomposed, best_cost
+            return matrices_decomposed, best_cost, final_graph
 
     def Z_extraction(self, decomposition):
         print("Z EXTRACTION INITIATED")
@@ -96,7 +98,7 @@ class Adaptive_decomposition:
     # INITIAL PLACEMENT
 
     def BFS(self, current_root,   level = 0):
-
+        print(".",  end="")
         #######################
 
         # check if close to diagonal
@@ -106,18 +108,18 @@ class Adaptive_decomposition:
 
         #is the diagonal noisy?
         valid_diag = (abs(np.diag(Ucopy))> 1.0e-4).sum() #> 1.0e-4
-        print("valid: "+ str(valid_diag))
+        #print("valid: "+ str(valid_diag))
 
         # are the non diagonal entries zeroed-out
         filtered_Ucopy = abs(Ucopy) > 1.0e-4
         np.fill_diagonal(filtered_Ucopy, 0)
 
         not_diag = filtered_Ucopy.sum(axis=0).sum()
-        print("not_diag: "+ str(not_diag))
+        #print("not_diag: "+ str(not_diag))
         ############################################
 
         if( (not not_diag) and valid_diag ):# if is diagonal enough then somehow signal end of algorithm
-            print("condition 2")
+            #print("condition 2")
 
             print(current_root.U_of_level)
             print(current_root.key)
@@ -140,9 +142,9 @@ class Adaptive_decomposition:
         U_ = current_root.U_of_level
 
         dimension = U_.shape[0]
-        print("dimension is "+str(dimension))
+        #print("dimension is "+str(dimension))
 
-        print("checking level")
+        #print("checking level")
         for c in range(dimension):
 
             for r in range(dimension):
@@ -152,16 +154,16 @@ class Adaptive_decomposition:
                     if( abs(U_[r,c])>1.0e-8 and abs(U_[r2,c])>1.0e-4 and r >= c and r2 > r):
 
 
-                        print("-------------------------------------------------------------------------")
-                        print(' r is '+str(r))
-                        print(' r2 is '+str(r2))
-                        print(' c is '+str(c))
+                        #print("-------------------------------------------------------------------------")
+                        #print(' r is '+str(r))
+                        #print(' r2 is '+str(r2))
+                        #print(' c is '+str(c))
 
                         theta = 2 * np.arctan( abs(U_[r2,c]/U_[r,c]))
                         phi = -(np.angle(U_[r,c]) - np.angle(U_[r2,c]))
 
-                        print("theta  : "+str(theta))
-                        print("phi  : "+str(phi))
+                        #print("theta  : "+str(theta))
+                        #print("phi  : "+str(phi))
 
                         rotation_involved = R(theta, phi,r, r2, dimension)
 
@@ -170,12 +172,12 @@ class Adaptive_decomposition:
 
 
                         non_zeros = np.count_nonzero(abs(U_temp)>1.0e-4)
-                        print("number of non-zeros  :"+ str(non_zeros))
+                        #print("number of non-zeros  :"+ str(non_zeros))
 
 
                         estimated_cost, pi_pulses_routing, new_placement  = cost_calculator(rotation_involved, current_placement, non_zeros)
-                        print("estimated_cost   :"+str(estimated_cost))
-                        print("-------------------------------------------------------------------------")
+                        #print("estimated_cost   :"+str(estimated_cost))
+                        #print("-------------------------------------------------------------------------")
 
                         next_step_cost = (estimated_cost + current_root.current_cost)
                         branch_condition = current_root.max_cost - next_step_cost
@@ -184,7 +186,8 @@ class Adaptive_decomposition:
                             #seed(current_root.key)
 
                             new_key = current_root.key + (current_root.size + 1)
-                            print(" LA NEW KEY IS : " + str(new_key))
+                            #print(" NEW KEY IS : " + str(new_key))
+                            #TODO FIX KEY SYSTEM BECAUSE NOT UNIQUE
 
                             #todo copy and modify placement
                             # new_placement = # method calculates what is the rotatino to be made and callculates the swap that has to be made, or the new conformation
@@ -194,11 +197,14 @@ class Adaptive_decomposition:
 
 
 
-        print("next level")
+        #print("next level")
         #===================================================================================
         ## FOR LOOP
 
         if( current_root.children != None):
+            # sort children by minimum cost, in order to get closer to minimum cost paths
+            #current_root.children = sorted(current_root.children, key=lambda x: x.current_cost)
+
             for child in current_root.children:
                 self.BFS(child, level+1)
         #===================================================================================
