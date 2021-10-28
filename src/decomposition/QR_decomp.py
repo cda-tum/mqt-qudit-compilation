@@ -1,4 +1,4 @@
-from binq.src.QC.Rotations import *
+from binq.src.circuit.Rotations import *
 from binq.src.utils.costs_utils import *
 from binq.src.utils.r_utils import *
 
@@ -6,8 +6,9 @@ from binq.src.utils.r_utils import *
 class QR_decomp:
 
     def __init__(self, gate , graph_orig):
-        U = gate.matrix
-        graph = graph_orig
+
+        self.U = gate.matrix
+        self.graph = graph_orig
 
     def execute(self):
 
@@ -58,7 +59,7 @@ class QR_decomp:
                     non_zeros = np.count_nonzero(abs(U_)>1.0e-4)
                     print("non-zeros:   "+ str(non_zeros))
 
-                    estimated_cost, pi_pulses_routing, self.circ.energy_level_graph = cost_calculator(rotation_involved, self.circ.energy_level_graph, non_zeros)
+                    estimated_cost, pi_pulses_routing, self.graph = cost_calculator(rotation_involved, self.graph, non_zeros)
                     print("estimated_cost :   "+str(estimated_cost))
 
                     #pi pulse append without checking if it could multiple ones

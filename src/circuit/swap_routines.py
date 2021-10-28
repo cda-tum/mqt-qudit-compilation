@@ -10,7 +10,7 @@ import networkx as nx
 import numpy as np
 
 
-from binq.src.QC.Rotations import R
+from binq.src.circuit.Rotations import R
 
 from binq.src.utils.r_utils import rotation_cost_calc
 
@@ -66,7 +66,9 @@ def find_next_available(i, lista):
 
     return -1
 
-def route_states2rotate(gate, placement):
+def route_states2rotate(gate, orig_placement):
+
+    placement = orig_placement
 
     dimension = gate.shape[0]
 

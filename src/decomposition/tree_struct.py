@@ -1,13 +1,5 @@
 #!/usr/binq/python3
 
-class NodeNotFoundException(Exception):
-	def __init__(self, value):
-		self.value = value
-	
-	def __str__(self):
-		return repr(self.value)
-
-
 class Node:
 	def __init__(self, key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses, parent_key, childs = None):
 		self.key = key
@@ -96,6 +88,7 @@ class N_ary_Tree:
 
 
 	def found_checker(self, node):
+		print("found_checker")
 		if not(node.children):
 			return node.finished
 
@@ -103,6 +96,7 @@ class N_ary_Tree:
 		for child in node.children:
 			children_checking.append(self.found_checker(child))
 		if(True in children_checking ):
+			print("SUCCESS")
 			node.finished = True
 
 		return node.finished

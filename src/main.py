@@ -1,67 +1,107 @@
-
-from binq.src.QC.QuantumCircuit import QuantumCircuit
+from binq.src.evaluation.Pauli import H
+from binq.src.evaluation.Verifier import Verifier
+from binq.src.architecture_graph.level_Graph import level_Graph
 from binq.src.decomposition.Adaptive_decomposition import *
 from binq.src.decomposition.QR_decomp import *
 import timeit
 
-
-dimension = 6
-edges = [(0,5, {"delta_m":0, "sensitivity": 1}),
-         (0,4, {"delta_m":0, "sensitivity": 1}),
-         (0,3, {"delta_m":1, "sensitivity": 3}),
-         (0,2, {"delta_m":1, "sensitivity": 3}),
-         (1,5, {"delta_m":0, "sensitivity": 1}),
-         (1,4, {"delta_m":0, "sensitivity": 1}),
-         (1,3, {"delta_m":1, "sensitivity": 3}),
-         (1,2, {"delta_m":1, "sensitivity": 3})
-         ]
-
-# to access attribute graph[node 1][node 2][name attr]
-circ = QuantumCircuit(1, 1, dimension)
-circ.energy_level_graph(edges)
-
-print(circ.energy_level_graph.nodes)
-
-"""
-U= np.array([[0.57735 + 0.00000j ,  0.57735 + 0.00000j,   0.57735 + 0.00000j],
-             [0.57735 + 0.00000j,  -0.28868 + 0.50000j , -0.28868 - 0.50000j],
-             [0.57735 + 0.00000j,  -0.28868 - 0.50000j , -0.28868 + 0.50000j]],dtype='complex')
-"""
-U = np.array([[ 0.95105652+0.j ,     0.+0.j,    0.+0.j,     0.+0.j,     0.+0.j,    -0.25+0.18163563j],
-            [ 0.0954915 +0.j,   0.9045085 +0.j, 0.23776413-0.17274575j,  0.+0.j,     0.+0.j,     0.23776413-0.17274575j],
-            [ 0.+0.j,   -0.25-0.18163563j,  0.95105652+0.j,     0.+0.j,     0.+0.j ,    0.+0.j],
-            [ 0.+0.j ,  0.+0.j,     0.+0.j, 1.+0.j,     0.+0.j,      0.+0.j ],
-            [ 0.+0.j ,     0. +0.j ,      0. +0.j,  0.  +0.j,     1. +0.j,     0. +0.j   ]  ,
-            [ 0.23776413+0.17274575j,  -0.23776413-0.17274575j,  -0.0954915 +0.j, 0. +0.j  ,    0.  +0.j  ,   0.9045085 +0.j ]])
-
-standard_decomp, cost_limit = algorithm(U , circ)
+################################################
 
 
-TREE = N_ary_Tree()
-TREE.add(0, custom_Unitary(np.identity(3, dtype='complex' ),  3), U, 0, cost_limit)
+dimension = 3
+
+
+# graph without ancillas
+#####################################################
+
+
+edges_7 = [(0, 5, {"delta_m": 1, "sensitivity": 5}),
+           (0, 4, {"delta_m": 0, "sensitivity": 3}),
+           (0, 3, {"delta_m": 0, "sensitivity": 3}),
+           (0, 2, {"delta_m": 1, "sensitivity": 5}),
+           (1, 4, {"delta_m": 0, "sensitivity": 3}),
+           (1, 3, {"delta_m": 1, "sensitivity": 5}),
+           (1, 6, {"delta_m": 1, "sensitivity": 5})
+           ]
+nodes_7 = [ 0, 1, 2, 3, 4, 5, 6]
+
+## NODES CAN also BE INFERRED BY THE EDGES
+graph_7 = level_Graph(edges_7, nodes_7)
+graph_7.define__states([1], [0], [ 2, 3, 4, 5, 6])
+
+################################################################
+
+# graph without ancillas
+#####################################################
+
+
+edges_5 = [(0, 3, {"delta_m": 1, "sensitivity": 5}),
+           (0, 4, {"delta_m": 0, "sensitivity": 3}),
+           (1, 4, {"delta_m": 0, "sensitivity": 3}),
+           (1, 2, {"delta_m": 1, "sensitivity": 5}),
+
+           ]
+nodes_5 = [ 0, 1, 2, 3, 4]
+
+## NODES CAN BE INFERRED BY THE EDGES
+graph_5 = level_Graph(edges_5, nodes_5)
+graph_5.define__states([1], [0], [ 2, 3, 4])
+
+################################################################
+
+edges_3 = [(0, 2, {"delta_m": 0, "sensitivity": 3}),
+           (1, 2, {"delta_m": 0, "sensitivity": 3}),
+           ]
+nodes_3 = [0, 1, 2 ]
+
+## NODES CAN BE INFERRED BY THE EDGES
+graph_3 = level_Graph(edges_3, nodes_3)
+graph_3.define__states([1], [0], [ 2])
+
+###############################################################
+#                            EXECUTION
+
+#############################################################
+
+H = H( dimension )
+
+QR = QR_decomp(H, graph_3)
 
 
 start = timeit.timeit()
-BFS(TREE.root, circ)
+decomp, total_cost = QR.execute()
 end = timeit.timeit()
 
-print("elapsed time")
-print(end - start)
+print("QR elapsed time")
+QR_time = end - start
+print(QR_time)
+
+###############################################################
+
+Adaptive = Adaptive_decomposition(H, graph_3, total_cost)
+
+start = timeit.timeit()
+matrices_decomposed, best_cost = Adaptive.execute()
+end = timeit.timeit()
+
+print("Adaptive elapsed time")
+Adaptive_time = end - start
+print(Adaptive_time)
 
 
+###################################################################
 
-decomp, best_cost = TREE.retrieve_decomposition(TREE.root)
-matrices_decomposed = Z_extraction(decomp)
+print("COST QR,   ", total_cost)
+print("BEST COST ADA,   ", best_cost)
 
-tree_print = TREE.print_tree(TREE.root,"TREE: ")
-print(tree_print)
-
+"""
 for m in matrices_decomposed:
     print(m)
 print("\n:)__:)__:)__:)__:)__:)__:)__:)__:)__:)__:)__:)__:)__:)__:)")
+"""
+
+V = Verifier(matrices_decomposed, H)
+is_correct = V.verify()
 
 
-
-
-
-
+#########################################################################################

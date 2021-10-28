@@ -1,5 +1,5 @@
-
-from binq.src.QC.Rotations import *
+from binq.src.Exceptions.Exceptions import SequenceFoundException
+from binq.src.circuit.Rotations import *
 from binq.src.decomposition.tree_struct import N_ary_Tree
 
 from binq.src.utils.costs_utils import *
@@ -10,23 +10,28 @@ class Adaptive_decomposition:
 
 
     def __init__(self, gate, graph_orig, cost_limit=0):
-        U = gate.matrix
-        graph = graph_orig
-        cost_limit = cost_limit
+        self.U = gate.matrix
+        self.graph = graph_orig
+        self.cost_limit = cost_limit
 
-        TREE = N_ary_Tree()
+        self.TREE = N_ary_Tree()
 
     def execute(self):
         self.TREE.add(0, custom_Unitary(np.identity(3, dtype='complex'), 3), self.U, self.graph, 0, self.cost_limit, [])
+        try:
+            self.BFS(self.TREE.root)
+        except SequenceFoundException:
+            pass
+        finally:
+            decomp, best_cost = self.TREE.retrieve_decomposition(self.TREE.root)
 
-        self.BFS(self.TREE.root)
-        decomp, best_cost = self.TREE.retrieve_decomposition(self.TREE.root)
-        matrices_decomposed = self.Z_extraction(decomp)
 
-        tree_print = self.TREE.print_tree(self.TREE.root, "TREE: ")
-        print(tree_print)
+            matrices_decomposed = self.Z_extraction(decomp)
 
-        return matrices_decomposed
+            tree_print = self.TREE.print_tree(self.TREE.root, "TREE: ")
+            print(tree_print)
+
+            return matrices_decomposed, best_cost
 
     def Z_extraction(self, decomposition):
         print("Z EXTRACTION INITIATED")
@@ -117,7 +122,7 @@ class Adaptive_decomposition:
             print(current_root.U_of_level)
             print(current_root.key)
 
-            print("\n\n ARRIVATO\n\n")
+            print("\n\n ARRIVED\n\n")
 
             current_root.finished = True
 
@@ -182,7 +187,7 @@ class Adaptive_decomposition:
                             # new_placement = # method calculates what is the rotatino to be made and callculates the swap that has to be made, or the new conformation
                             # pi_pulses = # method returns a lit of pi pulses represemtative of the new conformation
 
-                            current_root.add(new_key, rotation_involved, U_temp, next_step_cost, new_placement, current_root.max_cost, pi_pulses_routing)
+                            current_root.add(new_key, rotation_involved, U_temp, new_placement, next_step_cost, current_root.max_cost, pi_pulses_routing)
 
 
 
@@ -190,9 +195,9 @@ class Adaptive_decomposition:
         #===================================================================================
         ## FOR LOOP
 
-
-        for child in current_root.children:
-            self.BFS(child, level+1)
+        if( current_root.children != None):
+            for child in current_root.children:
+                self.BFS(child, level+1)
         #===================================================================================
 
         return

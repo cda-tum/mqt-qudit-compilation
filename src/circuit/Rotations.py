@@ -1,5 +1,5 @@
 
-from binq.src.QC.Gellman import *
+from binq.src.circuit.Gellman import *
 
 
 
