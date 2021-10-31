@@ -12,6 +12,8 @@ dimension = 7
 
 
 # graph without ancillas
+
+# DISCLAIMER: THERE SHOULD BE AT LEAST ALWAYS TWO -contiguous- LOGIC LEVELS
 #####################################################
 
 

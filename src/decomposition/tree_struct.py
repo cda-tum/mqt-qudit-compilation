@@ -90,7 +90,7 @@ class N_ary_Tree:
 
 
 	def found_checker(self, node):
-		print("found_checker")
+		#print("found_checker")
 		if not(node.children):
 			return node.finished
 

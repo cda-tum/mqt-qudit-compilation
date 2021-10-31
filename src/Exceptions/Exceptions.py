@@ -19,3 +19,11 @@ class SequenceFoundException(Exception):
 
 
 
+class RoutingException(Exception):
+    def __init__(self):
+        self.message = "ROUTING PROBLEM STUCK!"
+
+    def __str__(self):
+        return repr(self.message)
+
+

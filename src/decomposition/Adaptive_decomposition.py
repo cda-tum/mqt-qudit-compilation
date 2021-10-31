@@ -20,7 +20,7 @@ class Adaptive_decomposition:
         self.TREE.add(0, custom_Unitary(np.identity(3, dtype='complex'), 3), self.U, self.graph, 0, self.cost_limit, [])
         try:
             print("WAIT FOR ADAPTIVE...")
-            self.BFS(self.TREE.root)
+            self.DFS(self.TREE.root)
             print("ADAPTIVE FINISHED\n")
         except SequenceFoundException:
             pass
@@ -97,7 +97,7 @@ class Adaptive_decomposition:
     # GLOBAL TREE == U, cost_max,  current_cost
     # INITIAL PLACEMENT
 
-    def BFS(self, current_root,   level = 0):
+    def DFS(self, current_root,   level = 0):
         print(".",  end="")
         #######################
 
@@ -206,7 +206,7 @@ class Adaptive_decomposition:
             #current_root.children = sorted(current_root.children, key=lambda x: x.current_cost)
 
             for child in current_root.children:
-                self.BFS(child, level+1)
+                self.DFS(child, level+1)
         #===================================================================================
 
         return
