@@ -71,7 +71,7 @@ class Adaptive_decomposition:
 
             for i in range(dimension):   #TODO take care of this variable because imported globally
 
-                if( abs(np.mod(np.angle(diag_U[i]),1.0e-13))> 1.0e-4):
+                if( abs(np.angle(diag_U[i])> 1.0e-4)):
                     print("theta rotation :  ", np.angle(diag_U[i]))
 
                     print("U before phase rotation")

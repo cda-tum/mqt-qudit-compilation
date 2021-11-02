@@ -8,7 +8,7 @@ import timeit
 ################################################
 
 
-dimension = 7
+dimension = 3
 
 
 # graph without ancillas
@@ -40,8 +40,7 @@ graph_7.define__states([1], [0], [ 2, 3, 4, 5, 6])
 edges_5 = [(0, 3, {"delta_m": 1, "sensitivity": 5}),
            (0, 4, {"delta_m": 0, "sensitivity": 3}),
            (1, 4, {"delta_m": 0, "sensitivity": 3}),
-           (1, 2, {"delta_m": 1, "sensitivity": 5}),
-
+           (1, 2, {"delta_m": 1, "sensitivity": 5})
            ]
 nodes_5 = [ 0, 1, 2, 3, 4]
 
@@ -67,43 +66,48 @@ graph_3.define__states([1], [0], [ 2])
 
 H = H( dimension )
 
-QR = QR_decomp(H, graph_7)
+#-------------------------------------------------------------
+
+###############################################################
+QR = QR_decomp(H, graph_3)
 
 
-start = timeit.timeit()
+startqr = timeit.timeit()
 decomp, total_cost = QR.execute()
-end = timeit.timeit()
+endqr = timeit.timeit()
 
-print("QR elapsed time")
-QR_time = end - start
-print(QR_time)
+
 
 ###############################################################
 
-Adaptive = Adaptive_decomposition(H, graph_7, total_cost)
+Adaptive = Adaptive_decomposition(H, graph_3, total_cost)
 
 start = timeit.timeit()
 matrices_decomposed, best_cost, final_graph = Adaptive.execute()
 end = timeit.timeit()
 
-print("Adaptive elapsed time")
-Adaptive_time = end - start
-print(Adaptive_time)
 
 
 ###################################################################
 
+print("QR elapsed time")
+QR_time = endqr - startqr
+print(QR_time)
+
+
+print("Adaptive elapsed time")
+Adaptive_time = end - start
+print(Adaptive_time)
+
 print("COST QR,   ", total_cost)
 print("BEST COST ADA,   ", best_cost)
 
-"""
-for m in matrices_decomposed:
-    print(m)
-print("\n:)__:)__:)__:)__:)__:)__:)__:)__:)__:)__:)__:)__:)__:)__:)")
-"""
 
-V = Verifier(matrices_decomposed, H)
-is_correct = V.verify()
+
+V1 = Verifier(decomp, H, dimension)
+V2 = Verifier(matrices_decomposed, H, dimension)
+is_correct = V1.verify()
+is_correct = V2.verify()
 
 
 #########################################################################################

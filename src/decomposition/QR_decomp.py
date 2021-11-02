@@ -78,7 +78,7 @@ class QR_decomp:
         print("Extracting The Z gates in a standard way")
         for i in range(dimension):
 
-            if( abs(np.mod(np.angle(diag_U[i]),1.0e-13))> 1.0e-4):
+            if( abs(np.angle(diag_U[i])> 1.0e-4)):
                 print("theta rotation :  ", np.angle(diag_U[i]))
 
                 print("U before phase rotation")
