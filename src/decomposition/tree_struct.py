@@ -87,7 +87,15 @@ class N_ary_Tree:
 			children_max_depth.append(self.max_depth(child))
 		return 1 + max(children_max_depth)
 
+	def size_refresh(self, node):
+		if (node.size == 0):
+			return 0
+		else:
+			children_size = 0
+			for child in node.children:
+				children_size = children_size + self.size_refresh(child)
 
+			return children_size
 
 	def found_checker(self, node):
 		#print("found_checker")
@@ -122,9 +130,10 @@ class N_ary_Tree:
 		self.found_checker(node)
 
 		if( not node.finished):
-			decomp =  []
+			decomp_nodes =  []
 			from numpy import inf
 			best_cost = inf
+			final_graph = node.graph
 		else:
 			decomp_nodes, best_cost, final_graph = self.min_cost_decomp(node)
 

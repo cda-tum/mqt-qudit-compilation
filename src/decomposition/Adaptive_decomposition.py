@@ -25,10 +25,12 @@ class Adaptive_decomposition:
         except SequenceFoundException:
             pass
         finally:
-            decomp, best_cost, final_graph = self.TREE.retrieve_decomposition(self.TREE.root)
+            matrices_decomposed, best_cost, final_graph = self.TREE.retrieve_decomposition(self.TREE.root)
 
+            if(matrices_decomposed!=[]):
+                matrices_decomposed = self.Z_extraction(matrices_decomposed)
 
-            matrices_decomposed = self.Z_extraction(decomp)
+                print("couldn't decompose\n")
 
             tree_print = self.TREE.print_tree(self.TREE.root, "TREE: ")
             print(tree_print)

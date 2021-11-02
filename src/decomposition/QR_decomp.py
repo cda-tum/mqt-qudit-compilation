@@ -13,7 +13,7 @@ class QR_decomp:
     def execute(self):
 
         decomp=[]
-        total_cost = 0
+        total_cost = np.inf
 
         U_ = self.U
         dimension= self.U.shape[0]

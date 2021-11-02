@@ -1,9 +1,9 @@
-from binq.src.evaluation.Pauli import H
+from binq.src.evaluation.Pauli import H, S
 from binq.src.evaluation.Verifier import Verifier
 from binq.src.architecture_graph.level_Graph import level_Graph
 from binq.src.decomposition.Adaptive_decomposition import *
 from binq.src.decomposition.QR_decomp import *
-import timeit
+import time
 
 ################################################
 
@@ -66,25 +66,35 @@ graph_3.define__states([1], [0], [ 2])
 
 H = H( dimension )
 
+
+
+
+S = S( dimension)
+HS = custom_Unitary(matmul(H.matrix, S.matrix), dimension)
+R02 = R(np.pi, 0 , 0, 2, dimension) # already native uncompilable
+R12 = R(np.pi, 0 , 1, 2, dimension)
+
+R_custom = custom_Unitary(matmul(R02.matrix, R12.matrix), dimension)
+
 #-------------------------------------------------------------
 
 ###############################################################
-QR = QR_decomp(H, graph_3)
+QR = QR_decomp(HS, graph_3)
 
 
-startqr = timeit.timeit()
+startqr = time.time()
 decomp, total_cost = QR.execute()
-endqr = timeit.timeit()
+endqr = time.time()
 
 
 
 ###############################################################
 
-Adaptive = Adaptive_decomposition(H, graph_3, total_cost)
+Adaptive = Adaptive_decomposition(HS, graph_3, total_cost)
 
-start = timeit.timeit()
+start = time.time()
 matrices_decomposed, best_cost, final_graph = Adaptive.execute()
-end = timeit.timeit()
+end = time.time()
 
 
 
