@@ -29,7 +29,7 @@ class Adaptive_decomposition:
 
             if(matrices_decomposed!=[]):
                 matrices_decomposed = self.Z_extraction(matrices_decomposed)
-
+            else:
                 print("couldn't decompose\n")
 
             tree_print = self.TREE.print_tree(self.TREE.root, "TREE: ")
@@ -43,7 +43,8 @@ class Adaptive_decomposition:
         matrices = []
 
         for d in decomposition[1:]: #exclude the identity matrix coming from the root of the tree of solutions which is just for correctness
-            matrices.append(d.rotation)
+            matrices = matrices + d.PI_PULSES
+            matrices = matrices + [d.rotation]
 
 
         U_ = decomposition[-1].U_of_level #take U of last elaboration which should be the diagonal matrix found
@@ -132,7 +133,7 @@ class Adaptive_decomposition:
 
             raise SequenceFoundException(current_root.key)
 
-
+            #just in case something happens
             return
 
 

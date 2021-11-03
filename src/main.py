@@ -74,7 +74,7 @@ HS = custom_Unitary(matmul(H.matrix, S.matrix), dimension)
 R02 = R(np.pi, 0 , 0, 2, dimension) # already native uncompilable
 R12 = R(np.pi, 0 , 1, 2, dimension)
 
-R_custom = custom_Unitary(matmul(R02.matrix, R12.matrix), dimension)
+R_custom = custom_Unitary(matmul(HS.matrix, R12.matrix), dimension)
 
 #-------------------------------------------------------------
 
