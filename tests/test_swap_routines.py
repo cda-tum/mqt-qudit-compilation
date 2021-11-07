@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from binq.src.circuit.swap_routines import *
+from binq.src.circuit.swap_routines_ancilla_fixed import *
 from binq.src.architecture_graph.level_Graph import level_Graph
 import networkx as nx
 

@@ -9,15 +9,17 @@ from binq.src.utils.r_utils import *
 class Adaptive_decomposition:
 
 
-    def __init__(self, gate, graph_orig, cost_limit=0):
+    def __init__(self, gate, graph_orig, cost_limit=(0,0), dimension = -1):
         self.U = gate.matrix
         self.graph = graph_orig
         self.cost_limit = cost_limit
+        self.dimension = dimension
 
         self.TREE = N_ary_Tree()
 
     def execute(self):
-        self.TREE.add(0, custom_Unitary(np.identity(3, dtype='complex'), 3), self.U, self.graph, 0, self.cost_limit, [])
+
+        self.TREE.add(0, custom_Unitary(np.identity(self.dimension, dtype='complex'), self.dimension), self.U, self.graph, 0, 0, self.cost_limit, [])
         try:
             print("WAIT FOR ADAPTIVE...")
             self.DFS(self.TREE.root)
@@ -36,6 +38,13 @@ class Adaptive_decomposition:
             print(tree_print)
 
             return matrices_decomposed, best_cost, final_graph
+
+
+
+
+
+
+
 
     def Z_extraction(self, decomposition):
         print("Z EXTRACTION INITIATED")
@@ -97,8 +106,13 @@ class Adaptive_decomposition:
             return matrices
 
 
-    # GLOBAL TREE == U, cost_max,  current_cost
-    # INITIAL PLACEMENT
+
+
+
+
+
+
+
 
     def DFS(self, current_root,   level = 0):
         print(".",  end="")
@@ -156,17 +170,9 @@ class Adaptive_decomposition:
 
                     if( abs(U_[r,c])>1.0e-8 and abs(U_[r2,c])>1.0e-4 and r >= c and r2 > r):
 
-
-                        #print("-------------------------------------------------------------------------")
-                        #print(' r is '+str(r))
-                        #print(' r2 is '+str(r2))
-                        #print(' c is '+str(c))
-
                         theta = 2 * np.arctan( abs(U_[r2,c]/U_[r,c]))
                         phi = -(np.angle(U_[r,c]) - np.angle(U_[r2,c]))
 
-                        #print("theta  : "+str(theta))
-                        #print("phi  : "+str(phi))
 
                         rotation_involved = R(theta, phi,r, r2, dimension)
 
@@ -175,34 +181,29 @@ class Adaptive_decomposition:
 
 
                         non_zeros = np.count_nonzero(abs(U_temp)>1.0e-4)
-                        #print("number of non-zeros  :"+ str(non_zeros))
 
 
-                        estimated_cost, pi_pulses_routing, new_placement  = cost_calculator(rotation_involved, current_placement, non_zeros)
-                        #print("estimated_cost   :"+str(estimated_cost))
-                        #print("-------------------------------------------------------------------------")
+                        estimated_cost, pi_pulses_routing, new_placement, cost_of_pi_pulses, gate_cost = cost_calculator(rotation_involved, current_placement, non_zeros)
 
                         next_step_cost = (estimated_cost + current_root.current_cost)
-                        branch_condition = current_root.max_cost - next_step_cost
+                        decomp_next_step_cost = ( cost_of_pi_pulses + gate_cost + current_root.current_decomp_cost)
+
+                        branch_condition = current_root.max_cost[1] - decomp_next_step_cost #SECOND POSITION IS PHYISCAL COST
+                        branch_condition_2 = current_root.max_cost[0] - next_step_cost  # FIRST IS ALGORITHMIC COST
 
                         if(  branch_condition > 0 or abs(branch_condition) < 1.0e-12): #if cost is better can be only candidate otherwise try them all
-                            #seed(current_root.key)
-
-                            new_key = current_root.key + (current_root.size + 1)
-                            #print(" NEW KEY IS : " + str(new_key))
-                            #TODO FIX KEY SYSTEM BECAUSE NOT UNIQUE
-
-                            #todo copy and modify placement
-                            # new_placement = # method calculates what is the rotatino to be made and callculates the swap that has to be made, or the new conformation
-                            # pi_pulses = # method returns a lit of pi pulses represemtative of the new conformation
-
-                            current_root.add(new_key, rotation_involved, U_temp, new_placement, next_step_cost, current_root.max_cost, pi_pulses_routing)
+                            if (branch_condition_2 > 0 or abs(branch_condition_2) < 1.0e-12):
 
 
+                                new_key = current_root.key + (current_root.size + 1)
 
-        #print("next level")
-        #===================================================================================
-        ## FOR LOOP
+                                #TODO FIX KEY SYSTEM BECAUSE NOT UNIQUE
+
+                                physical_rotation = R(theta, phi, new_placement.nodes[r]['lpmap'],new_placement.nodes[r2]['lpmap'], dimension)
+
+                                current_root.add(new_key, physical_rotation, U_temp, new_placement, next_step_cost, decomp_next_step_cost, current_root.max_cost, pi_pulses_routing)
+
+
 
         if( current_root.children != None):
             # sort children by minimum cost, in order to get closer to minimum cost paths

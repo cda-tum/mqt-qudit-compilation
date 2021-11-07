@@ -13,11 +13,11 @@ class QR_decomp:
     def execute(self):
 
         decomp=[]
-        total_cost = np.inf
+        total_cost = 0
+        algorithmic_cost = 0
 
         U_ = self.U
         dimension= self.U.shape[0]
-        print("dimension is "+str(dimension))
 
 
         l=list(range(self.U.shape[0]))
@@ -31,43 +31,40 @@ class QR_decomp:
 
                 if( abs(U_[r,c])>1.0e-8 and abs(U_[r-1,c])>1.0e-4  ): ###check error change loop
 
-                    print("=======================================================")
-                    print(' r is '+str(r))
-                    print(' c is '+str(c))
-                    print("=======================================================")
 
                     theta = 2 * np.arctan( abs(U_[r,c]/U_[r-1,c]))
 
                     phi = -(np.angle(U_[r-1,c]) - np.angle(U_[r,c]))
 
-                    print(theta)
-                    print(phi)
-
-                    print(U_.round(4))
                     rotation_involved = R(theta,phi,r-1,r,dimension)
 
                     U_ = matmul(rotation_involved.matrix, U_)
 
-                    print('---')
-                    print(U_.round(4))
-
-                    print('@@@@@@@')
-                    print(rotation_involved.matrix.round(4))
-                    print()
 
 
                     non_zeros = np.count_nonzero(abs(U_)>1.0e-4)
-                    print("non-zeros:   "+ str(non_zeros))
 
-                    estimated_cost, pi_pulses_routing, self.graph = cost_calculator(rotation_involved, self.graph, non_zeros)
-                    print("estimated_cost :   "+str(estimated_cost))
+
+                    estimated_cost, pi_pulses_routing, unused_placement, cost_of_pi_pulses, gate_cost = cost_calculator(rotation_involved, self.graph, non_zeros)
+
+
+
+                    # PI PULSES ROTATION TO U
+                    # ROTATION TO U
+                    # PI PULSES ROTATION TO U
 
                     #pi pulse append without checking if it could multiple ones
 
                     decomp += pi_pulses_routing
-                    decomp.append(rotation_involved)
+                    physical_rotation = R( theta, phi, self.graph.nodes[r-1]['lpmap'], self.graph.nodes[r]['lpmap'], dimension)
+                    decomp.append(physical_rotation)
 
-                    total_cost += estimated_cost
+                    for pi_g in reversed(pi_pulses_routing):
+                        pi_g.matrix = pi_g.dag
+                        decomp.append(pi_g) #reversed and dag
+
+                    algorithmic_cost += estimated_cost
+                    total_cost += 2*cost_of_pi_pulses+gate_cost
 
 
 
@@ -101,4 +98,4 @@ class QR_decomp:
 
         print("TOTAL COST: ", total_cost)
 
-        return decomp, total_cost
+        return decomp, algorithmic_cost, total_cost

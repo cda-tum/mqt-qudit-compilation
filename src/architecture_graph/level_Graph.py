@@ -5,17 +5,36 @@ import networkx as nx
 
 class level_Graph(nx.Graph):
 
-    def __init__(self,  edges, nodes_from, data=None, val=None, **attr):
+    def __init__(self,  edges, nodes, nodes_physical_mapping=None, initialization_nodes=None):
         super(level_Graph, self).__init__()
-        self.add_nodes_from(nodes_from)
+
+
+        self.logic_nodes = nodes
+        self.add_nodes_from(self.logic_nodes)
+
+
+        if(nodes_physical_mapping):
+            self.logic_physical_map(nodes_physical_mapping)
+
+
         self.add_edges_from(edges)
+
+        if( initialization_nodes ):
+
+            inreach_nodes = [x for x in nodes if x not in initialization_nodes]
+            self.define__states(initialization_nodes, inreach_nodes)
+
+
+
 
 
     def distance_nodes(self, source, target):
         path = nx.shortest_path(self, source, target)
         return len(path)-1
 
-    def distance_nodes_in_pi_pulses(self, source, target):
+
+
+    def distance_nodes_pi_pulses_fixed_ancilla(self, source, target):
 
         path = nx.shortest_path(self, source, target)
         negs = 0
@@ -31,21 +50,24 @@ class level_Graph(nx.Graph):
 
 
 
-    def define__states(self, list_Sp_nodes, list_Sm_nodes, list_D_nodes):
-        #TODO TO REFACTOR FOR SUPPORTING DIFFERENT QUANTUM NUMBERS IN THE FUTURE
+    def logic_physical_map(self, physical_nodes):
 
-        Sp_dictionary = dict.fromkeys(list_Sp_nodes, "Sp")
-        Sm_dictionary = dict.fromkeys(list_Sm_nodes, "Sm")
-        D_dictionary = dict.fromkeys(list_D_nodes, "D")
+        logic_phy_map = { nl:np for nl, np in zip(self.logic_nodes, physical_nodes)}
+        nx.set_node_attributes(self, logic_phy_map, 'lpmap')
 
-        for n in list_Sp_nodes:
-            nx.set_node_attributes(self, Sp_dictionary, name='level')
 
-        for n in list_Sm_nodes:
-            nx.set_node_attributes(self, Sm_dictionary, name='level')
 
-        for n in list_D_nodes:
-            nx.set_node_attributes(self, D_dictionary, name='level')
+    def define__states(self, initialization_nodes, inreach_nodes):
+
+        inreach_dictionary = dict.fromkeys(inreach_nodes, "r")
+        initialization_dictionary = dict.fromkeys(initialization_nodes, "i")
+
+        for n in inreach_dictionary:
+            nx.set_node_attributes(self, inreach_dictionary, name='level')
+
+        for n in initialization_dictionary:
+            nx.set_node_attributes(self, initialization_dictionary, name='level')
+
 
 
 
@@ -87,13 +109,26 @@ class level_Graph(nx.Graph):
         return new_lst
 
 
-    def swap_nodes(self, node_a, node_b):
-        #------------------------------------------------
+    def swap_node_attributes(self, node_a, node_b):
+        # TODO REMOVE HARDCODING
+
         level_a = self.nodes[node_a]["level"]
         level_b = self.nodes[node_b]["level"]
         self.nodes[node_a]["level"] = level_b
         self.nodes[node_b]["level"] = level_a
-        nodes = list(self.nodes(data=True))
+
+        lp_a = self.nodes[node_a]["lpmap"]
+        lp_b = self.nodes[node_b]["lpmap"]
+        self.nodes[node_a]["lpmap"] = lp_b
+        self.nodes[node_b]["lpmap"] = lp_a
+
+        return list(self.nodes(data=True))
+
+
+
+    def swap_nodes(self, node_a, node_b):
+
+        nodes = self.swap_node_attributes(node_a, node_b)
         #------------------------------------------------
         new_Graph = level_Graph([], nodes)
 
@@ -115,49 +150,74 @@ class level_Graph(nx.Graph):
 
 
 
-    def get_sensitivity_cost(self, node_a, node_b):
-        path = nx.shortest_path(self, source = node_a, target = node_b)
+    def get_node_sensitivity_cost(self, node):
+        neighbs = [n for n in self.neighbors(node)]
 
         totalsensibility = 0
-        for i in range(len(path)-1):
-            totalsensibility += self[path[i]][path[i+1]]["sensitivity"]
+        for i in range(len(neighbs)-1):
+            totalsensibility += self[node][neighbs[i]]["sensitivity"]
 
         return totalsensibility
+
+
+
 
     def get_edge_sensitivity(self, node_a, node_b):
         #todo add try catch in case not there
         return self[node_a][node_b]["sensitivity"]
 
-    @property
-    def Sp(self):
-        Sp_node = [x for x, y in self.nodes(data=True) if y['level'] == "Sp"]
-        return Sp_node[0]
-    @property
-    def Sm(self):
-        Sm_node = [x for x, y in self.nodes(data=True) if y['level'] == "Sm"]
-        return Sm_node[0]
 
-    def is_Sp(self, node):
-        sp_nodes = [x for x, y in self.nodes(data=True) if y['level'] == "Sp"]
-        r = (node in sp_nodes)
+
+
+    @property
+    def _1stRnode(self):
+        r_node = [x for x, y in self.nodes(data=True) if y['level'] == "r"]
+        return r_node[0]
+    @property
+    def _1stInode(self):
+        Inode = [x for x, y in self.nodes(data=True) if y['level'] == "i"]
+        return Inode[0]
+
+    def is_irnode(self, node):
+        irnodes = [x for x, y in self.nodes(data=True) if y['level'] == "r"]
+        r = (node in irnodes)
         return r
 
-    def is_Sm(self, node):
-        sm_nodes = [x for x, y in self.nodes(data=True) if y['level'] == "Sm"]
-        r = (node in sm_nodes)
+    def is_Inode(self, node):
+        Inodes = [x for x, y in self.nodes(data=True) if y['level'] == "i"]
+        r = (node in Inodes)
         return r
 
+    @property
+    def lpmap(self):
+        nodes = self.nodes
+        listret = []
+
+        for key in nodes:
+            for N in self.nodes(data=True):
+                if(N[0]==key):
+
+                    listret.append(N[1]["lpmap"])
+        return  listret
+
+
+    """
     def get_bookmark(self, lev_a, lev_b):
+
         #TODO APPLY ROUTINE TO CALCULATE MOST EFFECTIVE BOOKMARK
-        if (lev_a in self.Sp and lev_b in self.Sm):
+
+        if (lev_a in self._1stRnode and lev_b in self._1stInode):
             return lev_b
-        elif (lev_a not in self.Sp and lev_b in self.Sm):
-            return self.Sp
-        elif (lev_a  in self.Sp and lev_b  not in self.Sm):
-            return self.Sm
-        elif (lev_a not in self.Sp and lev_b not in self.Sm):
+        elif (lev_a not in self._1stRnode and lev_b in self._1stInode):
+            return self._1stRnode
+        elif (lev_a  in self._1stRnode and lev_b  not in self._1stInode):
+            return self._1stInode
+        elif (lev_a not in self._1stRnode and lev_b not in self._1stInode):
             #COSTS LESS IN THEORY
-            return self.Sm
+            return self._1stInode
+    """
+
+
 
     def __str__(self):
         description = str(self.nodes(data=True))+ "\n"+ str(self.edges(data=True))

@@ -4,7 +4,7 @@
 
 # TODO TO INTEGRATE WITH QUANTUM CIRCUIT CLASS
 
-
+# TODO FIX FOR CREATING PHYSICAL PI PULSES
 
 import networkx as nx
 import numpy as np
@@ -108,7 +108,7 @@ def rotate_over_ancilla(path, source, target, placement, dimension):
     return (cost, swapping_list, placement, invert)
 
 
-def route_states2rotate(gate, orig_placement):
+def route_states2rotate_ancilla_fixed(gate, orig_placement):
 
     placement = orig_placement
 

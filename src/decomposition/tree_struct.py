@@ -3,24 +3,25 @@ from binq.src.Exceptions.Exceptions import NodeNotFoundException
 
 
 class Node:
-	def __init__(self, key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses, parent_key, childs = None):
+	def __init__(self, key, rotation, U_of_level, graph_current, current_cost, current_decomp_cost, max_cost, pi_pulses, parent_key, childs = None):
 		self.key = key
 		self.children = childs
 		self.rotation = rotation
 		self.U_of_level = U_of_level
 		self.finished = False
 		self.current_cost = current_cost
+		self.current_decomp_cost = current_decomp_cost
 		self.max_cost = max_cost
-		self.size =  0
+		self.size = 0
 		self.parent_key = parent_key
 		self.graph = graph_current
 		self.PI_PULSES = pi_pulses
 
 
-	def add(self, new_key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses):
+	def add(self, new_key, rotation, U_of_level, graph_current, current_cost, current_decomp_cost, max_cost, pi_pulses):
 		#TODO refactor so that size is kept track also in the tree upper structure
 
-		new_node = Node(new_key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses, self.key)
+		new_node = Node(new_key, rotation, U_of_level, graph_current, current_cost, current_decomp_cost, max_cost, pi_pulses, self.key)
 		if(self.children == None):
 			self.children = []
 
@@ -45,19 +46,19 @@ class N_ary_Tree:
 		self.root = None
 		self.size = 0
 
-	def add(self, new_key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses, parent_key=None):
+	def add(self, new_key, rotation, U_of_level, graph_current, current_cost, current_decomp_cost, max_cost, pi_pulses, parent_key=None):
 
 		# TODO TO TEST FOR CORRECTNESS
 
 
 		if parent_key == None:
-			self.root = Node(new_key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses, parent_key)
+			self.root = Node(new_key, rotation, U_of_level, graph_current, current_cost, current_decomp_cost, max_cost, pi_pulses, parent_key)
 			self.size = 1
 		else:
 			parent_node = self.find_node(self.root, parent_key)
 			if not (parent_node):
 				raise NodeNotFoundException('No element was found with the informed parent key.')
-			parent_node.add( new_key, rotation, U_of_level, graph_current, current_cost, max_cost, pi_pulses)
+			parent_node.add( new_key, rotation, U_of_level, graph_current, current_cost, current_decomp_cost, max_cost, pi_pulses)
 			self.size += 1
 
 	def find_node(self, node, key):
@@ -113,7 +114,7 @@ class N_ary_Tree:
 
 	def min_cost_decomp(self, node):
 		if ( not(node.children) ) :
-			return [node], node.current_cost, node.graph
+			return [node], (node.current_cost, node.current_decomp_cost ), node.graph
 		else:
 			children_cost = []
 
@@ -122,7 +123,7 @@ class N_ary_Tree:
 					children_cost.append( self.min_cost_decomp(child) )
 
 
-			minimum_child, best_cost, final_graph = min(children_cost, key=lambda t: t[1])
+			minimum_child, best_cost, final_graph = min(children_cost, key=lambda t: t[1][0])
 			minimum_child.insert(0, node)
 			return minimum_child, best_cost, final_graph
 
