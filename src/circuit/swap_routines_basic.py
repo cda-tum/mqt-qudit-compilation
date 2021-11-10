@@ -26,9 +26,14 @@ def route_states2rotate_basic(gate, orig_placement):
     cost_of_pi_pulses = 0
     pi_pulses_routing = []
 
-    source = gate.original_lev_a
-    target = gate.original_lev_b
-
+    source = gate.original_lev_a #
+    target = gate.original_lev_b #
+    """
+    if(source > target):
+        temp = source
+        source = target
+        target = temp
+    """
     path = nx.shortest_path(placement, source, target)
 
     i = len(path)-2
@@ -38,10 +43,18 @@ def route_states2rotate_basic(gate, orig_placement):
         phy_n_i = placement.nodes[path[i]]['lpmap']
         phy_n_ip1 = placement.nodes[path[i+1]]['lpmap']
 
-        pi_gate_phy = R(np.pi, 0, phy_n_i , phy_n_ip1, dimension)
+        if (phy_n_i < phy_n_ip1):
+            pi_gate_phy = R(np.pi, 0, phy_n_i , phy_n_ip1, dimension)
+        else:
+            pi_gate_phy = R(-np.pi, 0, phy_n_i, phy_n_ip1, dimension)
+
         pi_pulses_routing.append( pi_gate_phy )
 
-        pi_gate_logic = R(np.pi, 0, path[i] , path[i+1], dimension)
+        if(path[i] < path[i + 1]):
+            pi_gate_logic = R(np.pi, 0, path[i] , path[i+1], dimension)
+        else:
+            pi_gate_logic = R(-np.pi, 0, path[i], path[i + 1], dimension)
+
         cost_of_pi_pulses += rotation_cost_calc( pi_gate_logic, placement )
 
         placement = placement.swap_nodes(path[i+1], path[i])

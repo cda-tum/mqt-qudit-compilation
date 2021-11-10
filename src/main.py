@@ -8,7 +8,7 @@ import time
 ################################################
 
 
-dimension = 3
+dimension = 5
 
 
 # graph without ancillas
@@ -64,12 +64,15 @@ H = H( dimension )
 S = S( dimension)
 
 HS = custom_Unitary(matmul(H.matrix, S.matrix), dimension)
+print(HS.matrix.round(4))
 
-
+Rpi = R(np.pi, 0, 1, 2, 3)
+Rpi_ = R(np.pi, np.pi, 1, 2, 3)
+Rpi_1 = R(-np.pi, 0, 1, 2, 3)
 ###############################################################
 
 
-QR = QR_decomp(HS, graph_3)
+QR = QR_decomp(HS, graph_5)
 
 
 startqr = time.time()
@@ -80,7 +83,7 @@ endqr = time.time()
 
 ###############################################################
 
-Adaptive = Adaptive_decomposition(HS, graph_3, (algorithmic_cost, total_cost ), dimension)
+Adaptive = Adaptive_decomposition(HS, graph_5, (algorithmic_cost, total_cost ), dimension)
 
 start = time.time()
 matrices_decomposed, best_cost, final_graph = Adaptive.execute()
@@ -102,8 +105,8 @@ print("BEST COST ADA,   ", best_cost)
 
 final_map = final_graph.lpmap
 
-V1 = Verifier(decomp, HS, nodes_3, nodes_3 ,dimension)
-V2 = Verifier(matrices_decomposed, HS, nodes_3,final_map  ,dimension)
+V1 = Verifier(decomp, HS, nodes_5, nodes_5 ,dimension)
+V2 = Verifier(matrices_decomposed, HS, nodes_5, final_map ,dimension)
 print(V1.verify())
 print(V2.verify())
 

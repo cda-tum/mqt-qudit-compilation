@@ -45,7 +45,7 @@ class QR_decomp:
                     non_zeros = np.count_nonzero(abs(U_)>1.0e-4)
 
 
-                    estimated_cost, pi_pulses_routing, unused_placement, cost_of_pi_pulses, gate_cost = cost_calculator(rotation_involved, self.graph, non_zeros)
+                    estimated_cost, pi_pulses_routing, temp_placement, cost_of_pi_pulses, gate_cost = cost_calculator(rotation_involved, self.graph, non_zeros)
 
 
 
@@ -56,12 +56,14 @@ class QR_decomp:
                     #pi pulse append without checking if it could multiple ones
 
                     decomp += pi_pulses_routing
-                    physical_rotation = R( theta, phi, self.graph.nodes[r-1]['lpmap'], self.graph.nodes[r]['lpmap'], dimension)
+                    physical_rotation = R( theta, phi, temp_placement.nodes[r-1]['lpmap'], temp_placement.nodes[r]['lpmap'], dimension)
                     decomp.append(physical_rotation)
 
                     for pi_g in reversed(pi_pulses_routing):
-                        pi_g.matrix = pi_g.dag
-                        decomp.append(pi_g) #reversed and dag
+                        #dag_pi_g = R(-1*pi_g.theta, 0, pi_g.original_lev_a, pi_g.original_lev_b, dimension)
+                        #decomp.append(dag_pi_g) #reversed and dag
+                        decomp.append(custom_Unitary(pi_g.dag, dimension))
+                    pi_g = None
 
                     algorithmic_cost += estimated_cost
                     total_cost += 2*cost_of_pi_pulses+gate_cost
@@ -74,8 +76,8 @@ class QR_decomp:
         diag_U = np.diag(U_)
         print("Extracting The Z gates in a standard way")
         for i in range(dimension):
-
-            if( abs(np.angle(diag_U[i])> 1.0e-4)):
+            curiosity = np.angle(diag_U[i])
+            if( abs(np.angle(diag_U[i]))> 1.0e-4):
                 print("theta rotation :  ", np.angle(diag_U[i]))
 
                 print("U before phase rotation")

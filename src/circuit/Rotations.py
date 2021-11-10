@@ -29,9 +29,11 @@ class R:
 
     @staticmethod
     def theta_corrector(angle):
-        theta_in_units_of_pi = np.mod((angle / np.pi), 2)
-        if (theta_in_units_of_pi < 0.2):
-            theta_in_units_of_pi += 2.0
+        theta_in_units_of_pi = np.mod(abs(angle / np.pi), 4)
+        if(angle<0):
+            theta_in_units_of_pi = theta_in_units_of_pi * -1
+        if (abs(theta_in_units_of_pi) < 0.2):
+            theta_in_units_of_pi += 4.0
 
         return (theta_in_units_of_pi * np.pi)
 
@@ -79,17 +81,17 @@ class R:
 
     @property
     def dag(self):
-        return self.matrix.conj().T
+        return self.matrix.conj().T.copy()
 
     @property
     def cost(self):
         theta_on_units = self.theta/np.pi
         
-        E = ( 4*theta_on_units + 1*abs(np.mod(theta_on_units+0.25, 0.5) - 0.25) )*10.0e-04
+        E = ( 4*abs(theta_on_units) + 1*abs(np.mod(abs(theta_on_units)+0.25, 0.5) - 0.25) )*10.0e-04
         return E
 
     def __str__(self):
-        return str(self.matrix)
+        return str("R "+"Theta "+str(self.theta)+"phi "+str(self.phi)+"O lev a "+self.original_lev_a+"O lev b "+self.original_lev_b)
 
 
 
@@ -98,9 +100,11 @@ class Rz:
 
     @staticmethod
     def theta_corrector(angle):
-        theta_in_units_of_pi = np.mod((angle / np.pi), 2)
-        if (theta_in_units_of_pi < 0.2):
-            theta_in_units_of_pi += 2.0
+        theta_in_units_of_pi = np.mod(abs(angle / np.pi), 4)
+        if(angle<0):
+            theta_in_units_of_pi = theta_in_units_of_pi * -1
+        if (abs(theta_in_units_of_pi) < 0.2):
+            theta_in_units_of_pi += 4.0
 
         return (theta_in_units_of_pi * np.pi)
 
@@ -126,17 +130,17 @@ class Rz:
         self.shape = self.matrix.shape
 
     def __str__(self):
-        return str(self.matrix)
+        return str("R "+"Theta "+str(self.theta)+"O lev a "+self.lev)
 
     @property
     def dag(self):
-        return self.matrix.conj().T
+        return self.matrix.conj().T.copy()
 
     @property
     def cost(self):
         theta_on_units = self.theta / np.pi
 
-        E = theta_on_units * 10.0e-04
+        E = abs(theta_on_units) * 10.0e-04
         return E
 
 

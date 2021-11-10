@@ -30,6 +30,7 @@ def eurlerComplex(phi, A=1):
 
 
 def rotation_cost_calc(gate, placement):
+    ## CALCULATES COST OF THE ROTATION GIVEN IN TERMS OF LOGIC INDEXES
 
     source = gate.original_lev_a
     target = gate.original_lev_b
@@ -40,8 +41,8 @@ def rotation_cost_calc(gate, placement):
         SP_PENALTY = max(placement.distance_nodes(placement._1stInode, source), placement.distance_nodes(placement._1stInode, target))
 
         theta_on_units = gate.theta / np.pi
-        gate_cost = gate_cost - (( 1*abs(np.mod(theta_on_units+0.25, 0.5) - 0.25) )*10.0e-04)
-        gate_cost = gate_cost + ( SP_PENALTY*abs(np.mod(theta_on_units+0.25, 0.5) - 0.25) )*10.0e-04
+        gate_cost = gate_cost - (( 1*abs(np.mod(abs(theta_on_units)+0.25, 0.5) - 0.25) )*10.0e-04)
+        gate_cost = gate_cost + ( SP_PENALTY*abs(np.mod(abs(theta_on_units)+0.25, 0.5) - 0.25) )*10.0e-04
 
     return gate_cost
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

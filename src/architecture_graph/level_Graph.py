@@ -1,6 +1,6 @@
 
 import networkx as nx
-
+import copy
 
 
 class level_Graph(nx.Graph):
@@ -108,35 +108,53 @@ class level_Graph(nx.Graph):
 
         return new_lst
 
+    def deep_copy_func(self, l_n):
+        cpy_list = []
+        for li in l_n:
+            d2 = copy.deepcopy(li)
+            cpy_list.append(d2)
+
+        return cpy_list
+    def index(self, l, node):
+
+        for i in range(len(l)):
+            if(l[i][0]== node):
+                return i
+        return  None
 
     def swap_node_attributes(self, node_a, node_b):
         # TODO REMOVE HARDCODING
+        nodelistcopy = self.deep_copy_func(list(self.nodes(data=True)))
+        node_a = self.index(nodelistcopy, node_a)
+        node_b = self.index(nodelistcopy, node_b)
 
-        level_a = self.nodes[node_a]["level"]
-        level_b = self.nodes[node_b]["level"]
-        self.nodes[node_a]["level"] = level_b
-        self.nodes[node_b]["level"] = level_a
+        level_a = nodelistcopy[node_a][1]["level"]
+        level_b = nodelistcopy[node_b][1]["level"]
+        nodelistcopy[node_a][1]["level"] = level_b
+        nodelistcopy[node_b][1]["level"] = level_a
 
-        lp_a = self.nodes[node_a]["lpmap"]
-        lp_b = self.nodes[node_b]["lpmap"]
-        self.nodes[node_a]["lpmap"] = lp_b
-        self.nodes[node_b]["lpmap"] = lp_a
+        lp_a = nodelistcopy[node_a][1]["lpmap"]
+        lp_b = nodelistcopy[node_b][1]["lpmap"]
+        nodelistcopy[node_a][1]["lpmap"] = lp_b
+        nodelistcopy[node_b][1]["lpmap"] = lp_a
 
-        return list(self.nodes(data=True))
 
+
+        return nodelistcopy
 
 
     def swap_nodes(self, node_a, node_b):
 
         nodes = self.swap_node_attributes(node_a, node_b)
+
         #------------------------------------------------
         new_Graph = level_Graph([], nodes)
 
-        edges = list(self.edges)
+        edges = self.deep_copy_func( list(self.edges) )
 
         attribute_list = []
         for e in edges:
-            attribute_list.append(self.get_edge_data(*e))
+            attribute_list.append(self.get_edge_data(*e).copy())
 
         swapped_nodes_edges = self.update_list(edges, node_a, node_b)
 

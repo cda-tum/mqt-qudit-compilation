@@ -63,14 +63,14 @@ class Adaptive_decomposition:
         Ucopy = U_.copy()
 
         # is the diagonal noisy?
-        valid_diag = (abs(np.diag(Ucopy)) > 1.0e-4).sum()  # > 1.0e-4
+        valid_diag = any(abs(np.diag(Ucopy)) > 1.0e-4) # > 1.0e-4
         print("valid: " + str(valid_diag))
 
         # are the non diagonal entries zeroed-out
         filtered_Ucopy = abs(Ucopy) > 1.0e-4
         np.fill_diagonal(filtered_Ucopy, 0)
 
-        not_diag = filtered_Ucopy.sum(axis=0).sum()
+        not_diag = filtered_Ucopy.any()
         print("not_diag: " + str(not_diag))
         #---------------------------------------------------------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ class Adaptive_decomposition:
 
             for i in range(dimension):   #TODO take care of this variable because imported globally
 
-                if( abs(np.angle(diag_U[i])> 1.0e-4)):
+                if( abs(np.angle(diag_U[i]))> 1.0e-4):
                     print("theta rotation :  ", np.angle(diag_U[i]))
 
                     print("U before phase rotation")
@@ -124,14 +124,14 @@ class Adaptive_decomposition:
 
 
         #is the diagonal noisy?
-        valid_diag = (abs(np.diag(Ucopy))> 1.0e-4).sum() #> 1.0e-4
+        valid_diag = any(abs(np.diag(Ucopy))> 1.0e-4) #> 1.0e-4
         #print("valid: "+ str(valid_diag))
 
         # are the non diagonal entries zeroed-out
         filtered_Ucopy = abs(Ucopy) > 1.0e-4
         np.fill_diagonal(filtered_Ucopy, 0)
 
-        not_diag = filtered_Ucopy.sum(axis=0).sum()
+        not_diag = filtered_Ucopy.any()
         #print("not_diag: "+ str(not_diag))
         ############################################
 
@@ -177,7 +177,7 @@ class Adaptive_decomposition:
                         rotation_involved = R(theta, phi,r, r2, dimension)
 
                         U_temp = matmul(  rotation_involved.matrix, U_ )
-                        U_temp = U_temp.round(12)
+                        #U_temp = U_temp.round(12)
 
 
                         non_zeros = np.count_nonzero(abs(U_temp)>1.0e-4)
@@ -200,8 +200,15 @@ class Adaptive_decomposition:
                                 #TODO FIX KEY SYSTEM BECAUSE NOT UNIQUE
 
                                 physical_rotation = R(theta, phi, new_placement.nodes[r]['lpmap'],new_placement.nodes[r2]['lpmap'], dimension)
+                                ############################
+                                ## FORCED DAGGER
+                                pi_pulses_routing_easy_fix = []
+                                for pi_g in pi_pulses_routing:
+                                    dag_pi_g = R(-1 * pi_g.theta, 0, pi_g.original_lev_a, pi_g.original_lev_b, dimension)
+                                    pi_pulses_routing_easy_fix.append(dag_pi_g)
 
-                                current_root.add(new_key, physical_rotation, U_temp, new_placement, next_step_cost, decomp_next_step_cost, current_root.max_cost, pi_pulses_routing)
+                                #########
+                                current_root.add(new_key, physical_rotation, U_temp, new_placement, next_step_cost, decomp_next_step_cost, current_root.max_cost, pi_pulses_routing_easy_fix)
 
 
 
