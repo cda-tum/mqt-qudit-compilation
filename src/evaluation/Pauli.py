@@ -32,8 +32,8 @@ class H:
 
         ret = (1 / np.sqrt(dimension)) * ret
 
-        print()
-        print(ret)
+        #print()
+        #print(ret)
         self.matrix = ret
 
 class Z:
@@ -43,12 +43,12 @@ class Z:
         ret = np.outer([0 for x in range(dimension)], [0 for x in range(dimension)])
 
         for el in l:
-            print((2 * el / dimension, 2))
+            #print((2 * el / dimension, 2))
             omega = np.mod(2 * el / dimension, 2)
             omega = omega * np.pi * 1j
             omega = np.e ** omega
 
-            print(el)
+            #print(el)
 
             l1 = [0 for x in range(dimension)]
             l2 = [0 for x in range(dimension)]
@@ -63,8 +63,8 @@ class Z:
 
             ret = ret + result
 
-        print("\n")
-        print(ret)
+        #print("\n")
+        #print(ret)
         self.matrix = ret
 
 class X:
@@ -89,8 +89,8 @@ class X:
 
             ret = ret + result
 
-        print("\n")
-        print(ret)
+        #print("\n")
+        #print(ret)
         self.matrix = ret
 
 
@@ -118,7 +118,7 @@ class S:
 
             ret = ret + result
 
-        print("\n")
-        print(ret)
+        #print("\n")
+        #print(ret)
         self.matrix = ret
 

@@ -1,3 +1,4 @@
+from binq.src.evaluation.Clifford_Generator import Clifford_Generator
 from binq.src.evaluation.Pauli import H, S
 from binq.src.evaluation.Verifier import Verifier
 from binq.src.architecture_graph.level_Graph import level_Graph
@@ -8,9 +9,10 @@ import time
 ################################################
 
 
-dimension = 5
+dimension = 3
 
-
+C = Clifford_Generator(3,3)
+C.generate()
 # graph without ancillas
 
 #####################################################
@@ -49,9 +51,10 @@ graph_5 = level_Graph(edges_5, nodes_5, nodes_5,  [0])
 edges_3 = [(0, 2, {"delta_m": 0, "sensitivity": 3}),
            (1, 2, {"delta_m": 0, "sensitivity": 3}),
            ]
-nodes_3 = [0, 1, 2 ]
+nodes_3 = [0, 1, 2]
+nmap = [2, 0, 1]
 
-graph_3 = level_Graph(edges_3, nodes_3, nodes_3,  [0])
+graph_3 = level_Graph(edges_3, nodes_3, nmap,  [0])
 
 
 ###############################################################
@@ -72,7 +75,7 @@ Rpi_1 = R(-np.pi, 0, 1, 2, 3)
 ###############################################################
 
 
-QR = QR_decomp(HS, graph_5)
+QR = QR_decomp(HS, graph_3)
 
 
 startqr = time.time()
@@ -83,7 +86,7 @@ endqr = time.time()
 
 ###############################################################
 
-Adaptive = Adaptive_decomposition(HS, graph_5, (algorithmic_cost, total_cost ), dimension)
+Adaptive = Adaptive_decomposition(HS, graph_3, (algorithmic_cost, total_cost ), dimension)
 
 start = time.time()
 matrices_decomposed, best_cost, final_graph = Adaptive.execute()
@@ -105,8 +108,8 @@ print("BEST COST ADA,   ", best_cost)
 
 final_map = final_graph.lpmap
 
-V1 = Verifier(decomp, HS, nodes_5, nodes_5 ,dimension)
-V2 = Verifier(matrices_decomposed, HS, nodes_5, final_map ,dimension)
+V1 = Verifier(decomp, HS,  nodes_3, nmap, nmap, dimension)
+V2 = Verifier(matrices_decomposed, HS, nodes_3, nmap, final_map, dimension)
 print(V1.verify())
 print(V2.verify())
 

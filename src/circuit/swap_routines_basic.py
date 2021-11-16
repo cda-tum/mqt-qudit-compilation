@@ -6,8 +6,6 @@ from binq.src.circuit.Rotations import R
 
 from binq.src.utils.r_utils import rotation_cost_calc
 
-
-
 def swap_elements(l, i, j):
     a = l[i]
     b = l[j]
@@ -15,6 +13,38 @@ def swap_elements(l, i, j):
     l[j] = a
     return l
 
+def gate_chain_condition(previous_gates, current):
+    if(not previous_gates):
+        return current
+    new_source = current.lev_a
+    new_target = current.lev_b
+    theta = current.theta
+    phi = current.phi
+
+
+    last_gate = previous_gates[-1]
+    last_source = last_gate.lev_a  #original_lev_a R10 -> R01 leva levb -> matrix
+    last_target = last_gate.lev_b  #original_lev_b
+
+    # Very unelegant sequence of if-s
+    if(new_source == last_source):
+        if( new_target > last_target): # changed lower one with lower one
+            pass
+        elif( new_target < last_target ): # changed higher one one with lower
+            phi = phi * -1
+    elif(new_target == last_target):
+        if(new_source < last_source): # changed
+            theta = theta * -1
+        elif(new_source > last_source):
+            theta = theta * -1
+            phi = phi * -1
+    elif (new_source == last_target):
+        theta = theta * -1
+
+    elif (new_target == last_source):
+        pass
+
+    return  R(theta, phi, current.lev_a, current.lev_b, current.dimension )
 
 
 def route_states2rotate_basic(gate, orig_placement):
@@ -28,12 +58,7 @@ def route_states2rotate_basic(gate, orig_placement):
 
     source = gate.original_lev_a #
     target = gate.original_lev_b #
-    """
-    if(source > target):
-        temp = source
-        source = target
-        target = temp
-    """
+
     path = nx.shortest_path(placement, source, target)
 
     i = len(path)-2
@@ -43,17 +68,17 @@ def route_states2rotate_basic(gate, orig_placement):
         phy_n_i = placement.nodes[path[i]]['lpmap']
         phy_n_ip1 = placement.nodes[path[i+1]]['lpmap']
 
-        if (phy_n_i < phy_n_ip1):
-            pi_gate_phy = R(np.pi, 0, phy_n_i , phy_n_ip1, dimension)
+        if (phy_n_i > phy_n_ip1):
+            pi_gate_phy = R(np.pi, -np.pi/2, phy_n_i , phy_n_ip1, dimension) # TODO CHANGE BACK TO + PI/2
         else:
-            pi_gate_phy = R(-np.pi, 0, phy_n_i, phy_n_ip1, dimension)
+            pi_gate_phy = R(np.pi, np.pi/2, phy_n_i, phy_n_ip1, dimension)
 
+
+        pi_gate_phy  = gate_chain_condition(pi_pulses_routing, pi_gate_phy)
         pi_pulses_routing.append( pi_gate_phy )
 
-        if(path[i] < path[i + 1]):
-            pi_gate_logic = R(np.pi, 0, path[i] , path[i+1], dimension)
-        else:
-            pi_gate_logic = R(-np.pi, 0, path[i], path[i + 1], dimension)
+
+        pi_gate_logic = R(np.pi, np.pi, path[i], path[i + 1], dimension) # doesnt really matter its just logical
 
         cost_of_pi_pulses += rotation_cost_calc( pi_gate_logic, placement )
 

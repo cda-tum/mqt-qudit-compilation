@@ -1,5 +1,6 @@
 from binq.src.Exceptions.Exceptions import SequenceFoundException
 from binq.src.circuit.Rotations import *
+from binq.src.circuit.swap_routines_basic import gate_chain_condition
 from binq.src.decomposition.tree_struct import N_ary_Tree
 
 from binq.src.utils.costs_utils import *
@@ -30,7 +31,7 @@ class Adaptive_decomposition:
             matrices_decomposed, best_cost, final_graph = self.TREE.retrieve_decomposition(self.TREE.root)
 
             if(matrices_decomposed!=[]):
-                matrices_decomposed = self.Z_extraction(matrices_decomposed)
+                matrices_decomposed = self.Z_extraction(matrices_decomposed, final_graph)
             else:
                 print("couldn't decompose\n")
 
@@ -46,7 +47,7 @@ class Adaptive_decomposition:
 
 
 
-    def Z_extraction(self, decomposition):
+    def Z_extraction(self, decomposition, placement):
         print("Z EXTRACTION INITIATED")
         ###########################################################################################################
         matrices = []
@@ -88,7 +89,10 @@ class Adaptive_decomposition:
 
                     print("U before phase rotation")
                     print(U_.round(4))
-                    phase_gate = Rz( np.angle(diag_U[i]), i, dimension)
+
+                    phy_n_i = placement.nodes[i]['lpmap']
+
+                    phase_gate = Rz( np.angle(diag_U[i]), phy_n_i, dimension)
 
                     U_ = matmul( phase_gate.matrix, U_)
 
@@ -101,7 +105,6 @@ class Adaptive_decomposition:
                     print('@@@@@@@')
                     print()
                     matrices.append( phase_gate )
-
 
             return matrices
 
@@ -171,7 +174,7 @@ class Adaptive_decomposition:
                     if( abs(U_[r,c])>1.0e-8 and abs(U_[r2,c])>1.0e-4 and r >= c and r2 > r):
 
                         theta = 2 * np.arctan( abs(U_[r2,c]/U_[r,c]))
-                        phi = -(np.angle(U_[r,c]) - np.angle(U_[r2,c]))
+                        phi = -( np.pi/2 + np.angle(U_[r,c]) - np.angle(U_[r2,c]))
 
 
                         rotation_involved = R(theta, phi,r, r2, dimension)
@@ -198,17 +201,16 @@ class Adaptive_decomposition:
                                 new_key = current_root.key + (current_root.size + 1)
 
                                 #TODO FIX KEY SYSTEM BECAUSE NOT UNIQUE
+                                if (new_placement.nodes[r ]['lpmap'] > new_placement.nodes[r2]['lpmap']):
+                                    phi = phi * -1
 
                                 physical_rotation = R(theta, phi, new_placement.nodes[r]['lpmap'],new_placement.nodes[r2]['lpmap'], dimension)
-                                ############################
-                                ## FORCED DAGGER
-                                pi_pulses_routing_easy_fix = []
-                                for pi_g in pi_pulses_routing:
-                                    dag_pi_g = R(-1 * pi_g.theta, 0, pi_g.original_lev_a, pi_g.original_lev_b, dimension)
-                                    pi_pulses_routing_easy_fix.append(dag_pi_g)
+
+                                physical_rotation = gate_chain_condition(pi_pulses_routing, physical_rotation)
+
 
                                 #########
-                                current_root.add(new_key, physical_rotation, U_temp, new_placement, next_step_cost, decomp_next_step_cost, current_root.max_cost, pi_pulses_routing_easy_fix)
+                                current_root.add(new_key, physical_rotation, U_temp, new_placement, next_step_cost, decomp_next_step_cost, current_root.max_cost, pi_pulses_routing)
 
 
 

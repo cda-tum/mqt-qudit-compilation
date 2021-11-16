@@ -72,8 +72,8 @@ class R:
         
         
         self.matrix =  (cosine_matrix - 1j * np.sin(theta/2) *
-                        (np.sin(phi) * GellMann(self.lev_a, self.lev_b, 's', dimension).matrix -
-                         np.cos(phi) * GellMann(self.lev_a, self.lev_b, 'a', dimension).matrix))
+                        (np.sin(phi) * GellMann(self.lev_a, self.lev_b, 'a', dimension).matrix +
+                         np.cos(phi) * GellMann(self.lev_a, self.lev_b, 's', dimension).matrix))
         
         """control if the matrix is actually correct because different from the slides of Martin, 
             but works as in example"""

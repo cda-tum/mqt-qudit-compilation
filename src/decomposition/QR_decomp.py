@@ -1,4 +1,5 @@
 from binq.src.circuit.Rotations import *
+from binq.src.circuit.swap_routines_basic import gate_chain_condition
 from binq.src.utils.costs_utils import *
 from binq.src.utils.r_utils import *
 
@@ -34,12 +35,12 @@ class QR_decomp:
 
                     theta = 2 * np.arctan( abs(U_[r,c]/U_[r-1,c]))
 
-                    phi = -(np.angle(U_[r-1,c]) - np.angle(U_[r,c]))
+                    phi = -( np.pi/2 + np.angle(U_[r-1,c]) - np.angle(U_[r,c]) )
 
                     rotation_involved = R(theta,phi,r-1,r,dimension)
 
                     U_ = matmul(rotation_involved.matrix, U_)
-
+                    print(U_.round(2))
 
 
                     non_zeros = np.count_nonzero(abs(U_)>1.0e-4)
@@ -56,7 +57,12 @@ class QR_decomp:
                     #pi pulse append without checking if it could multiple ones
 
                     decomp += pi_pulses_routing
+                    if(temp_placement.nodes[r-1]['lpmap'] > temp_placement.nodes[r]['lpmap']):
+                        phi = phi * -1
+
                     physical_rotation = R( theta, phi, temp_placement.nodes[r-1]['lpmap'], temp_placement.nodes[r]['lpmap'], dimension)
+                    physical_rotation = gate_chain_condition(pi_pulses_routing, physical_rotation )
+
                     decomp.append(physical_rotation)
 
                     for pi_g in reversed(pi_pulses_routing):
@@ -82,9 +88,11 @@ class QR_decomp:
 
                 print("U before phase rotation")
                 print(U_.round(4))
-                phase_gate = Rz(np.angle(diag_U[i]), i, dimension)
+                phy_n_i = self.graph.nodes[i]['lpmap']
 
-                U_ = matmul(phase_gate.matrix, U_)
+                phase_gate = Rz(np.angle(diag_U[i]), phy_n_i, dimension)
+
+                #U_ = matmul(phase_gate.matrix, U_)
 
                 print('---')
                 print("U after phase rotation")
@@ -96,6 +104,7 @@ class QR_decomp:
                 print()
 
                 decomp.append( phase_gate )
+
 
 
         print("TOTAL COST: ", total_cost)
