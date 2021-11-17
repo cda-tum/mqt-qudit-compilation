@@ -152,5 +152,5 @@ class TestN_ary_Tree(TestCase):
         self.T.root.children[0].children[2].finished = False
         self.T.root.children[0].children[1].children[0].finished = True
 
-        print(self.T)
+       #print(self.T)
         self.T.print_tree(self.T.root, "")

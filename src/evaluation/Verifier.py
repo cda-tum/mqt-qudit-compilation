@@ -41,7 +41,7 @@ class Verifier:
         target = matmul(inv(self.permutation_matrix_final), target)
 
 
-        res = ((target - np.identity(self.dimension , dtype='complex'))<10e-6).all()
+        res = ( abs(target - np.identity(self.dimension , dtype='complex'))<10e-6 ).all()
 
         return res
 

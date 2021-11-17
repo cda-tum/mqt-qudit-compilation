@@ -2,6 +2,9 @@ from random import  randint, shuffle
 import numpy as np
 from numpy import allclose
 
+from numpy import savetxt
+from numpy import loadtxt
+
 from binq.src.evaluation.Pauli import S
 from binq.src.evaluation.Pauli import H
 from binq.src.utils.r_utils import matmul
@@ -16,7 +19,13 @@ class Clifford_Generator:
         self.stringsdb = []
 
     def numerical_comparison(self, matrix):
-        return next(  (True for elem in self.database if elem.size == matrix.size and allclose(elem, matrix, rtol=1e-08, atol=1e-010)) , False)
+        for elem in self.database:
+            if(elem.size == matrix.size):
+                if( (abs(matrix-elem)<1e-12).all() ):
+                    return True
+
+        return False
+
 
     def random_string_gen(self, limit):
         zero_count = randint(0, limit)
@@ -24,23 +33,40 @@ class Clifford_Generator:
 
         string = [0] * zero_count + [1] * one_count
         shuffle(string)
+        shuffle(string)
+        shuffle(string)
+        shuffle(string)
+
 
         return string
 
-    def strings_gen(self):
+    def strings_gen_random(self):
         for i in range(1, self.power):
-            for j in range(10):
+            for j in range(1000000):
                 sequ = self.random_string_gen(i)
                 if( not( sequ in self.stringsdb )):
                     self.stringsdb.append(sequ)
 
+    def genbin(self, n, l, bs=[]):
+        if (n - 1):
+            self.genbin(n - 1, l, bs + [0])
+            self.genbin(n - 1, l, bs + [1])
+        else:
+            l.append(bs)
+
+    def strings_gen_fixed(self):
+        for i in range(2, self.power + 2):
+            self.genbin(i, self.stringsdb)
+
+
     def generate(self):
-        self.strings_gen()
+        self.strings_gen_fixed()
+        #self.strings_gen_random() -> alternative with random
         Hm = H(self.dimension)
         Sm = S(self.dimension)
 
         for s in self.stringsdb:
-            matrix = np.identity(self.dimension)
+            matrix = np.identity(self.dimension , dtype='complex')
             for bit in s:
                 if(bit):
                     matrix = matmul(Hm.matrix, matrix)
@@ -49,5 +75,15 @@ class Clifford_Generator:
 
             if( not self.numerical_comparison(matrix)):
                 self.database.append(matrix)
+                self.save_to_csv(matrix, s)
 
         return self.database
+
+    def save_to_csv(self, matrix, name):
+        name = " ".join(str(x) for x in name)
+        savetxt("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(self.dimension)+"/"+str(name)+".csv", matrix, fmt='%.12e', delimiter=',')
+
+    def load_from_csv(self, name):
+        name = " ".join(str(x) for x in name)
+        data = loadtxt("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(self.dimension)+"/"+str(name)+".csv", delimiter=',',dtype=complex, converters={0: lambda s: complex(s.decode().replace('+-', '-'))})
+        return data

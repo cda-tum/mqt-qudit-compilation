@@ -40,7 +40,7 @@ class QR_decomp:
                     rotation_involved = R(theta,phi,r-1,r,dimension)
 
                     U_ = matmul(rotation_involved.matrix, U_)
-                    print(U_.round(2))
+                   #print(U_.round(2))
 
 
                     non_zeros = np.count_nonzero(abs(U_)>1.0e-4)
@@ -80,33 +80,33 @@ class QR_decomp:
         """Change of plans since the matrices now are sigle entry the linear system is just an identity matrix arg[diag(U)] 
         """
         diag_U = np.diag(U_)
-        print("Extracting The Z gates in a standard way")
+       #print("Extracting The Z gates in a standard way")
         for i in range(dimension):
             curiosity = np.angle(diag_U[i])
             if( abs(np.angle(diag_U[i]))> 1.0e-4):
-                print("theta rotation :  ", np.angle(diag_U[i]))
+               #print("theta rotation :  ", np.angle(diag_U[i]))
 
-                print("U before phase rotation")
-                print(U_.round(4))
+               #print("U before phase rotation")
+               #print(U_.round(4))
                 phy_n_i = self.graph.nodes[i]['lpmap']
 
                 phase_gate = Rz(np.angle(diag_U[i]), phy_n_i, dimension)
 
                 #U_ = matmul(phase_gate.matrix, U_)
 
-                print('---')
-                print("U after phase rotation")
-                print(U_.round(4))
+               #print('---')
+               #print("U after phase rotation")
+               #print(U_.round(4))
 
-                print('@@@@@@@')
-                print(phase_gate.matrix.round(4))
-                print('@@@@@@@')
-                print()
+               #print('@@@@@@@')
+               #print(phase_gate.matrix.round(4))
+               #print('@@@@@@@')
+               #print()
 
                 decomp.append( phase_gate )
 
 
 
-        print("TOTAL COST: ", total_cost)
+       #print("TOTAL COST: ", total_cost)
 
         return decomp, algorithmic_cost, total_cost

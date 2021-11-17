@@ -22,9 +22,9 @@ class Adaptive_decomposition:
 
         self.TREE.add(0, custom_Unitary(np.identity(self.dimension, dtype='complex'), self.dimension), self.U, self.graph, 0, 0, self.cost_limit, [])
         try:
-            print("WAIT FOR ADAPTIVE...")
+           #print("WAIT FOR ADAPTIVE...")
             self.DFS(self.TREE.root)
-            print("ADAPTIVE FINISHED\n")
+           #print("ADAPTIVE FINISHED\n")
         except SequenceFoundException:
             pass
         finally:
@@ -33,10 +33,10 @@ class Adaptive_decomposition:
             if(matrices_decomposed!=[]):
                 matrices_decomposed = self.Z_extraction(matrices_decomposed, final_graph)
             else:
-                print("couldn't decompose\n")
+               print("couldn't decompose\n")
 
             tree_print = self.TREE.print_tree(self.TREE.root, "TREE: ")
-            print(tree_print)
+           #print(tree_print)
 
             return matrices_decomposed, best_cost, final_graph
 
@@ -48,7 +48,7 @@ class Adaptive_decomposition:
 
 
     def Z_extraction(self, decomposition, placement):
-        print("Z EXTRACTION INITIATED")
+       #print("Z EXTRACTION INITIATED")
         ###########################################################################################################
         matrices = []
 
@@ -65,14 +65,14 @@ class Adaptive_decomposition:
 
         # is the diagonal noisy?
         valid_diag = any(abs(np.diag(Ucopy)) > 1.0e-4) # > 1.0e-4
-        print("valid: " + str(valid_diag))
+       #print("valid: " + str(valid_diag))
 
         # are the non diagonal entries zeroed-out
         filtered_Ucopy = abs(Ucopy) > 1.0e-4
         np.fill_diagonal(filtered_Ucopy, 0)
 
         not_diag = filtered_Ucopy.any()
-        print("not_diag: " + str(not_diag))
+       #print("not_diag: " + str(not_diag))
         #---------------------------------------------------------------------------------------------------------------------
 
         if ( not_diag or not valid_diag):  # if is diagonal enough then somehow signal end of algorithm
@@ -85,10 +85,10 @@ class Adaptive_decomposition:
             for i in range(dimension):   #TODO take care of this variable because imported globally
 
                 if( abs(np.angle(diag_U[i]))> 1.0e-4):
-                    print("theta rotation :  ", np.angle(diag_U[i]))
+                   #print("theta rotation :  ", np.angle(diag_U[i]))
 
-                    print("U before phase rotation")
-                    print(U_.round(4))
+                   #print("U before phase rotation")
+                   #print(U_.round(4))
 
                     phy_n_i = placement.nodes[i]['lpmap']
 
@@ -96,14 +96,14 @@ class Adaptive_decomposition:
 
                     U_ = matmul( phase_gate.matrix, U_)
 
-                    print('---')
-                    print("U after phase rotation")
-                    print(U_.round(4))
+                   #print('---')
+                   #print("U after phase rotation")
+                   #print(U_.round(4))
 
-                    print('@@@@@@@')
-                    print(phase_gate.matrix.round(4))
-                    print('@@@@@@@')
-                    print()
+                   #print('@@@@@@@')
+                   #print(phase_gate.matrix.round(4))
+                   #print('@@@@@@@')
+                   #print()
                     matrices.append( phase_gate )
 
             return matrices
@@ -118,7 +118,7 @@ class Adaptive_decomposition:
 
 
     def DFS(self, current_root,   level = 0):
-        print(".",  end="")
+       #print(".",  end="")
         #######################
 
         # check if close to diagonal
@@ -141,10 +141,10 @@ class Adaptive_decomposition:
         if( (not not_diag) and valid_diag ):# if is diagonal enough then somehow signal end of algorithm
             #print("condition 2")
 
-            print(current_root.U_of_level)
-            print(current_root.key)
+           #print(current_root.U_of_level)
+           #print(current_root.key)
 
-            print("\n\n ARRIVED\n\n")
+           #print("\n\n ARRIVED\n\n")
 
             current_root.finished = True
 

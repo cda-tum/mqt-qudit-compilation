@@ -1,5 +1,5 @@
 from binq.src.evaluation.Clifford_Generator import Clifford_Generator
-from binq.src.evaluation.Pauli import H, S
+from binq.src.evaluation.Pauli import H, S, X
 from binq.src.evaluation.Verifier import Verifier
 from binq.src.architecture_graph.level_Graph import level_Graph
 from binq.src.decomposition.Adaptive_decomposition import *
@@ -9,10 +9,24 @@ import time
 ################################################
 
 
-dimension = 3
 
-C = Clifford_Generator(3,3)
-C.generate()
+"""
+C3 = Clifford_Generator(3,9) #log2(500)=9
+C3.generate()
+print("ok3")
+C5 = Clifford_Generator(5,12)#log2(4000) =circa 12
+C5.generate()
+print("ok5")
+C7 = Clifford_Generator(7,13)# 2^14= 16384
+C7.generate()
+print("ok7")
+"""
+################################################
+
+
+
+
+dimension = 3
 # graph without ancillas
 
 #####################################################
@@ -67,11 +81,8 @@ H = H( dimension )
 S = S( dimension)
 
 HS = custom_Unitary(matmul(H.matrix, S.matrix), dimension)
-print(HS.matrix.round(4))
 
-Rpi = R(np.pi, 0, 1, 2, 3)
-Rpi_ = R(np.pi, np.pi, 1, 2, 3)
-Rpi_1 = R(-np.pi, 0, 1, 2, 3)
+X = X(dimension)
 ###############################################################
 
 
@@ -112,6 +123,8 @@ V1 = Verifier(decomp, HS,  nodes_3, nmap, nmap, dimension)
 V2 = Verifier(matrices_decomposed, HS, nodes_3, nmap, final_map, dimension)
 print(V1.verify())
 print(V2.verify())
+
+
 
 
 #########################################################################################
