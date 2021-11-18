@@ -30,10 +30,12 @@ class QR_decomp:
 
             for r in l[:diag_index]:
 
-                if( abs(U_[r,c])>1.0e-8 and abs(U_[r-1,c])>1.0e-4  ): ###check error change loop
+                #if( abs(U_[r,c])>1.0e-8 and abs(U_[r-1,c])>1.0e-4  ):
+                if (abs(U_[r, c]) > 1.0e-8 ):
 
 
-                    theta = 2 * np.arctan( abs(U_[r,c]/U_[r-1,c]))
+                    #theta = 2 * np.arctan( abs(U_[r,c]/U_[r-1,c]))
+                    theta = 2 * np.arctan(abs(np.divide(U_[r, c] , U_[r - 1, c])))
 
                     phi = -( np.pi/2 + np.angle(U_[r-1,c]) - np.angle(U_[r,c]) )
 

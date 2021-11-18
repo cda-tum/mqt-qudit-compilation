@@ -12,7 +12,7 @@ from binq.src.utils.r_utils import matmul
 
 class Clifford_Generator:
 
-    def __init__(self, dimension, log2power):
+    def __init__(self, dimension, log2power=0):
         self.dimension = dimension
         self.power = log2power
         self.database = []
@@ -60,6 +60,9 @@ class Clifford_Generator:
 
 
     def generate(self):
+        if(not self.power):
+            return
+
         self.strings_gen_fixed()
         #self.strings_gen_random() -> alternative with random
         Hm = H(self.dimension)
@@ -83,7 +86,7 @@ class Clifford_Generator:
         name = " ".join(str(x) for x in name)
         savetxt("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(self.dimension)+"/"+str(name)+".csv", matrix, fmt='%.12e', delimiter=',')
 
-    def load_from_csv(self, name):
-        name = " ".join(str(x) for x in name)
-        data = loadtxt("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(self.dimension)+"/"+str(name)+".csv", delimiter=',',dtype=complex, converters={0: lambda s: complex(s.decode().replace('+-', '-'))})
+    def load_from_csv(self, path):
+        #name = " ".join(str(x) for x in name)
+        data = loadtxt(path, delimiter=',',dtype=complex, converters={0: lambda s: complex(s.decode().replace('+-', '-'))}) #"/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(self.dimension)+"/"+str(name)+".csv"
         return data

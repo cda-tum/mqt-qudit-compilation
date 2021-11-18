@@ -5,7 +5,7 @@ from binq.src.decomposition.tree_struct import N_ary_Tree
 
 from binq.src.utils.costs_utils import *
 from binq.src.utils.r_utils import *
-
+np.seterr(all='ignore')
 
 class Adaptive_decomposition:
 
@@ -22,9 +22,9 @@ class Adaptive_decomposition:
 
         self.TREE.add(0, custom_Unitary(np.identity(self.dimension, dtype='complex'), self.dimension), self.U, self.graph, 0, 0, self.cost_limit, [])
         try:
-           #print("WAIT FOR ADAPTIVE...")
+            #print("WAIT FOR ADAPTIVE...")
             self.DFS(self.TREE.root)
-           #print("ADAPTIVE FINISHED\n")
+            #print("ADAPTIVE FINISHED\n")
         except SequenceFoundException:
             pass
         finally:
@@ -48,8 +48,7 @@ class Adaptive_decomposition:
 
 
     def Z_extraction(self, decomposition, placement):
-       #print("Z EXTRACTION INITIATED")
-        ###########################################################################################################
+
         matrices = []
 
         for d in decomposition[1:]: #exclude the identity matrix coming from the root of the tree of solutions which is just for correctness
@@ -80,15 +79,11 @@ class Adaptive_decomposition:
         #@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=#@=
         else:
             diag_U = np.diag(U_)
-            dimension = U_.shape[0]      # TODO eay fix
+            dimension = U_.shape[0]
 
             for i in range(dimension):   #TODO take care of this variable because imported globally
 
                 if( abs(np.angle(diag_U[i]))> 1.0e-4):
-                   #print("theta rotation :  ", np.angle(diag_U[i]))
-
-                   #print("U before phase rotation")
-                   #print(U_.round(4))
 
                     phy_n_i = placement.nodes[i]['lpmap']
 
@@ -118,7 +113,7 @@ class Adaptive_decomposition:
 
 
     def DFS(self, current_root,   level = 0):
-       #print(".",  end="")
+        #print(".",  end="")
         #######################
 
         # check if close to diagonal
@@ -127,7 +122,7 @@ class Adaptive_decomposition:
 
 
         #is the diagonal noisy?
-        valid_diag = any(abs(np.diag(Ucopy))> 1.0e-4) #> 1.0e-4
+        valid_diag = any(abs(np.diag(Ucopy))> 1.0e-4)
         #print("valid: "+ str(valid_diag))
 
         # are the non diagonal entries zeroed-out
@@ -162,25 +157,28 @@ class Adaptive_decomposition:
         U_ = current_root.U_of_level
 
         dimension = U_.shape[0]
-        #print("dimension is "+str(dimension))
 
-        #print("checking level")
+
+
         for c in range(dimension):
 
-            for r in range(dimension):
+            for r in range(c, dimension):
 
-                for r2 in range(r, dimension):
+                for r2 in range(r+1, dimension):
 
-                    if( abs(U_[r,c])>1.0e-8 and abs(U_[r2,c])>1.0e-4 and r >= c and r2 > r):
+                    # if( abs(U_[r2,c])>1.0e-8 and abs(U_[r,c])>1.0e-4  ):
+                    if (abs(U_[r2, c]) > 1.0e-8 and (abs(U_[r,c])>1.0e-18 or abs(U_[r,c])==0  ) ):
 
-                        theta = 2 * np.arctan( abs(U_[r2,c]/U_[r,c]))
+                        # theta = 2 * np.arctan( abs(U_[r2,c]/U_[r,c]))
+                        theta = 2 * np.arctan2( abs(U_[r2, c]), abs(U_[r, c]) )
+
                         phi = -( np.pi/2 + np.angle(U_[r,c]) - np.angle(U_[r2,c]))
 
 
                         rotation_involved = R(theta, phi,r, r2, dimension)
 
                         U_temp = matmul(  rotation_involved.matrix, U_ )
-                        #U_temp = U_temp.round(12)
+                        debug = U_temp.round(2)
 
 
                         non_zeros = np.count_nonzero(abs(U_temp)>1.0e-4)
@@ -197,10 +195,10 @@ class Adaptive_decomposition:
                         if(  branch_condition > 0 or abs(branch_condition) < 1.0e-12): #if cost is better can be only candidate otherwise try them all
                             if (branch_condition_2 > 0 or abs(branch_condition_2) < 1.0e-12):
 
-
+                                # TODO FIX KEY SYSTEM BECAUSE NOT UNIQUE
                                 new_key = current_root.key + (current_root.size + 1)
 
-                                #TODO FIX KEY SYSTEM BECAUSE NOT UNIQUE
+
                                 if (new_placement.nodes[r ]['lpmap'] > new_placement.nodes[r2]['lpmap']):
                                     phi = phi * -1
 
@@ -209,7 +207,6 @@ class Adaptive_decomposition:
                                 physical_rotation = gate_chain_condition(pi_pulses_routing, physical_rotation)
 
 
-                                #########
                                 current_root.add(new_key, physical_rotation, U_temp, new_placement, next_step_cost, decomp_next_step_cost, current_root.max_cost, pi_pulses_routing)
 
 
