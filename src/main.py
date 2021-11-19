@@ -26,25 +26,23 @@ print("ok7")
 """
 
 dimension = 7
-graph_combo = "g3nm3"
+graph_combo = "g7_3"
 graph_to_use = graph_7_3
 nodes_to_use = nodes_7_3
-nmap_to_use = nodes_7_3
+nmap_to_use = nmap7_3
 ################################################
 
 files_to_read = glob.glob("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(dimension)+"/*.csv")
 
 for file in files_to_read:
-    #file = "/home/k3vn/Documents/Compiler/binq/data/dim5/1 0 0 0 1 1 1 0 0 1.csv"
-
 
     IDbin = [int(i) for i in file.split() if i.isdigit() and (i=='0' or i=='1')]
     IDbin = " ".join(str(x) for x in IDbin)
 
     print("####################################")
     print(IDbin)
-    if(IDbin == "0 0 0 0 1 0 1 1 0 1 0"):
-        lol = 5
+    #if(IDbin == "0 0 0 0 1 0 1 1 0 1 0"):
+    #    lol = 5
     print("####################################")
 
     C_loader = Clifford_Generator(dimension)
@@ -102,15 +100,16 @@ for file in files_to_read:
     print(V1r)
     print(V2r)
 
-    #time.sleep(100000)
 
     field_names = ['ID','graphcombo', 'timeQR', 'timeADA', 'algoCostQR', 'algoCostADA', 'decoCostQR', 'decoCostADA', 'numRzQR', 'numRzADA', 'succQR', 'succADA' ]
 
     # Dictionary
-    record = {'ID': IDbin,'graphcombo': graph_combo, 'timeQR':QR_time, 'timeADA':Adaptive_time, 'algoCostQR':algorithmic_cost, 'algoCostADA':best_cost, 'decoCostQR':total_cost, 'decoCostADA':best_cost, 'numRzQR':numRzQR, 'numRzADA':numRzADA, 'succQR':V1r, 'succADA':V2r }
+    ada_algo = best_cost[0]
+    ada_cost = best_cost[1]
+    record = {'ID': IDbin,'graphcombo': graph_combo, 'timeQR':QR_time, 'timeADA':Adaptive_time, 'algoCostQR':algorithmic_cost, 'algoCostADA':ada_algo, 'decoCostQR':total_cost, 'decoCostADA':ada_cost, 'numRzQR':numRzQR, 'numRzADA':numRzADA, 'succQR':V1r, 'succADA':V2r }
 
-    """
-    with open('event.csv', 'a') as f_object:
+
+    with open('/binq/data/evaluation/dim7/evalg73.csv', 'a') as f_object:
         
         dictwriter_object = DictWriter(f_object, fieldnames=field_names)
     
@@ -119,6 +118,6 @@ for file in files_to_read:
     
         # Close the file object
         f_object.close()
-    """
+
     gc.collect()
 #########################################################################################

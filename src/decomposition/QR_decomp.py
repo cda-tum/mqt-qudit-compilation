@@ -35,7 +35,8 @@ class QR_decomp:
 
 
                     #theta = 2 * np.arctan( abs(U_[r,c]/U_[r-1,c]))
-                    theta = 2 * np.arctan(abs(np.divide(U_[r, c] , U_[r - 1, c])))
+                    #theta = 2 * np.arctan(abs(np.divide(U_[r, c] , U_[r - 1, c])))
+                    theta = 2 * np.arctan2(abs(U_[r, c]), abs(U_[r - 1 , c]))
 
                     phi = -( np.pi/2 + np.angle(U_[r-1,c]) - np.angle(U_[r,c]) )
 
