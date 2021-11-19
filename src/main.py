@@ -26,10 +26,10 @@ print("ok7")
 """
 
 dimension = 7
-graph_combo = "g7_3"
-graph_to_use = graph_7_3
-nodes_to_use = nodes_7_3
-nmap_to_use = nmap7_3
+graph_combo = "g7_2"
+graph_to_use = graph_7_2
+nodes_to_use = nodes_7_2
+nmap_to_use = nmap7_2
 ################################################
 
 files_to_read = glob.glob("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(dimension)+"/*.csv")
@@ -109,7 +109,7 @@ for file in files_to_read:
     record = {'ID': IDbin,'graphcombo': graph_combo, 'timeQR':QR_time, 'timeADA':Adaptive_time, 'algoCostQR':algorithmic_cost, 'algoCostADA':ada_algo, 'decoCostQR':total_cost, 'decoCostADA':ada_cost, 'numRzQR':numRzQR, 'numRzADA':numRzADA, 'succQR':V1r, 'succADA':V2r }
 
 
-    with open('/binq/data/evaluation/dim7/evalg73.csv', 'a') as f_object:
+    with open('/home/k3vn/Documents/Compiler/binq/data/evaluation/dim7/evalg72.csv', 'a') as f_object:
         
         dictwriter_object = DictWriter(f_object, fieldnames=field_names)
     
