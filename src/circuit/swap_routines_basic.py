@@ -60,14 +60,14 @@ def route_states2rotate_basic(gate, orig_placement):
     target = gate.original_lev_b #
 
     path = nx.shortest_path(placement, source, target)
-
+    #print("----")
     i = len(path)-2
 
     while(i > 0):
 
         phy_n_i = placement.nodes[path[i]]['lpmap']
         phy_n_ip1 = placement.nodes[path[i+1]]['lpmap']
-
+        #print("PI PULSEEEEEEEEEEEEEEEEEEEE")
         if (phy_n_i > phy_n_ip1):
             pi_gate_phy = R(np.pi, -np.pi/2, phy_n_i , phy_n_ip1, dimension) # TODO CHANGE BACK TO + PI/2
         else:

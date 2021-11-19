@@ -24,8 +24,17 @@ class Node:
 		new_node = Node(new_key, rotation, U_of_level, graph_current, current_cost, current_decomp_cost, max_cost, pi_pulses, self.key)
 		if(self.children == None):
 			self.children = []
-
+		"""
+		index = -1
+		
+		for i in range(self.size):
+			if(self.children[i].current_cost >= new_node.current_cost):
+				index = i
+		
+		self.children.insert(index, new_node)
+		"""
 		self.children.append(new_node)
+
 		self.size += 1
 	
 	def __str__(self):

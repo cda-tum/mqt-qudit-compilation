@@ -22,9 +22,7 @@ class Adaptive_decomposition:
 
         self.TREE.add(0, custom_Unitary(np.identity(self.dimension, dtype='complex'), self.dimension), self.U, self.graph, 0, 0, self.cost_limit, [])
         try:
-            #print("WAIT FOR ADAPTIVE...")
             self.DFS(self.TREE.root)
-            #print("ADAPTIVE FINISHED\n")
         except SequenceFoundException:
             pass
         finally:
@@ -115,9 +113,11 @@ class Adaptive_decomposition:
     def DFS(self, current_root,   level = 0):
         #print(".",  end="")
         #######################
-
+        debug_lvel = level
         # check if close to diagonal
         Ucopy = current_root.U_of_level.copy()
+        debug_U = Ucopy.round(2)
+        #print(debug_U)
         current_placement = current_root.graph
 
 
@@ -178,7 +178,7 @@ class Adaptive_decomposition:
                         rotation_involved = R(theta, phi,r, r2, dimension)
 
                         U_temp = matmul(  rotation_involved.matrix, U_ )
-                        debug = U_temp.round(2)
+                        #debug = U_temp.round(2)
 
 
                         non_zeros = np.count_nonzero(abs(U_temp)>1.0e-4)
@@ -193,27 +193,25 @@ class Adaptive_decomposition:
                         branch_condition_2 = current_root.max_cost[0] - next_step_cost  # FIRST IS ALGORITHMIC COST
 
                         if(  branch_condition > 0 or abs(branch_condition) < 1.0e-12): #if cost is better can be only candidate otherwise try them all
-                            if (branch_condition_2 > 0 or abs(branch_condition_2) < 1.0e-12):
+                            #if (branch_condition_2 > 0 or abs(branch_condition_2) < 1.0e-12):
 
-                                # TODO FIX KEY SYSTEM BECAUSE NOT UNIQUE
-                                new_key = current_root.key + (current_root.size + 1)
-
-
-                                if (new_placement.nodes[r ]['lpmap'] > new_placement.nodes[r2]['lpmap']):
-                                    phi = phi * -1
-
-                                physical_rotation = R(theta, phi, new_placement.nodes[r]['lpmap'],new_placement.nodes[r2]['lpmap'], dimension)
-
-                                physical_rotation = gate_chain_condition(pi_pulses_routing, physical_rotation)
+                            # TODO FIX KEY SYSTEM BECAUSE NOT UNIQUE
+                            new_key = current_root.key + (current_root.size + 1)
 
 
-                                current_root.add(new_key, physical_rotation, U_temp, new_placement, next_step_cost, decomp_next_step_cost, current_root.max_cost, pi_pulses_routing)
+                            if (new_placement.nodes[r ]['lpmap'] > new_placement.nodes[r2]['lpmap']):
+                                phi = phi * -1
+
+                            physical_rotation = R(theta, phi, new_placement.nodes[r]['lpmap'],new_placement.nodes[r2]['lpmap'], dimension)
+
+                            physical_rotation = gate_chain_condition(pi_pulses_routing, physical_rotation)
+
+
+                            current_root.add(new_key, physical_rotation, U_temp, new_placement, next_step_cost, decomp_next_step_cost, current_root.max_cost, pi_pulses_routing)
 
 
 
         if( current_root.children != None):
-            # sort children by minimum cost, in order to get closer to minimum cost paths
-            #current_root.children = sorted(current_root.children, key=lambda x: x.current_cost)
 
             for child in current_root.children:
                 self.DFS(child, level+1)

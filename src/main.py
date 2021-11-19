@@ -25,11 +25,11 @@ C7.generate()
 print("ok7")
 """
 
-dimension = 5
+dimension = 7
 graph_combo = "g3nm3"
-graph_to_use = graph_5
-nodes_to_use = nodes_5
-nmap_to_use = nmap5
+graph_to_use = graph_7_3
+nodes_to_use = nodes_7_3
+nmap_to_use = nodes_7_3
 ################################################
 
 files_to_read = glob.glob("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(dimension)+"/*.csv")
@@ -40,11 +40,13 @@ for file in files_to_read:
 
     IDbin = [int(i) for i in file.split() if i.isdigit() and (i=='0' or i=='1')]
     IDbin = " ".join(str(x) for x in IDbin)
+
     print("####################################")
     print(IDbin)
-    if(IDbin == "1 1 0 1 0 0 0"):
+    if(IDbin == "0 0 0 0 1 0 1 1 0 1 0"):
         lol = 5
     print("####################################")
+
     C_loader = Clifford_Generator(dimension)
     matrix_to_analyze = C_loader.load_from_csv(file)
 
@@ -59,15 +61,15 @@ for file in files_to_read:
     startqr = time.time()
     decomp, algorithmic_cost, total_cost = QR.execute()
     endqr = time.time()
-
+    print(len(decomp))
     ###############################################################
 
-    Adaptive = Adaptive_decomposition(operation, graph_to_use, (algorithmic_cost, total_cost ), dimension)
+    Adaptive = Adaptive_decomposition(operation, graph_to_use, (algorithmic_cost, 5*total_cost ), dimension)
 
     start = time.time()
     matrices_decomposed, best_cost, final_graph = Adaptive.execute()
     end = time.time()
-
+    print(len(matrices_decomposed))
     ###################################################################
 
     print("QR elapsed time")
@@ -86,18 +88,21 @@ for file in files_to_read:
     ###############################################################################################
     numRzQR = sum(isinstance(x, Rz) for x in decomp )
     numRzADA = sum(isinstance(x, Rz) for x in matrices_decomposed )
+    print(numRzQR)
+    print(numRzADA)
     ################################################################################################
 
     final_map = final_graph.lpmap
 
     V1 = Verifier(decomp, operation,  nodes_to_use, nmap_to_use, nmap_to_use, dimension)
-    V2 = Verifier(matrices_decomposed, operation, nodes_7, nmap_to_use, final_map, dimension)
+    V2 = Verifier(matrices_decomposed, operation, nodes_to_use, nmap_to_use, final_map, dimension)
     V1r = V1.verify()
     V2r = V2.verify()
 
     print(V1r)
     print(V2r)
 
+    #time.sleep(100000)
 
     field_names = ['ID','graphcombo', 'timeQR', 'timeADA', 'algoCostQR', 'algoCostADA', 'decoCostQR', 'decoCostADA', 'numRzQR', 'numRzADA', 'succQR', 'succADA' ]
 
