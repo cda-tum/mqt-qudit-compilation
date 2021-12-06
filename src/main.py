@@ -1,4 +1,5 @@
 from binq.src.evaluation.Clifford_Generator import Clifford_Generator
+from binq.src.evaluation.Pauli import H, S
 from binq.src.evaluation.Verifier import Verifier
 from binq.src.decomposition.Adaptive_decomposition import *
 from binq.src.decomposition.QR_decomp import *
@@ -25,11 +26,11 @@ C7.generate()
 print("ok7")
 """
 
-dimension = 7
-graph_combo = "g7_2"
-graph_to_use = graph_7_2
-nodes_to_use = nodes_7_2
-nmap_to_use = nmap7_2
+dimension = 3
+graph_combo = "g3_4"
+graph_to_use = graph_3_3
+nodes_to_use = nodes_3_3
+nmap_to_use = nmap3_3
 ################################################
 
 files_to_read = glob.glob("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(dimension)+"/*.csv")
@@ -48,7 +49,15 @@ for file in files_to_read:
     C_loader = Clifford_Generator(dimension)
     matrix_to_analyze = C_loader.load_from_csv(file)
 
-    operation = custom_Unitary( matrix_to_analyze  , dimension)
+    ##########################################################
+    H1 = H(dimension)
+    S1 = S(dimension)
+    HS= matmul(H1.matrix , S1.matrix)
+    #########################################################
+
+
+    #operation = custom_Unitary( matrix_to_analyze  , dimension)
+    operation = custom_Unitary(HS, dimension)
     #############################################################
 
     #                        EXECUTION
@@ -62,7 +71,7 @@ for file in files_to_read:
     print(len(decomp))
     ###############################################################
 
-    Adaptive = Adaptive_decomposition(operation, graph_to_use, (algorithmic_cost, 5*total_cost ), dimension)
+    Adaptive = Adaptive_decomposition(operation, graph_to_use, (algorithmic_cost, total_cost ), dimension)
 
     start = time.time()
     matrices_decomposed, best_cost, final_graph = Adaptive.execute()
@@ -107,9 +116,9 @@ for file in files_to_read:
     ada_algo = best_cost[0]
     ada_cost = best_cost[1]
     record = {'ID': IDbin,'graphcombo': graph_combo, 'timeQR':QR_time, 'timeADA':Adaptive_time, 'algoCostQR':algorithmic_cost, 'algoCostADA':ada_algo, 'decoCostQR':total_cost, 'decoCostADA':ada_cost, 'numRzQR':numRzQR, 'numRzADA':numRzADA, 'succQR':V1r, 'succADA':V2r }
-
-
-    with open('/home/k3vn/Documents/Compiler/binq/data/evaluation/dim7/evalg72.csv', 'a') as f_object:
+    print(ada_algo)
+    """
+    with open('/home/k3vn/Documents/Compiler/binq/data/evaluation_2/dim3/evalg34.csv', 'a') as f_object:
         
         dictwriter_object = DictWriter(f_object, fieldnames=field_names)
     
@@ -118,6 +127,6 @@ for file in files_to_read:
     
         # Close the file object
         f_object.close()
-
+    """
     gc.collect()
 #########################################################################################

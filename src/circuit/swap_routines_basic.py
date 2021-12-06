@@ -21,6 +21,11 @@ def gate_chain_condition(previous_gates, current):
     theta = current.theta
     phi = current.phi
 
+    #######################################
+    #correction
+    #l = len(previous_gates)
+    phi = phi + len(previous_gates)* np.pi
+    ##########################################
 
     last_gate = previous_gates[-1]
     last_source = last_gate.lev_a  #original_lev_a R10 -> R01 leva levb -> matrix
@@ -43,6 +48,8 @@ def gate_chain_condition(previous_gates, current):
 
     elif (new_target == last_source):
         pass
+
+
 
     return  R(theta, phi, current.lev_a, current.lev_b, current.dimension )
 

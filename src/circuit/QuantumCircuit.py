@@ -15,34 +15,34 @@ from binq.src.utils.costs_utils import *
 
 class QuantumCircuit:
     
-    def __init__(self, qubits, bits, dimension):
+    def __init__(self, qudits, bits, dimension):
         
-        self.qubits = list(range(qubits))
+        self.qudits = list(range(qudits))
         self.bits = list(range(bits))
-        self.qreg = [[] for x in range(qubits)] 
+        self.qreg = [[] for x in range(qudits)]
         self.reg = [[] for x in range(bits)] 
         self.dimension = dimension
         self.energy_level_graph = None
         
-    def R(self, qubit_line, theta, phi, lev_a, lev_b ):
+    def R(self, qudit_line, theta, phi, lev_a, lev_b ):
         
-        self.qreg[qubit_line].append( R(theta, phi, lev_a, lev_b , self.dimension))
+        self.qreg[qudit_line].append( R(theta, phi, lev_a, lev_b , self.dimension))
 
-    def PI_PULSE(self, qubit_line, lev_a, lev_b, additional_bookmark, seq_flag):
+    def PI_PULSE(self, qudit_line, lev_a, lev_b, additional_bookmark, seq_flag):
 
-        self.qreg[qubit_line].append( PI_PULSE(lev_a, lev_b, additional_bookmark, seq_flag, self.dimension))
+        self.qreg[qudit_line].append( PI_PULSE(lev_a, lev_b, additional_bookmark, seq_flag, self.dimension))
 
         
-    def Rz(self, qubit_line, theta, lev):
+    def Rz(self, qudit_line, theta, lev):
         
-        self.qreg[qubit_line].append( Rz(theta, lev, self.dimension))
+        self.qreg[qudit_line].append( Rz(theta, lev, self.dimension))
         
-    def custom_unitary(self, qubit_line, unitary):
+    def custom_unitary(self, qudit_line, unitary):
         
-        self.qreg[qubit_line].append( custom_Unitary(unitary, self.dimension) )
+        self.qreg[qudit_line].append( custom_Unitary(unitary, self.dimension) )
 
-    def energy_level_graph(self, edges):
-        self.energy_level_graph = level_Graph( edges, self.dimension)
+    def energy_level_graph(self, edges, nodes, nmap, calibration_n):
+        self.energy_level_graph = level_Graph(edges, nodes, nmap, calibration_n)
 
 
 #@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=@@@=@=@=
@@ -182,7 +182,7 @@ class QuantumCircuit:
 
 
 
-    def decompose(self, algorithm=None):
+    def DFS_decompose(self):
 
         new_qreg = []
 
@@ -192,55 +192,36 @@ class QuantumCircuit:
             
             for gate in line:
 
-                standard_decomposition, standard_cost = algorithm(gate.matrix, self.energy_level_graph)
+                QR = QR(gate.matrix, self.energy_level_graph)
 
-                if(type_alg=="BFS"):
-                    TREE = N_ary_Tree()
-                    TREE.add(0, custom_Unitary(np.identity(self.dimension, dtype='complex'), 3), gate, 0, standard_cost)
+                decomp, algorithmic_cost, total_cost = QR.execute()
 
-                    BFS(TREE.root)
+                Adaptive = Adaptive_decomposition(gate.matrix, self.energy_level_graph, (algorithmic_cost, total_cost), self.dimension)
 
-                    BFS_decomposition, BFS_cost = TREE.retrieve_decomposition(TREE.root)
-                    matrices_decomposed = self.Z_extraction(BFS_decomposition)
+                matrices_decomposed, best_cost, final_graph = Adaptive.execute()
 
-                    clean_line = clean_line + matrices_decomposed
-                else:
-                    clean_line = clean_line + standard_decomposition
+                clean_line = clean_line + matrices_decomposed
+
 
             new_qreg.append(clean_line)
 
             self.qreg = new_qreg
 
-    ####################################################################
-    ####################################################################
-    ####################################################################
-    #
-    #               SWAPPING ROUTINES (- integrated version?)
-    #
-    ####################################################################
-    ####################################################################
-    ####################################################################
+    def QR_decompose(self):
 
-    def swap_route_levels(self, qubit_line, lev_a, lev_b):
-        #TODO TODO COMPLETE INTEGRATION IN QUANTUM CIRCUIT
+        new_qreg = []
 
-        if(lev_a == lev_b):
-            raise Exception
+        for line in self.qreg:
 
-        else:
-            dist = self.energy_level_graph.distance_nodes(lev_a, lev_b)
+            clean_line = []
 
-            additional_bookmark = self.get_bookmark( lev_a, lev_b)
+            for gate in line:
+                QR = QR(gate.matrix, self.energy_level_graph)
 
-            if(dist > 1):
-                path = self.energy_level_graph.shortest_path(self, lev_a, lev_b)
-                #TODO IN CASE TO REWRITE FOR ARBITRARY SORTING
-                self.PI_PULSE( qubit_line, path[0], path[1], additional_bookmark, True)
-                self.PI_PULSE( qubit_line, path[1], path[2], additional_bookmark, True)
-                self.PI_PULSE( qubit_line, path[0], path[1], additional_bookmark, True)
+                decomp, algorithmic_cost, total_cost = QR.execute()
 
-            else:
-                self.PI_PULSE(qubit_line, lev_a, lev_b, additional_bookmark, False)
+                clean_line = clean_line + decomp
 
-            self.energy_level_graph.swap_nodes(lev_a, lev_b)
+            new_qreg.append(clean_line)
 
+            self.qreg = new_qreg

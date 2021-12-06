@@ -33,15 +33,15 @@ graph_7_2 = level_Graph(edges_7_2, nodes_7_2, nmap7_2, [0])
 
 edges_7_3 = [(1, 0, {"delta_m": 1, "sensitivity": 5}),
                (1, 2, {"delta_m": 0, "sensitivity": 3}),
-               (1, 3, {"delta_m": 0, "sensitivity": 3}),
+                (1, 3, {"delta_m": 0, "sensitivity": 3}),
                (4, 2, {"delta_m": 0, "sensitivity": 3}),
                (4, 3, {"delta_m": 0, "sensitivity": 3}),
                (4, 5, {"delta_m": 1, "sensitivity": 5}),
                (4, 6, {"delta_m": 1, "sensitivity": 5})
                ]
-nodes_7_3 = [ 0, 1, 2, 3, 4, 5, 6]
+nodes_7_3 = [ 0, 1, 2, 3, 4, 5, 6 ]
 nmap7_3 =   [ 0, 5, 2, 6, 4, 3, 1 ]
-graph_7_3 = level_Graph(edges_7_3, nodes_7_3, nmap7_3, [5])
+graph_7_3 = level_Graph(edges_7_3, nodes_7_3, nmap7_3, [3])
 
 ################################################################
 
@@ -79,7 +79,7 @@ edges_5_2 = [(3, 0, {"delta_m": 1, "sensitivity": 5}),
                ]
 nodes_5_2 = [ 0, 1, 2, 3, 4]
 nmap5_2 =   [ 3, 2, 1, 4, 0]
-graph_5_2 = level_Graph(edges_5_2, nodes_5_2, nmap5_2,  [4])
+graph_5_2 = level_Graph(edges_5_2, nodes_5_2, nmap5_2,  [0])
 
 
 edges_5_3 = [(4, 1, {"delta_m": 1, "sensitivity": 5}),
@@ -126,3 +126,30 @@ nodes_3_3 = [0, 1, 2]
 nmap3_3 =   [0, 1, 2]
 
 graph_3_3 = level_Graph(edges_3_3, nodes_3_3, nmap3_3,  [1])
+#-----------------------------------------------------------------
+
+
+edges_3_4 = [(1, 0, {"delta_m": 0, "sensitivity": 3}),
+            (0, 2, {"delta_m": 0, "sensitivity": 3}),
+            ]
+nodes_3_4 = [0, 1, 2]
+nmap3_4 =   [0, 1, 2]
+
+graph_3_4 = level_Graph(edges_3_4, nodes_3_4, nmap3_4,  [0])
+
+######################################################
+######################################################
+
+edges_7_4 = [(1, 0, {"delta_m": 1, "sensitivity": 5}),
+               (1, 2, {"delta_m": 0, "sensitivity": 3}),
+               (1, 3, {"delta_m": 0, "sensitivity": 3}),
+               (4, 2, {"delta_m": 0, "sensitivity": 3}),
+               (4, 3, {"delta_m": 0, "sensitivity": 3}),
+               (4, 5, {"delta_m": 1, "sensitivity": 5}),
+               (4, 6, {"delta_m": 1, "sensitivity": 5})
+               ]
+nodes_7_4 = [ 0, 1, 2, 3, 4, 5, 6]
+nmap7_4 =   [ 0, 5, 2, 6, 4, 3, 1 ]
+graph_7_4 = level_Graph(edges_7_4, nodes_7_4, nmap7_4, [0])
+
+

@@ -38,11 +38,13 @@ def rotation_cost_calc(gate, placement):
     gate_cost = gate.cost
 
     if(placement.is_irnode(source) or placement.is_irnode(target)):
-        SP_PENALTY = max(placement.distance_nodes(placement._1stInode, source), placement.distance_nodes(placement._1stInode, target))
-
+        SP_PENALTY = min(placement.distance_nodes(placement._1stInode, source), placement.distance_nodes(placement._1stInode, target))+1
+        print(SP_PENALTY)
+        #print(placement.distance_nodes(placement._1stInode, source), placement.distance_nodes(placement._1stInode, target) )
+        #print(source, target)
         theta_on_units = gate.theta / np.pi
-        gate_cost = gate_cost - (( 1*abs(np.mod(abs(theta_on_units)+0.25, 0.5) - 0.25) )*10.0e-04)
-        gate_cost = gate_cost + ( SP_PENALTY*abs(np.mod(abs(theta_on_units)+0.25, 0.5) - 0.25) )*10.0e-04
+        #gate_cost = gate_cost - (( 1*abs(np.mod(abs(theta_on_units)+0.25, 0.5) - 0.25) )*10.0e-04)
+        gate_cost = SP_PENALTY*( 4*abs(theta_on_units) + abs(np.mod(abs(theta_on_units)+0.25, 0.5) - 0.25) )*1e-04
 
     return gate_cost
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

@@ -87,7 +87,7 @@ class R:
     def cost(self):
         theta_on_units = self.theta/np.pi
         
-        E = ( 4*abs(theta_on_units) + 1*abs(np.mod(abs(theta_on_units)+0.25, 0.5) - 0.25) )*10.0e-04
+        E = ( 4*abs(theta_on_units) + 1*abs(np.mod(abs(theta_on_units)+0.25, 0.5) - 0.25) )*1e-04
         return E
 
     def __str__(self):
@@ -140,7 +140,7 @@ class Rz:
     def cost(self):
         theta_on_units = self.theta / np.pi
 
-        E = abs(theta_on_units) * 10.0e-04
+        E = abs(theta_on_units) * 1e-04
         return E
 
 
