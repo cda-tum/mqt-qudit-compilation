@@ -8,22 +8,22 @@ from binq.src.evaluation.Verifier import Verifier
 
 
 class TestVerifier(TestCase):
-
     def setUp(self) -> None:
         self.dimension = 5
 
-        edges_5 = [(0, 3, {"delta_m": 1, "sensitivity": 5}),
-                   (0, 4, {"delta_m": 0, "sensitivity": 3}),
-                   (1, 4, {"delta_m": 0, "sensitivity": 3}),
-                   (1, 2, {"delta_m": 1, "sensitivity": 5})
-                   ]
+        edges_5 = [
+            (0, 3, {"delta_m": 1, "sensitivity": 5}),
+            (0, 4, {"delta_m": 0, "sensitivity": 3}),
+            (1, 4, {"delta_m": 0, "sensitivity": 3}),
+            (1, 2, {"delta_m": 1, "sensitivity": 5}),
+        ]
         nodes_5 = [0, 1, 2, 3, 4]
 
         ## NODES CAN BE INFERRED BY THE EDGES
         self.graph_5 = level_Graph(edges_5, nodes_5)
         self.graph_5.define__states([1], [0], [2, 3, 4])
 
-        self.H = H( self.dimension )
+        self.H = H(self.dimension)
 
     def test_verify(self):
 
@@ -33,6 +33,6 @@ class TestVerifier(TestCase):
         matrices_decomposed, best_cost, final_graph = Adaptive.execute()
 
         V1 = Verifier(decomp, self.H, self.dimension)
-        V2 = Verifier(matrices_decomposed, self.H,  self.dimension)
+        V2 = Verifier(matrices_decomposed, self.H, self.dimension)
         self.assertTrue(V1.verify())
         self.assertTrue(V2.verify())

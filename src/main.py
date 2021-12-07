@@ -33,16 +33,18 @@ nodes_to_use = nodes_3_3
 nmap_to_use = nmap3_3
 ################################################
 
-files_to_read = glob.glob("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(dimension)+"/*.csv")
+files_to_read = glob.glob(
+    "/home/k3vn/Documents/Compiler/binq/data/" + "dim" + str(dimension) + "/*.csv"
+)
 
 for file in files_to_read:
 
-    IDbin = [int(i) for i in file.split() if i.isdigit() and (i=='0' or i=='1')]
+    IDbin = [int(i) for i in file.split() if i.isdigit() and (i == "0" or i == "1")]
     IDbin = " ".join(str(x) for x in IDbin)
 
     print("####################################")
     print(IDbin)
-    #if(IDbin == "0 0 0 0 1 0 1 1 0 1 0"):
+    # if(IDbin == "0 0 0 0 1 0 1 1 0 1 0"):
     #    lol = 5
     print("####################################")
 
@@ -52,18 +54,17 @@ for file in files_to_read:
     ##########################################################
     H1 = H(dimension)
     S1 = S(dimension)
-    HS= matmul(H1.matrix , S1.matrix)
+    HS = matmul(H1.matrix, S1.matrix)
     #########################################################
 
-
-    #operation = custom_Unitary( matrix_to_analyze  , dimension)
+    # operation = custom_Unitary( matrix_to_analyze  , dimension)
     operation = custom_Unitary(HS, dimension)
     #############################################################
 
     #                        EXECUTION
 
     #############################################################
-    QR = QR_decomp( operation, graph_to_use)
+    QR = QR_decomp(operation, graph_to_use)
 
     startqr = time.time()
     decomp, algorithmic_cost, total_cost = QR.execute()
@@ -71,7 +72,9 @@ for file in files_to_read:
     print(len(decomp))
     ###############################################################
 
-    Adaptive = Adaptive_decomposition(operation, graph_to_use, (algorithmic_cost, total_cost ), dimension)
+    Adaptive = Adaptive_decomposition(
+        operation, graph_to_use, (algorithmic_cost, total_cost), dimension
+    )
 
     start = time.time()
     matrices_decomposed, best_cost, final_graph = Adaptive.execute()
@@ -83,39 +86,65 @@ for file in files_to_read:
     QR_time = endqr - startqr
     print(QR_time)
 
-
     print("Adaptive elapsed time")
     Adaptive_time = end - start
     print(Adaptive_time)
 
     ###############################################################################################
-    print("COST QR,   ", (algorithmic_cost, total_cost ))
+    print("COST QR,   ", (algorithmic_cost, total_cost))
     print("BEST COST ADA,   ", best_cost)
 
     ###############################################################################################
-    numRzQR = sum(isinstance(x, Rz) for x in decomp )
-    numRzADA = sum(isinstance(x, Rz) for x in matrices_decomposed )
+    numRzQR = sum(isinstance(x, Rz) for x in decomp)
+    numRzADA = sum(isinstance(x, Rz) for x in matrices_decomposed)
     print(numRzQR)
     print(numRzADA)
     ################################################################################################
 
     final_map = final_graph.lpmap
 
-    V1 = Verifier(decomp, operation,  nodes_to_use, nmap_to_use, nmap_to_use, dimension)
-    V2 = Verifier(matrices_decomposed, operation, nodes_to_use, nmap_to_use, final_map, dimension)
+    V1 = Verifier(decomp, operation, nodes_to_use, nmap_to_use, nmap_to_use, dimension)
+    V2 = Verifier(
+        matrices_decomposed, operation, nodes_to_use, nmap_to_use, final_map, dimension
+    )
     V1r = V1.verify()
     V2r = V2.verify()
 
     print(V1r)
     print(V2r)
 
-
-    field_names = ['ID','graphcombo', 'timeQR', 'timeADA', 'algoCostQR', 'algoCostADA', 'decoCostQR', 'decoCostADA', 'numRzQR', 'numRzADA', 'succQR', 'succADA' ]
+    field_names = [
+        "ID",
+        "graphcombo",
+        "timeQR",
+        "timeADA",
+        "algoCostQR",
+        "algoCostADA",
+        "decoCostQR",
+        "decoCostADA",
+        "numRzQR",
+        "numRzADA",
+        "succQR",
+        "succADA",
+    ]
 
     # Dictionary
     ada_algo = best_cost[0]
     ada_cost = best_cost[1]
-    record = {'ID': IDbin,'graphcombo': graph_combo, 'timeQR':QR_time, 'timeADA':Adaptive_time, 'algoCostQR':algorithmic_cost, 'algoCostADA':ada_algo, 'decoCostQR':total_cost, 'decoCostADA':ada_cost, 'numRzQR':numRzQR, 'numRzADA':numRzADA, 'succQR':V1r, 'succADA':V2r }
+    record = {
+        "ID": IDbin,
+        "graphcombo": graph_combo,
+        "timeQR": QR_time,
+        "timeADA": Adaptive_time,
+        "algoCostQR": algorithmic_cost,
+        "algoCostADA": ada_algo,
+        "decoCostQR": total_cost,
+        "decoCostADA": ada_cost,
+        "numRzQR": numRzQR,
+        "numRzADA": numRzADA,
+        "succQR": V1r,
+        "succADA": V2r,
+    }
     print(ada_algo)
     """
     with open('/home/k3vn/Documents/Compiler/binq/data/evaluation_2/dim3/evalg34.csv', 'a') as f_object:

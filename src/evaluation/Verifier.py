@@ -4,8 +4,8 @@ from binq.src.utils.r_utils import matmul
 
 from numpy.linalg import inv
 
-class Verifier:
 
+class Verifier:
     def __init__(self, sequence, target, nodes, initial_map, final_map, dimension):
         self.decomposition = sequence
         self.target = target.matrix.copy()
@@ -13,7 +13,6 @@ class Verifier:
         self.permutation_matrix_initial = self.get_perm_matrix(nodes, initial_map)
         self.permutation_matrix_final = self.get_perm_matrix(nodes, final_map)
         self.target = matmul(self.permutation_matrix_initial, self.target)
-
 
     def get_perm_matrix(self, nodes, mapping):
         perm = np.zeros((self.dimension, self.dimension))
@@ -30,7 +29,7 @@ class Verifier:
         return perm
 
     def verify(self):
-        #product = np.identity(self.dimension , dtype='complex') #starts with Identity
+        # product = np.identity(self.dimension , dtype='complex') #starts with Identity
         targetdeb = self.target.round(4)
         target = self.target.copy()
 
@@ -40,9 +39,6 @@ class Verifier:
 
         target = matmul(inv(self.permutation_matrix_final), target)
 
-
-        res = ( abs(target - np.identity(self.dimension , dtype='complex'))<10e-6 ).all()
+        res = (abs(target - np.identity(self.dimension, dtype="complex")) < 10e-6).all()
 
         return res
-
-
