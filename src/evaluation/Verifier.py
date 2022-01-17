@@ -1,6 +1,6 @@
 import numpy as np
 
-from binq.src.utils.r_utils import matmul
+from src.utils.r_utils import matmul
 
 from numpy.linalg import inv
 
@@ -30,16 +30,16 @@ class Verifier:
         return perm
 
     def verify(self):
-        #product = np.identity(self.dimension , dtype='complex') #starts with Identity
         targetdeb = self.target.round(4)
         target = self.target.copy()
 
         for rotation in self.decomposition:
+
             target = matmul(rotation.matrix, target)
-            debug = target.round(4)
+            targetdeb = target.round(4)
 
         target = matmul(inv(self.permutation_matrix_final), target)
-
+        targetdeb = target.round(4)
 
         res = ( abs(target - np.identity(self.dimension , dtype='complex'))<10e-6 ).all()
 

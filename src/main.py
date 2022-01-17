@@ -1,9 +1,9 @@
-from binq.src.evaluation.Clifford_Generator import Clifford_Generator
-from binq.src.evaluation.Pauli import H, S
-from binq.src.evaluation.Verifier import Verifier
-from binq.src.decomposition.Adaptive_decomposition import *
-from binq.src.decomposition.QR_decomp import *
-from binq.src.evaluation.Evaluation_Graphs import *
+from src.evaluation.Clifford_Generator import Clifford_Generator
+from src.evaluation.Pauli import H, S, X
+from src.evaluation.Verifier import Verifier
+from src.decomposition.Adaptive_decomposition import *
+from src.decomposition.QR_decomp import *
+from src.evaluation.Evaluation_Graphs import *
 import time
 import glob
 import gc
@@ -14,6 +14,8 @@ from csv import DictWriter
 
 ################################################
 # CREATING DATASET OF MATRICES
+
+
 """
 C3 = Clifford_Generator(3,9) #log2(500)=9
 C3.generate()
@@ -24,13 +26,19 @@ print("ok5")
 C7 = Clifford_Generator(7,13)# 2^14= 16384
 C7.generate()
 print("ok7")
-"""
 
 dimension = 3
 graph_combo = "g3_4"
 graph_to_use = graph_3_3
 nodes_to_use = nodes_3_3
 nmap_to_use = nmap3_3
+"""
+
+dimension = 3
+graph_combo = "g3_4"
+graph_to_use = graph_3_4
+nodes_to_use = nodes_3_4
+nmap_to_use = nmap3_4
 ################################################
 
 files_to_read = glob.glob("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(dimension)+"/*.csv")
@@ -53,11 +61,19 @@ for file in files_to_read:
     H1 = H(dimension)
     S1 = S(dimension)
     HS= matmul(H1.matrix , S1.matrix)
+
+    HS2 = matmul(HS, HS)
+    print(HS2.round(4))
+    print(HS.round(4))
+    Xop = X(dimension)
+    Xop2 = custom_Unitary(matmul(Xop.matrix, Xop.matrix), dimension)
     #########################################################
 
 
     #operation = custom_Unitary( matrix_to_analyze  , dimension)
-    operation = custom_Unitary(HS, dimension)
+    #operation = custom_Unitary(HS, dimension)
+    #operation = Xop2
+    operation = H1
     #############################################################
 
     #                        EXECUTION
@@ -67,6 +83,7 @@ for file in files_to_read:
 
     startqr = time.time()
     decomp, algorithmic_cost, total_cost = QR.execute()
+
     endqr = time.time()
     print(len(decomp))
     ###############################################################
@@ -117,6 +134,7 @@ for file in files_to_read:
     ada_cost = best_cost[1]
     record = {'ID': IDbin,'graphcombo': graph_combo, 'timeQR':QR_time, 'timeADA':Adaptive_time, 'algoCostQR':algorithmic_cost, 'algoCostADA':ada_algo, 'decoCostQR':total_cost, 'decoCostADA':ada_cost, 'numRzQR':numRzQR, 'numRzADA':numRzADA, 'succQR':V1r, 'succADA':V2r }
     print(ada_algo)
+
     """
     with open('/home/k3vn/Documents/Compiler/binq/data/evaluation_2/dim3/evalg34.csv', 'a') as f_object:
         

@@ -7,10 +7,10 @@
 ###  TODO:       *****   ALL THE CLASS HAS TO BE REFACTORED FOR INTEGRATION + TO FOLLOW DESIGN PATTERNS ****
 
 
-from binq.src.decomposition.Adaptive_decomposition import *
-from binq.src.decomposition.tree_struct import *
-from binq.src.architecture_graph.level_Graph import *
-from binq.src.utils.costs_utils import *
+from src.decomposition.Adaptive_decomposition import *
+from src.decomposition.tree_struct import *
+from src.architecture_graph.level_Graph import *
+from src.utils.costs_utils import *
 
 
 class QuantumCircuit:

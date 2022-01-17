@@ -1,5 +1,5 @@
 from unittest import TestCase
-from binq.src.architecture_graph.level_Graph import *
+from src.architecture_graph.level_Graph import *
 
 
 class Testlevel_Graph(TestCase):

@@ -1,5 +1,5 @@
 #!/usr/binq/python3
-from binq.src.Exceptions.Exceptions import NodeNotFoundException
+from src.Exceptions.Exceptions import NodeNotFoundException
 
 
 class Node:
@@ -54,6 +54,7 @@ class N_ary_Tree:
 	def __init__(self):
 		self.root = None
 		self.size = 0
+		self.global_id_counter = 0
 
 	def add(self, new_key, rotation, U_of_level, graph_current, current_cost, current_decomp_cost, max_cost, pi_pulses, parent_key=None):
 

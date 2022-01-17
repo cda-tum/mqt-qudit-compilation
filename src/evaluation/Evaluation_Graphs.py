@@ -1,4 +1,4 @@
-from binq.src.architecture_graph.level_Graph import level_Graph
+from src.architecture_graph.level_Graph import level_Graph
 
 
 

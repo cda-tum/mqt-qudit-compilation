@@ -5,9 +5,9 @@ from numpy import allclose
 from numpy import savetxt
 from numpy import loadtxt
 
-from binq.src.evaluation.Pauli import S
-from binq.src.evaluation.Pauli import H
-from binq.src.utils.r_utils import matmul
+from src.evaluation.Pauli import S
+from src.evaluation.Pauli import H
+from src.utils.r_utils import matmul
 
 
 class Clifford_Generator:

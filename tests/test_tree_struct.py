@@ -1,6 +1,6 @@
 from unittest import TestCase
-from binq.src.architecture_graph.level_Graph import level_Graph
-from binq.src.decomposition.tree_struct import *
+from src.architecture_graph.level_Graph import level_Graph
+from src.decomposition.tree_struct import *
 import numpy as np
 
 

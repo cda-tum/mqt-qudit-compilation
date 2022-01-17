@@ -1,8 +1,8 @@
 from unittest import TestCase
 
-from binq.src.circuit.Rotations import R
-from binq.src.architecture_graph.level_Graph import level_Graph
-from binq.src.utils.r_utils import *
+from src.circuit.Rotations import R
+from src.architecture_graph.level_Graph import level_Graph
+from src.utils.r_utils import *
 
 class Testr_utils(TestCase):
 

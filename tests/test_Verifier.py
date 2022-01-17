@@ -1,10 +1,10 @@
 from unittest import TestCase
 
-from binq.src.architecture_graph.level_Graph import level_Graph
-from binq.src.decomposition.Adaptive_decomposition import Adaptive_decomposition
-from binq.src.decomposition.QR_decomp import QR_decomp
-from binq.src.evaluation.Pauli import H
-from binq.src.evaluation.Verifier import Verifier
+from src.architecture_graph.level_Graph import level_Graph
+from src.decomposition.Adaptive_decomposition import Adaptive_decomposition
+from src.decomposition.QR_decomp import QR_decomp
+from src.evaluation.Pauli import H
+from src.evaluation.Verifier import Verifier
 
 
 class TestVerifier(TestCase):

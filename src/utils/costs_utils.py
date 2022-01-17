@@ -1,7 +1,7 @@
 
 #########################################
-from binq.src.circuit.swap_routines_basic import route_states2rotate_basic
-from binq.src.utils.r_utils import rotation_cost_calc
+from src.circuit.swap_routines_basic import route_states2rotate_basic
+from src.utils.r_utils import rotation_cost_calc
 
 
 def cost_calculator(gate, placement, non_zeros):

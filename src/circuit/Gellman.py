@@ -5,7 +5,7 @@ class GellMann:
     # TODO WE CAN BUILD TEST CASES FOR THIS, BUT I SWEATED ALREADY TOO MUCH ON THIS.
     # TODO BE CAREFUL IF YOU MAKE ANY CHANGES AND TEST IT CAREFULLY
     
-    def __init__(self, lev_a,lev_b, type_m, d):
+    def __init__(self, lev_a, lev_b, type_m, d):
         """ Definition taken from https://mathworld.wolfram.com/GeneralizedGell-MannMatrix.html"""
         
         

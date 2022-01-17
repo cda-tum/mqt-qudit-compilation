@@ -1,5 +1,5 @@
 from unittest import TestCase
-from binq.src.utils.costs_utils import *
+from src.utils.costs_utils import *
 
 
 class Testcost_utils(TestCase):

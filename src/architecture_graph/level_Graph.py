@@ -2,6 +2,8 @@
 import networkx as nx
 import copy
 
+from circuit.Rotations import Rz
+
 
 class level_Graph(nx.Graph):
 
@@ -10,6 +12,8 @@ class level_Graph(nx.Graph):
 
 
         self.logic_nodes = nodes
+
+
         self.add_nodes_from(self.logic_nodes)
 
 
@@ -27,6 +31,11 @@ class level_Graph(nx.Graph):
 
 
 
+    def phase_storing_setup(self):
+        for node in self.nodes:
+            node_dict = self.nodes[node]
+            if 'phase_storage' not in node_dict:
+                node_dict['phase_storage'] = 0
 
     def distance_nodes(self, source, target):
         path = nx.shortest_path(self, source, target)
@@ -138,7 +147,12 @@ class level_Graph(nx.Graph):
         nodelistcopy[node_a][1]["lpmap"] = lp_b
         nodelistcopy[node_b][1]["lpmap"] = lp_a
 
-
+        inode = self._1stInode
+        if('phase_storage' in self.nodes[inode] ):
+            phi_a = nodelistcopy[node_a][1]["phase_storage"]
+            phi_b = nodelistcopy[node_b][1]["phase_storage"]
+            nodelistcopy[node_a][1]["phase_storage"] = phi_b
+            nodelistcopy[node_b][1]["phase_storage"] = phi_a
 
         return nodelistcopy
 
@@ -168,6 +182,21 @@ class level_Graph(nx.Graph):
 
 
 
+
+    def get_Rz_gates(self):
+        matrices = []
+        for node in self.nodes:
+            node_dict = self.nodes[node]
+            if 'phase_storage' in node_dict:
+                if(node_dict['phase_storage'] < 1e-3 or np.mod(node_dict['phase_storage'], 2*np.pi)<1e-3):
+                    phy_n_i = self.nodes[node]['lpmap']
+
+                    phase_gate = Rz(node_dict['phase_storage'], phy_n_i, len(list(self.nodes)) )
+                    matrices.append(phase_gate)
+
+        return matrices
+
+
     def get_node_sensitivity_cost(self, node):
         neighbs = [n for n in self.neighbors(node)]
 
@@ -183,8 +212,6 @@ class level_Graph(nx.Graph):
     def get_edge_sensitivity(self, node_a, node_b):
         #todo add try catch in case not there
         return self[node_a][node_b]["sensitivity"]
-
-
 
 
     @property
@@ -217,24 +244,6 @@ class level_Graph(nx.Graph):
 
                     listret.append(N[1]["lpmap"])
         return  listret
-
-
-    """
-    def get_bookmark(self, lev_a, lev_b):
-
-        #TODO APPLY ROUTINE TO CALCULATE MOST EFFECTIVE BOOKMARK
-
-        if (lev_a in self._1stRnode and lev_b in self._1stInode):
-            return lev_b
-        elif (lev_a not in self._1stRnode and lev_b in self._1stInode):
-            return self._1stRnode
-        elif (lev_a  in self._1stRnode and lev_b  not in self._1stInode):
-            return self._1stInode
-        elif (lev_a not in self._1stRnode and lev_b not in self._1stInode):
-            #COSTS LESS IN THEORY
-            return self._1stInode
-    """
-
 
 
     def __str__(self):

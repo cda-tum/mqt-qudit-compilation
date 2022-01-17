@@ -1,5 +1,5 @@
 from unittest import TestCase
-from binq.src.circuit.Gellman import *
+from src.circuit.Gellman import *
 
 
 class TestGellMann(TestCase):

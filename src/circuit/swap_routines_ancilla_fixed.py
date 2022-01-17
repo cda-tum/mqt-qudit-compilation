@@ -9,10 +9,10 @@
 import networkx as nx
 import numpy as np
 
-from binq.src.Exceptions.Exceptions import RoutingException
-from binq.src.circuit.Rotations import R
+from src.Exceptions.Exceptions import RoutingException
+from src.circuit.Rotations import R
 
-from binq.src.utils.r_utils import rotation_cost_calc
+from src.utils.r_utils import rotation_cost_calc
 
 def swap_assignment(a, b):
     return b,a

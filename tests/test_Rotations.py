@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 import numpy as np
-from binq.src.circuit.Rotations import R, Rz
+from src.circuit.Rotations import R, Rz
 
 
 #TODO GETTERS TO FINISH

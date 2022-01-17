@@ -1,7 +1,5 @@
 
-from binq.src.circuit.Gellman import *
-
-
+from src.circuit.Gellman import *
 
 
 # TODO:                             DISCLAIMER!!!!!!
