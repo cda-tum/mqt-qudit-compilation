@@ -1,6 +1,6 @@
 from src.Exceptions.Exceptions import SequenceFoundException
 from src.circuit.Rotations import *
-from src.circuit.swap_routines_basic import gate_chain_condition, phase_storage_processing
+from src.circuit.swap_routines_basic import gate_chain_condition, graph_rule_ongate, graph_rule_update
 from src.decomposition.tree_struct import N_ary_Tree
 
 from src.utils.costs_utils import *
@@ -10,7 +10,7 @@ np.seterr(all='ignore')
 class Adaptive_decomposition:
 
 
-    def __init__(self, gate, graph_orig, cost_limit=(0,0), dimension = -1):
+    def __init__(self, gate, graph_orig, cost_limit=(0,0), dimension = -1, Z_prop = False):
         self.U = gate.matrix
 
         self.graph = graph_orig
@@ -18,6 +18,7 @@ class Adaptive_decomposition:
 
         self.cost_limit = cost_limit
         self.dimension = dimension
+        self.phase_propagation = Z_prop
 
         self.TREE = N_ary_Tree()
 
@@ -32,12 +33,11 @@ class Adaptive_decomposition:
             matrices_decomposed, best_cost, final_graph = self.TREE.retrieve_decomposition(self.TREE.root)
 
             if(matrices_decomposed!=[]):
-                matrices_decomposed, final_graph = self.Z_extraction(matrices_decomposed, final_graph)
+                matrices_decomposed, final_graph = self.Z_extraction(matrices_decomposed, final_graph, self.phase_propagation)
             else:
                print("couldn't decompose\n")
 
             tree_print = self.TREE.print_tree(self.TREE.root, "TREE: ")
-           #print(tree_print)
 
             return matrices_decomposed, best_cost, final_graph
 
@@ -48,7 +48,7 @@ class Adaptive_decomposition:
 
 
 
-    def Z_extraction(self, decomposition, placement, phase_propagation=False):
+    def Z_extraction(self, decomposition, placement, phase_propagation):
 
         matrices = []
 
@@ -62,7 +62,7 @@ class Adaptive_decomposition:
 
         # check if close to diagonal
         Ucopy = U_.copy()
-
+        print(Ucopy.round(6))
         # is the diagonal noisy?
         valid_diag = any(abs(np.diag(Ucopy)) > 1.0e-4) # > 1.0e-4
        #print("valid: " + str(valid_diag))
@@ -84,10 +84,11 @@ class Adaptive_decomposition:
 
                 if( abs(np.angle(diag_U[i]))> 1.0e-4):
 
-                    if (phase_propagation):
-                        inode = self._1stInode
-                        if ('phase_storage' in self.nodes[inode]):
+                    if(phase_propagation):
+                        inode = placement._1stInode
+                        if ('phase_storage' in placement.nodes[inode]):
                             placement.nodes[i]['phase_storage'] = placement.nodes[i]['phase_storage'] + np.angle(diag_U[i])
+                            placement.nodes[i]['phase_storage'] = newMod(placement.nodes[i]['phase_storage'])
                     else:
                         phy_n_i = placement.nodes[i]['lpmap']
 
@@ -96,6 +97,17 @@ class Adaptive_decomposition:
                         U_ = matmul( phase_gate.matrix, U_)
 
                         matrices.append( phase_gate )
+
+
+            if(not phase_propagation):
+                inode = placement._1stInode
+                if ('phase_storage' in placement.nodes[inode]):
+                    for i in range(len(list(placement.nodes))):
+                        thetaZ = newMod( placement.nodes[i]['phase_storage'] )
+                        if(abs( thetaZ )> 1.0e-4):
+                            phase_gate = Rz( thetaZ, placement.nodes[i]['lpmap'], dimension)
+                            matrices.append(phase_gate)
+
 
             return matrices, placement
 
@@ -150,6 +162,10 @@ class Adaptive_decomposition:
 
                         phi = -( np.pi/2 + np.angle(U_[r,c]) - np.angle(U_[r2,c]))
 
+                        oldieth = theta
+                        oldie = phi
+
+
 
                         rotation_involved = R(theta, phi,r, r2, dimension)
 
@@ -160,55 +176,65 @@ class Adaptive_decomposition:
 
                         estimated_cost, pi_pulses_routing, new_placement, cost_of_pi_pulses, gate_cost = cost_calculator(rotation_involved, current_placement, non_zeros)
 
+
                         next_step_cost = (estimated_cost + current_root.current_cost)
                         decomp_next_step_cost = ( cost_of_pi_pulses + gate_cost + current_root.current_decomp_cost)
 
+
+
+
                         branch_condition = current_root.max_cost[1] - decomp_next_step_cost #SECOND POSITION IS PHYISCAL COST
-                        branch_condition_2 = current_root.max_cost[0] - next_step_cost  # FIRST IS ALGORITHMIC COST
+                        #branch_condition_2 = current_root.max_cost[0] - next_step_cost  # FIRST IS ALGORITHMIC COST
 
                         if(  branch_condition > 0 or abs(branch_condition) < 1.0e-12): #if cost is better can be only candidate otherwise try them all
 
-                            if (new_placement.nodes[r ]['lpmap'] > new_placement.nodes[r2]['lpmap']):
-                                phi = phi * -1
-
-                            physical_rotation = R(theta, phi, new_placement.nodes[r]['lpmap'],new_placement.nodes[r2]['lpmap'], dimension)
-
-                            physical_rotation = gate_chain_condition(pi_pulses_routing, physical_rotation)
-
-                            ##############################
-                            physical_rotation, new_placement = phase_storage_processing(physical_rotation, new_placement)
-                            """
-                            ################# EXPERIMENT###############################
-                            for pipi in pi_pulses_routing:
-
-                                logic_nodes = [None, None]
-                                for n, d in new_placement.nodes(data=True):
-                                    if (d['lpmap'] == pipi.lev_a):
-                                        logic_nodes[0] = n
-                                    if (d['lpmap'] == pipi.lev_b):
-                                        logic_nodes[1] = n
-
-                                #U_temp = matmul( pipi.matrix, U_temp)
-                                U_temp = matmul( R(pipi.theta,pipi.phi, logic_nodes[0] , logic_nodes[1], pipi.dimension  ).matrix, U_temp)
-
-                                U_temp = matmul(Rz(np.pi, logic_nodes[1], dimension).matrix,  U_temp)
-
-                            ################# REMOVE EXPERIMENT###############################
-                            """
-                            self.TREE.global_id_counter = self.TREE.global_id_counter +1
+                            self.TREE.global_id_counter = self.TREE.global_id_counter + 1
                             new_key = self.TREE.global_id_counter
 
-                            if(new_key in [0,1,5,8]):
+                            if(new_key in [0,1,21,40,57,71,81,90,97,101,104]):  #[0,1,5,8]
+                                kekeky = new_key
+                                logsource = r
+                                logtarget = r2
+                                oldiesource = new_placement.nodes[r]['lpmap']
+                                oldietarget = new_placement.nodes[r2]['lpmap']
+                                thetabug = oldieth
+                                phibug =  oldie
                                 lll = 0
+                            #
+                            if (new_placement.nodes[r]['lpmap'] > new_placement.nodes[r2]['lpmap']):
+                                phi = phi * -1
+                            #
+                            physical_rotation = R(theta, phi, new_placement.nodes[r]['lpmap'],new_placement.nodes[r2]['lpmap'], dimension)
+                            #
+                            physical_rotation = gate_chain_condition(pi_pulses_routing, physical_rotation)
+                            #
+                            physical_rotation = graph_rule_ongate(physical_rotation, new_placement)
+                            #
+
+                            ############################## EXPERIMENT ##############################
+                            p_backs = []
+                            for ppulse in pi_pulses_routing:
+                                p_backs.append(R(ppulse.theta, -ppulse.phi, ppulse.lev_a, ppulse.lev_b, dimension))
+
+                            for p_back in p_backs:
+                                graph_rule_update(p_back, new_placement)
+                            ########################################################################################
+
+
                             current_root.add(new_key, physical_rotation, U_temp, new_placement, next_step_cost, decomp_next_step_cost, current_root.max_cost, pi_pulses_routing)
 
 
 
+        # ===================================================================================
         if( current_root.children != None):
 
             for child in current_root.children:
                 self.DFS(child, level+1)
         #===================================================================================
+
+
+
+
 
         return
 

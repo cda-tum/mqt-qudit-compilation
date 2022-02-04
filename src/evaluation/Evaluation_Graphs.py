@@ -105,6 +105,7 @@ nodes_3_1 = [0, 1, 2]
 nmap3_1 =   [2, 0, 1]
 
 graph_3_1 = level_Graph(edges_3_1, nodes_3_1, nmap3_1,  [0])
+graph_3_1_2 = level_Graph(edges_3_1, nodes_3_1, nmap3_1,  [2])
 
 
 

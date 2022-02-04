@@ -30,6 +30,7 @@ class Verifier:
         return perm
 
     def verify(self):
+        i =0
         targetdeb = self.target.round(4)
         target = self.target.copy()
 
@@ -37,6 +38,10 @@ class Verifier:
 
             target = matmul(rotation.matrix, target)
             targetdeb = target.round(4)
+            i +=1
+            if(i == 9 ):
+                print((repr(targetdeb)))
+
 
         target = matmul(inv(self.permutation_matrix_final), target)
         targetdeb = target.round(4)

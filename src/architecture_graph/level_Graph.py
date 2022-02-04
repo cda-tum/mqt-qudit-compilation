@@ -156,6 +156,19 @@ class level_Graph(nx.Graph):
 
         return nodelistcopy
 
+    def swap_node_attr_simple(self , node_a, node_b):
+
+        res_list = [x[0] for x in self.nodes(data=True)]
+        node_a = res_list.index(node_a)
+        node_b = res_list.index(node_b)
+
+        inode = self._1stInode
+        print(self.nodes[node_a]["phase_storage"])
+        if ('phase_storage' in self.nodes[inode]):
+            phi_a = self.nodes[node_a]["phase_storage"]
+            phi_b = self.nodes[node_b]["phase_storage"]
+            self.nodes[node_a]["phase_storage"] = phi_b
+            self.nodes[node_b]["phase_storage"] = phi_a
 
     def swap_nodes(self, node_a, node_b):
 

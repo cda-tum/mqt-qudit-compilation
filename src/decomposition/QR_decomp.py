@@ -49,6 +49,7 @@ class QR_decomp:
                     non_zeros = np.count_nonzero(abs(U_)>1.0e-4)
 
 
+
                     estimated_cost, pi_pulses_routing, temp_placement, cost_of_pi_pulses, gate_cost = cost_calculator(rotation_involved, self.graph, non_zeros)
 
                     decomp += pi_pulses_routing

@@ -2,6 +2,19 @@ import numpy as np
 
 
 ###         UTILS
+def newMod(a,b = 2*np.pi):
+    res = np.mod(a,b)
+    return res if not res else res-b if a<0 else res
+
+
+def Pi_mod(a):
+    a = newMod(a)
+    print(a)
+    if (a > 0 and a > np.pi):
+        a = a - 2 * np.pi
+    elif (a < 0 and abs(a) > np.pi):
+        a = 2 * np.pi + a
+    return a
 
 def matmul(f,s):
     dim = f.shape[1]

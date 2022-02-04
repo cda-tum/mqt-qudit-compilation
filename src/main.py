@@ -34,11 +34,11 @@ nodes_to_use = nodes_3_3
 nmap_to_use = nmap3_3
 """
 
-dimension = 3
+dimension = 5
 graph_combo = "g3_4"
-graph_to_use = graph_3_4
-nodes_to_use = nodes_3_4
-nmap_to_use = nmap3_4
+graph_to_use = graph_5_2
+nodes_to_use = nodes_5_2
+nmap_to_use = nmap5_2
 ################################################
 
 files_to_read = glob.glob("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(dimension)+"/*.csv")
@@ -60,13 +60,31 @@ for file in files_to_read:
     ##########################################################
     H1 = H(dimension)
     S1 = S(dimension)
-    HS= matmul(H1.matrix , S1.matrix)
+    X1 = X(dimension)
+    Xop = X1
+
+    HS = matmul(H1.matrix , S1.matrix)
+
 
     HS2 = matmul(HS, HS)
-    print(HS2.round(4))
-    print(HS.round(4))
-    Xop = X(dimension)
+    HS2op = custom_Unitary(HS2, dimension)
+
+
     Xop2 = custom_Unitary(matmul(Xop.matrix, Xop.matrix), dimension)
+
+    #################################################################
+    XHS = matmul(Xop.matrix, HS)
+    XHSop = custom_Unitary(XHS, dimension)
+    XHS2op = custom_Unitary( matmul(XHS, XHS), dimension)
+
+    HSXHS2op = custom_Unitary( matmul(HS, XHS2op.matrix), dimension)
+    ################################################################
+    SH = matmul(S1.matrix, H1.matrix)
+    XSH = matmul(X1.matrix, SH)
+    HXSH = matmul(H1.matrix, XSH)
+    SHXSH = matmul(S1.matrix, HXSH)
+    SHXSH2 = matmul(SHXSH, SHXSH)
+    SHXSH2op = custom_Unitary(SHXSH2, dimension)
     #########################################################
 
 
