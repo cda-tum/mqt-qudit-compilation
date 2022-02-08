@@ -1,10 +1,6 @@
 
-
-
-
 # TODO TO INTEGRATE WITH QUANTUM CIRCUIT CLASS
-
-# TODO FIX FOR CREATING PHYSICAL PI PULSES
+# TODO TO FIX AND INTEGRATE
 
 import networkx as nx
 import numpy as np
@@ -12,7 +8,8 @@ import numpy as np
 from src.Exceptions.Exceptions import RoutingException
 from src.circuit.Rotations import R
 
-from src.utils.r_utils import rotation_cost_calc
+from utils.cost_functions import rotation_cost_calc
+
 
 def swap_assignment(a, b):
     return b,a

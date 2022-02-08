@@ -30,21 +30,14 @@ class Verifier:
         return perm
 
     def verify(self):
-        i =0
-        targetdeb = self.target.round(4)
         target = self.target.copy()
 
         for rotation in self.decomposition:
 
             target = matmul(rotation.matrix, target)
-            targetdeb = target.round(4)
-            i +=1
-            if(i == 9 ):
-                print((repr(targetdeb)))
 
 
         target = matmul(inv(self.permutation_matrix_final), target)
-        targetdeb = target.round(4)
 
         res = ( abs(target - np.identity(self.dimension , dtype='complex'))<10e-6 ).all()
 

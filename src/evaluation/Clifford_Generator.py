@@ -1,6 +1,5 @@
 from random import  randint, shuffle
 import numpy as np
-from numpy import allclose
 
 from numpy import savetxt
 from numpy import loadtxt
@@ -12,9 +11,10 @@ from src.utils.r_utils import matmul
 
 class Clifford_Generator:
 
-    def __init__(self, dimension, log2power=0):
+    def __init__(self, dimension, log2power=0, saving_path="/"):
         self.dimension = dimension
         self.power = log2power
+        self.saving_path = saving_path
         self.database = []
         self.stringsdb = []
 
@@ -64,7 +64,6 @@ class Clifford_Generator:
             return
 
         self.strings_gen_fixed()
-        #self.strings_gen_random() -> alternative with random
         Hm = H(self.dimension)
         Sm = S(self.dimension)
 
@@ -84,9 +83,22 @@ class Clifford_Generator:
 
     def save_to_csv(self, matrix, name):
         name = " ".join(str(x) for x in name)
-        savetxt("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(self.dimension)+"/"+str(name)+".csv", matrix, fmt='%.12e', delimiter=',')
+        savetxt(self.saving_path+"dim"+str(self.dimension)+"/"+str(name)+".csv", matrix, fmt='%.12e', delimiter=',')
 
-    def load_from_csv(self, path):
-        #name = " ".join(str(x) for x in name)
-        data = loadtxt(path, delimiter=',',dtype=complex, converters={0: lambda s: complex(s.decode().replace('+-', '-'))}) #"/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(self.dimension)+"/"+str(name)+".csv"
+    @staticmethod
+    def load_from_csv(path):
+        data = loadtxt(path, delimiter=',',dtype=complex, converters={0: lambda s: complex(s.decode().replace('+-', '-'))})
         return data
+
+    @staticmethod
+    def generate_all_3_5_7(path):
+
+        C3 = Clifford_Generator(3, 9, path)  # log2(500)=9
+        C3.generate()
+        print("ok3")
+        C5 = Clifford_Generator(5, 12, path)  # log2(4000) = circa 12
+        C5.generate()
+        print("ok5")
+        C7 = Clifford_Generator(7, 13, path)  # 2^14= 16384
+        C7.generate()
+        print("ok7")

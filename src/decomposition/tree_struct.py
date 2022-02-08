@@ -117,7 +117,7 @@ class N_ary_Tree:
 		for child in node.children:
 			children_checking.append(self.found_checker(child))
 		if(True in children_checking ):
-			#print("SUCCESS")
+
 			node.finished = True
 
 		return node.finished

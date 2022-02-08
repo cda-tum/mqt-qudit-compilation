@@ -4,7 +4,8 @@ import numpy as np
 
 from src.circuit.Rotations import R
 
-from src.utils.r_utils import rotation_cost_calc, newMod, Pi_mod
+from src.utils.r_utils import newMod, Pi_mod
+from utils.cost_functions import rotation_cost_calc
 
 
 def swap_elements(l, i, j):

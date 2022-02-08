@@ -3,6 +3,8 @@ from unittest import TestCase
 from src.circuit.Rotations import R
 from src.architecture_graph.level_Graph import level_Graph
 from src.utils.r_utils import *
+from utils.cost_functions import rotation_cost_calc
+
 
 class Testr_utils(TestCase):
 
@@ -16,15 +18,7 @@ class Testr_utils(TestCase):
 
         self.assertTrue(np.array_equal(expected, result))
 
-    def test_eurlerComplex(self):
-        A = 2
-        phi = np.pi/2
-        num = eurlerComplex(phi, A).round(3)
-        self.assertEqual(num, 2*1j )
-        phi = np.pi / 4
-        num = eurlerComplex(phi, A).round(3)
-        exp = (2 * (np.sqrt(2)/2+ (np.sqrt(2)/2*1j))).round(3)
-        self.assertEqual(num, exp)
+
 
     def test_rotation_cost_calc(self):
         test_sample_edges_1 = [(0, 5, {"delta_m": 1, "sensitivity": 3}),

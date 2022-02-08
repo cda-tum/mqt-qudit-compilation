@@ -30,21 +30,15 @@ class QR_decomp:
 
             for r in l[:diag_index]:
 
-                #if( abs(U_[r,c])>1.0e-8 and abs(U_[r-1,c])>1.0e-4  ):
                 if (abs(U_[r, c]) > 1.0e-8 ):
 
-
-                    #theta = 2 * np.arctan( abs(U_[r,c]/U_[r-1,c]))
-                    #theta = 2 * np.arctan(abs(np.divide(U_[r, c] , U_[r - 1, c])))
                     theta = 2 * np.arctan2(abs(U_[r, c]), abs(U_[r - 1 , c]))
 
                     phi = -( np.pi/2 + np.angle(U_[r-1,c]) - np.angle(U_[r,c]) )
 
                     rotation_involved = R(theta,phi,r-1,r,dimension)
-                    #print(rotation_involved.matrix.round(4))
-                    U_ = matmul(rotation_involved.matrix, U_)
-                    #print(U_.round(2))
 
+                    U_ = matmul(rotation_involved.matrix, U_)
 
                     non_zeros = np.count_nonzero(abs(U_)>1.0e-4)
 
@@ -63,7 +57,7 @@ class QR_decomp:
                     decomp.append(physical_rotation)
 
                     for pi_g in reversed(pi_pulses_routing):
-                        decomp.append(custom_Unitary(pi_g.dag, dimension))
+                        decomp.append(R(pi_g.theta, -pi_g.phi, pi_g.lev_a, pi_g.lev_b, dimension))
                     pi_g = None
 
                     algorithmic_cost += estimated_cost

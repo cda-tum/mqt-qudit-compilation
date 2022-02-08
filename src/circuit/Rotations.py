@@ -12,7 +12,10 @@ from src.circuit.Gellman import *
 ## cost functions in this class take input radians but work on units of pi, the rest is taken care automatically
 
 ####################### ROTATION MATRICES
-class custom_Unitary:
+from utils.cost_functions import phi_cost, theta_cost
+
+
+class Custom_Unitary:
     
     def __init__(self, matrix, dimension):
         
@@ -21,7 +24,9 @@ class custom_Unitary:
         
     def cost(self):
         return np.NAN
-        
+
+
+
 
 class R:
 
@@ -83,10 +88,7 @@ class R:
 
     @property
     def cost(self):
-        theta_on_units = self.theta/np.pi
-        
-        E = ( 4*abs(theta_on_units) + 1*abs(np.mod(abs(theta_on_units)+0.25, 0.5) - 0.25) )*1e-04
-        return E
+        return theta_cost(self.theta)
 
     def __str__(self):
         return str("R "+"Theta "+str(self.theta)+"phi "+str(self.phi)+"O lev a "+self.original_lev_a+"O lev b "+self.original_lev_b)
@@ -136,18 +138,9 @@ class Rz:
 
     @property
     def cost(self):
-        theta_on_units = self.theta / np.pi
-
-        E = abs(theta_on_units) * 1e-04
-        return E
+        return phi_cost(self.theta)
 
 
-class PI_PULSE(R):
 
-    def __init__(self, lev_a, lev_b, additional_bookmark, sequence_flag,  dimension):
-        super(PI_PULSE, self).__init__(np.pi, 0, lev_a, lev_b, dimension)
-
-        self.bookmark = additional_bookmark
-        self.sequence_gate = sequence_flag
 
 

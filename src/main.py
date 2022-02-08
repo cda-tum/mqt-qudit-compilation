@@ -1,168 +1,57 @@
-from src.evaluation.Clifford_Generator import Clifford_Generator
-from src.evaluation.Pauli import H, S, X
-from src.evaluation.Verifier import Verifier
-from src.decomposition.Adaptive_decomposition import *
-from src.decomposition.QR_decomp import *
-from src.evaluation.Evaluation_Graphs import *
-import time
-import glob
-import gc
-
-
-from csv import DictWriter
-
-
-################################################
-# CREATING DATASET OF MATRICES
-
-
-"""
-C3 = Clifford_Generator(3,9) #log2(500)=9
-C3.generate()
-print("ok3")
-C5 = Clifford_Generator(5,12)#log2(4000) =circa 12
-C5.generate()
-print("ok5")
-C7 = Clifford_Generator(7,13)# 2^14= 16384
-C7.generate()
-print("ok7")
-
-dimension = 3
-graph_combo = "g3_4"
-graph_to_use = graph_3_3
-nodes_to_use = nodes_3_3
-nmap_to_use = nmap3_3
-"""
+from architecture_graph.level_Graph import level_Graph
+from circuit.QuantumCircuit import QuantumCircuit
+from evaluation.Pauli import H, S, X
 
 dimension = 5
-graph_combo = "g3_4"
-graph_to_use = graph_5_2
-nodes_to_use = nodes_5_2
-nmap_to_use = nmap5_2
-################################################
+H1 = H(dimension)
+S1 = S(dimension)
+X1 = X(dimension)
 
-files_to_read = glob.glob("/home/k3vn/Documents/Compiler/binq/data/"+"dim"+str(dimension)+"/*.csv")
-
-for file in files_to_read:
-
-    IDbin = [int(i) for i in file.split() if i.isdigit() and (i=='0' or i=='1')]
-    IDbin = " ".join(str(x) for x in IDbin)
-
-    print("####################################")
-    print(IDbin)
-    #if(IDbin == "0 0 0 0 1 0 1 1 0 1 0"):
-    #    lol = 5
-    print("####################################")
-
-    C_loader = Clifford_Generator(dimension)
-    matrix_to_analyze = C_loader.load_from_csv(file)
-
-    ##########################################################
-    H1 = H(dimension)
-    S1 = S(dimension)
-    X1 = X(dimension)
-    Xop = X1
-
-    HS = matmul(H1.matrix , S1.matrix)
+edges_5 = [(0, 3, {"delta_m": 1, "sensitivity": 5}),
+(0, 4, {"delta_m": 0, "sensitivity": 3}),
+(1, 4, {"delta_m": 0, "sensitivity": 3}),
+(1, 2, {"delta_m": 1, "sensitivity": 5})
+]
+nodes_5 = [ 0, 1, 2, 3, 4]
+nmap5 = [ 0, 4, 2, 3, 1]
+graph_5 = level_Graph(edges_5, nodes_5, nmap5, [0])
 
 
-    HS2 = matmul(HS, HS)
-    HS2op = custom_Unitary(HS2, dimension)
+QC = QuantumCircuit(4, 0, dimension, graph_5)
 
 
-    Xop2 = custom_Unitary(matmul(Xop.matrix, Xop.matrix), dimension)
+QC.draw()
 
-    #################################################################
-    XHS = matmul(Xop.matrix, HS)
-    XHSop = custom_Unitary(XHS, dimension)
-    XHS2op = custom_Unitary( matmul(XHS, XHS), dimension)
+print("ADDED GATE")
+for i in range(2):
+    for j in range(4):
+        QC.custom_unitary(j, H1.matrix)
 
-    HSXHS2op = custom_Unitary( matmul(HS, XHS2op.matrix), dimension)
-    ################################################################
-    SH = matmul(S1.matrix, H1.matrix)
-    XSH = matmul(X1.matrix, SH)
-    HXSH = matmul(H1.matrix, XSH)
-    SHXSH = matmul(S1.matrix, HXSH)
-    SHXSH2 = matmul(SHXSH, SHXSH)
-    SHXSH2op = custom_Unitary(SHXSH2, dimension)
-    #########################################################
+QC.draw()
+print("DECOMPOSE")
 
+QC.DFS_decompose()
+#QC.Z_prop()
 
-    #operation = custom_Unitary( matrix_to_analyze  , dimension)
-    #operation = custom_Unitary(HS, dimension)
-    #operation = Xop2
-    operation = H1
-    #############################################################
+QC.draw()
+print("DONE")
 
-    #                        EXECUTION
-
-    #############################################################
-    QR = QR_decomp( operation, graph_to_use)
-
-    startqr = time.time()
-    decomp, algorithmic_cost, total_cost = QR.execute()
-
-    endqr = time.time()
-    print(len(decomp))
-    ###############################################################
-
-    Adaptive = Adaptive_decomposition(operation, graph_to_use, (algorithmic_cost, total_cost ), dimension)
-
-    start = time.time()
-    matrices_decomposed, best_cost, final_graph = Adaptive.execute()
-    end = time.time()
-    print(len(matrices_decomposed))
-    ###################################################################
-
-    print("QR elapsed time")
-    QR_time = endqr - startqr
-    print(QR_time)
+QC = QuantumCircuit(4, 0, dimension, graph_5)
 
 
-    print("Adaptive elapsed time")
-    Adaptive_time = end - start
-    print(Adaptive_time)
+QC.draw()
 
-    ###############################################################################################
-    print("COST QR,   ", (algorithmic_cost, total_cost ))
-    print("BEST COST ADA,   ", best_cost)
+print("ADDED GATE")
+for i in range(5):
+    for j in range(4):
+        QC.custom_unitary(j, H1.matrix)
 
-    ###############################################################################################
-    numRzQR = sum(isinstance(x, Rz) for x in decomp )
-    numRzADA = sum(isinstance(x, Rz) for x in matrices_decomposed )
-    print(numRzQR)
-    print(numRzADA)
-    ################################################################################################
+QC.draw()
+print("DECOMPOSE")
 
-    final_map = final_graph.lpmap
+QC.QR_decompose()
+#QC.Z_prop()
 
-    V1 = Verifier(decomp, operation,  nodes_to_use, nmap_to_use, nmap_to_use, dimension)
-    V2 = Verifier(matrices_decomposed, operation, nodes_to_use, nmap_to_use, final_map, dimension)
-    V1r = V1.verify()
-    V2r = V2.verify()
+QC.draw()
+print("DONE")
 
-    print(V1r)
-    print(V2r)
-
-
-    field_names = ['ID','graphcombo', 'timeQR', 'timeADA', 'algoCostQR', 'algoCostADA', 'decoCostQR', 'decoCostADA', 'numRzQR', 'numRzADA', 'succQR', 'succADA' ]
-
-    # Dictionary
-    ada_algo = best_cost[0]
-    ada_cost = best_cost[1]
-    record = {'ID': IDbin,'graphcombo': graph_combo, 'timeQR':QR_time, 'timeADA':Adaptive_time, 'algoCostQR':algorithmic_cost, 'algoCostADA':ada_algo, 'decoCostQR':total_cost, 'decoCostADA':ada_cost, 'numRzQR':numRzQR, 'numRzADA':numRzADA, 'succQR':V1r, 'succADA':V2r }
-    print(ada_algo)
-
-    """
-    with open('/home/k3vn/Documents/Compiler/binq/data/evaluation_2/dim3/evalg34.csv', 'a') as f_object:
-        
-        dictwriter_object = DictWriter(f_object, fieldnames=field_names)
-    
-        # Pass the dictionary as an argument to the Writerow()
-        dictwriter_object.writerow(record)
-    
-        # Close the file object
-        f_object.close()
-    """
-    gc.collect()
-#########################################################################################
