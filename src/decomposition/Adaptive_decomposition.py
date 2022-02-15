@@ -5,12 +5,13 @@ from src.decomposition.tree_struct import N_ary_Tree
 
 from src.utils.costs_utils import *
 from src.utils.r_utils import *
+
 np.seterr(all='ignore')
+
 
 class Adaptive_decomposition:
 
-
-    def __init__(self, gate, graph_orig, cost_limit=(0,0), dimension = -1, Z_prop = False):
+    def __init__(self, gate, graph_orig, cost_limit=(0, 0), dimension=-1, Z_prop=False):
         self.U = gate.matrix
 
         self.graph = graph_orig
@@ -24,7 +25,8 @@ class Adaptive_decomposition:
 
     def execute(self):
 
-        self.TREE.add(0, Custom_Unitary(np.identity(self.dimension, dtype='complex'), self.dimension), self.U, self.graph, 0, 0, self.cost_limit, [])
+        self.TREE.add(0, Custom_Unitary(np.identity(self.dimension, dtype='complex'), self.dimension), self.U,
+                      self.graph, 0, 0, self.cost_limit, [])
         try:
             self.DFS(self.TREE.root)
         except SequenceFoundException:
@@ -32,36 +34,33 @@ class Adaptive_decomposition:
         finally:
             matrices_decomposed, best_cost, final_graph = self.TREE.retrieve_decomposition(self.TREE.root)
 
-            if(matrices_decomposed!=[]):
-                matrices_decomposed, final_graph = self.Z_extraction(matrices_decomposed, final_graph, self.phase_propagation)
+            if (matrices_decomposed != []):
+                matrices_decomposed, final_graph = self.Z_extraction(matrices_decomposed, final_graph,
+                                                                     self.phase_propagation)
             else:
-               print("couldn't decompose\n")
+                print("couldn't decompose\n")
 
             tree_print = self.TREE.print_tree(self.TREE.root, "TREE: ")
 
             return matrices_decomposed, best_cost, final_graph
 
-
-
-
     def Z_extraction(self, decomposition, placement, phase_propagation):
 
         matrices = []
 
-        for d in decomposition[1:]: #exclude the identity matrix coming from the root of the tree of solutions which is just for correctness
+        for d in decomposition[
+                 1:]:  # exclude the identity matrix coming from the root of the tree of solutions which is just for correctness
             matrices = matrices + d.PI_PULSES
             matrices = matrices + [d.rotation]
 
-
-        U_ = decomposition[-1].U_of_level #take U of last elaboration which should be the diagonal matrix found
+        U_ = decomposition[-1].U_of_level  # take U of last elaboration which should be the diagonal matrix found
         ###########################################################################################################
 
         # check if close to diagonal
         Ucopy = U_.copy()
 
         # is the diagonal noisy?
-        valid_diag = any(abs(np.diag(Ucopy)) > 1.0e-4) # > 1.0e-4
-
+        valid_diag = any(abs(np.diag(Ucopy)) > 1.0e-4)  # > 1.0e-4
 
         # are the non diagonal entries zeroed-out
         filtered_Ucopy = abs(Ucopy) > 1.0e-4
@@ -69,8 +68,7 @@ class Adaptive_decomposition:
 
         not_diag = filtered_Ucopy.any()
 
-
-        if ( not_diag or not valid_diag):  # if is diagonal enough then somehow signal end of algorithm
+        if (not_diag or not valid_diag):  # if is diagonal enough then somehow signal end of algorithm
             raise Exception('Matrix isnt close to diagonal!')
         else:
             diag_U = np.diag(U_)
@@ -78,49 +76,43 @@ class Adaptive_decomposition:
 
             for i in range(dimension):
 
-                if( abs(np.angle(diag_U[i]))> 1.0e-4):
+                if (abs(np.angle(diag_U[i])) > 1.0e-4):
 
-                    if(phase_propagation):
+                    if (phase_propagation):
                         inode = placement._1stInode
                         if ('phase_storage' in placement.nodes[inode]):
-                            placement.nodes[i]['phase_storage'] = placement.nodes[i]['phase_storage'] + np.angle(diag_U[i])
+                            placement.nodes[i]['phase_storage'] = placement.nodes[i]['phase_storage'] + np.angle(
+                                diag_U[i])
                             placement.nodes[i]['phase_storage'] = newMod(placement.nodes[i]['phase_storage'])
                     else:
                         phy_n_i = placement.nodes[i]['lpmap']
 
-                        phase_gate = Rz( np.angle(diag_U[i]), phy_n_i, dimension)
+                        phase_gate = Rz(np.angle(diag_U[i]), phy_n_i, dimension)
 
-                        U_ = matmul( phase_gate.matrix, U_)
+                        U_ = matmul(phase_gate.matrix, U_)
 
-                        matrices.append( phase_gate )
+                        matrices.append(phase_gate)
 
-
-            if(not phase_propagation):
+            if (not phase_propagation):
                 inode = placement._1stInode
                 if ('phase_storage' in placement.nodes[inode]):
                     for i in range(len(list(placement.nodes))):
-                        thetaZ = newMod( placement.nodes[i]['phase_storage'] )
-                        if(abs( thetaZ )> 1.0e-4):
-                            phase_gate = Rz( thetaZ, placement.nodes[i]['lpmap'], dimension)
+                        thetaZ = newMod(placement.nodes[i]['phase_storage'])
+                        if (abs(thetaZ) > 1.0e-4):
+                            phase_gate = Rz(thetaZ, placement.nodes[i]['lpmap'], dimension)
                             matrices.append(phase_gate)
-
 
             return matrices, placement
 
-
-
-    def DFS(self, current_root,   level = 0):
-
+    def DFS(self, current_root, level=0):
 
         ######## check if close to diagonal #########
         Ucopy = current_root.U_of_level.copy()
 
         current_placement = current_root.graph
 
-
-        #is the diagonal noisy?
-        valid_diag = any(abs(np.diag(Ucopy))> 1.0e-4)
-
+        # is the diagonal noisy?
+        valid_diag = any(abs(np.diag(Ucopy)) > 1.0e-4)
 
         # are the non diagonal entries zeroed-out?
         filtered_Ucopy = abs(Ucopy) > 1.0e-4
@@ -128,22 +120,20 @@ class Adaptive_decomposition:
 
         not_diag = filtered_Ucopy.any()
 
-
         # if is diagonal enough then somehow signal end of algorithm
-        if( (not not_diag) and valid_diag ):
-
+        if ((not not_diag) and valid_diag):
             current_root.finished = True
 
             raise SequenceFoundException(current_root.key)
 
-            #just in case something happens
+            # just in case something happens
             return
 
         ################################################
         ###############
         #########
 
-        #BEGIN SEARCH
+        # BEGIN SEARCH
 
         U_ = current_root.U_of_level
 
@@ -153,35 +143,31 @@ class Adaptive_decomposition:
 
             for r in range(c, dimension):
 
-                for r2 in range(r+1, dimension):
+                for r2 in range(r + 1, dimension):
 
+                    if (abs(U_[r2, c]) > 1.0e-8 and (abs(U_[r, c]) > 1.0e-18 or abs(U_[r, c]) == 0)):
 
-                    if (abs(U_[r2, c]) > 1.0e-8 and (abs(U_[r,c])>1.0e-18 or abs(U_[r,c])==0  ) ):
+                        theta = 2 * np.arctan2(abs(U_[r2, c]), abs(U_[r, c]))
 
+                        phi = -(np.pi / 2 + np.angle(U_[r, c]) - np.angle(U_[r2, c]))
 
-                        theta = 2 * np.arctan2( abs(U_[r2, c]), abs(U_[r, c]) )
+                        rotation_involved = R(theta, phi, r, r2, dimension)
 
-                        phi = -( np.pi/2 + np.angle(U_[r,c]) - np.angle(U_[r2,c]))
+                        U_temp = matmul(rotation_involved.matrix, U_)
 
+                        non_zeros = np.count_nonzero(abs(U_temp) > 1.0e-4)
 
-                        rotation_involved = R(theta, phi,r, r2, dimension)
-
-                        U_temp = matmul(  rotation_involved.matrix, U_ )
-
-                        non_zeros = np.count_nonzero(abs(U_temp)>1.0e-4)
-
-
-                        estimated_cost, pi_pulses_routing, new_placement, cost_of_pi_pulses, gate_cost = cost_calculator(rotation_involved, current_placement, non_zeros)
-
+                        estimated_cost, pi_pulses_routing, new_placement, cost_of_pi_pulses, gate_cost = cost_calculator(
+                            rotation_involved, current_placement, non_zeros)
 
                         next_step_cost = (estimated_cost + current_root.current_cost)
-                        decomp_next_step_cost = ( cost_of_pi_pulses + gate_cost + current_root.current_decomp_cost)
+                        decomp_next_step_cost = (cost_of_pi_pulses + gate_cost + current_root.current_decomp_cost)
 
+                        branch_condition = current_root.max_cost[
+                                               1] - decomp_next_step_cost  # SECOND POSITION IS PHYISCAL COST
+                        # branch_condition_2 = current_root.max_cost[0] - next_step_cost  # deprecated: FIRST IS ALGORITHMIC COST
 
-                        branch_condition = current_root.max_cost[1] - decomp_next_step_cost #SECOND POSITION IS PHYISCAL COST
-                        #branch_condition_2 = current_root.max_cost[0] - next_step_cost  # deprecated: FIRST IS ALGORITHMIC COST
-
-                        if(  branch_condition > 0 or abs(branch_condition) < 1.0e-12):
+                        if (branch_condition > 0 or abs(branch_condition) < 1.0e-12):
                             # if cost is better can be only candidate otherwise try them all
 
                             self.TREE.global_id_counter = self.TREE.global_id_counter + 1
@@ -191,14 +177,15 @@ class Adaptive_decomposition:
                             if (new_placement.nodes[r]['lpmap'] > new_placement.nodes[r2]['lpmap']):
                                 phi = phi * -1
                             #
-                            physical_rotation = R(theta, phi, new_placement.nodes[r]['lpmap'],new_placement.nodes[r2]['lpmap'], dimension)
+                            physical_rotation = R(theta, phi, new_placement.nodes[r]['lpmap'],
+                                                  new_placement.nodes[r2]['lpmap'], dimension)
                             #
                             physical_rotation = gate_chain_condition(pi_pulses_routing, physical_rotation)
                             #
                             physical_rotation = graph_rule_ongate(physical_rotation, new_placement)
                             #
 
-                            #take care of phases accumulated by not pi-pulsing back
+                            # take care of phases accumulated by not pi-pulsing back
                             p_backs = []
                             for ppulse in pi_pulses_routing:
                                 p_backs.append(R(ppulse.theta, -ppulse.phi, ppulse.lev_a, ppulse.lev_b, dimension))
@@ -206,25 +193,16 @@ class Adaptive_decomposition:
                             for p_back in p_backs:
                                 graph_rule_update(p_back, new_placement)
 
-
-
-                            current_root.add(new_key, physical_rotation, U_temp, new_placement, next_step_cost, decomp_next_step_cost, current_root.max_cost, pi_pulses_routing)
-
-
+                            current_root.add(new_key, physical_rotation, U_temp, new_placement, next_step_cost,
+                                             decomp_next_step_cost, current_root.max_cost, pi_pulses_routing)
 
         # ===============CONTINUE SEARCH ON CHILDREN========================================
-        if( current_root.children != None):
+        if (current_root.children != None):
 
             for child in current_root.children:
-                self.DFS(child, level+1)
-        #===================================================================================
+                self.DFS(child, level + 1)
+        # ===================================================================================
 
-
-
-
-        #END OF RECURSION#
+        # END OF RECURSION#
         return  ##########
         ##################
-
-
-

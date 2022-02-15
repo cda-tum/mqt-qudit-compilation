@@ -1,13 +1,12 @@
 #############################################################
 
-####            Z GATES PROPAGATION
+#            Z GATES PROPAGATION
 
-####################################################################
-####################################################################
-####################################################################
+#############################################################
+from .Rotations import R, Rz
+from utils.r_utils import Pi_mod
 
-from circuit.Rotations import Rz, R
-from utils.r_utils import newMod
+
 
 
 def tag_generator(gates):
@@ -16,20 +15,26 @@ def tag_generator(gates):
     is_reset = False
 
     for g in gates:
-        if (isinstance(g, Rz) and is_reset):
-            tag_number += 1
-            is_reset = False
-        else:
+        # BASED ON EAFP
+        try:
+            blev = g.lev_b
             is_reset = True
+
+        except AttributeError:
+            if (is_reset):
+                tag_number += 1
+                is_reset = False
 
         tags.append(tag_number)
 
     return tags
 
+
 ######################################
 #####################################
 
-def propagate_Z_backward(QC, line_num):
+
+def propagate_Z(QC, line_num, back):
     line = QC.qreg[line_num]
 
     tags = tag_generator(line)
@@ -40,149 +45,75 @@ def propagate_Z_backward(QC, line_num):
 
     for gate_index in range(len(line)):
 
-        if (isinstance(line[gate_index], Rz)):
-
-            list_of_Zrots.append((line[gate_index], tags[gate_index]))
-
-        elif (isinstance(line[gate_index], R)):
-
+        if(isinstance(line[gate_index], R)):
             list_of_XYrots.append((line[gate_index], tags[gate_index]))
+        else:
+            list_of_Zrots.append((line[gate_index], tags[gate_index]))
 
     levels = {}
 
-    for Rz_gate_i, Rz_gate_tag  in list_of_Zrots:
+    for Rz_gate_i, Rz_gate_tag in list_of_Zrots:
 
-        key1 = Rz_gate_i.lev
-        key2 = Rz_gate_tag
+        tag_r = Rz_gate_tag
+        e_lev_key = Rz_gate_i.lev
 
-        if key1 in levels:
-            if key2 in levels[key1]:
-
-                for tag in levels[key1]:
-                    if (tag < key2):
-                        levels[key1][tag] = newMod( levels[key1][tag] + Rz_gate_i.theta )
-
-                        levels[key1][key2] += Rz_gate_i.theta
+        if tag_r in levels:
+            if e_lev_key in levels[tag_r]:
+                levels[tag_r][e_lev_key] = Pi_mod(levels[tag_r][e_lev_key] + Rz_gate_i.theta)
             else:
-                for tag in levels[key1]:
-                    if (tag < key2):
-                        levels[key1][tag] = newMod( levels[key1][tag] + Rz_gate_i.theta )
-
-                        levels[key1][key2] = Rz_gate_i.theta
-
+                levels[tag_r][e_lev_key] = Pi_mod(Rz_gate_i.theta)
         else:
-            levels[key1] = {}
-            levels[key1][key2] = Rz_gate_i.theta
+            levels[tag_r] = {}
+            levels[tag_r][e_lev_key] = Pi_mod(Rz_gate_i.theta)
 
-    for gate_tuple in list_of_XYrots:
-        R_gate_i = gate_tuple[0]
-        R_gate_tag = gate_tuple[1]
+    for R_gate_i, R_gate_tag in list_of_XYrots:
 
         phi = 0
-
-        if (R_gate_i.lev_a in levels):
-            for z_tags in levels[R_gate_i.lev_a]:
-                if (z_tags > R_gate_tag):
-                    phi += levels[R_gate_i.lev_a][z_tags]
-
-        if (R_gate_i.lev_b in levels):
-            for z_tags in levels[R_gate_i.lev_b]:
-                if (z_tags > R_gate_tag):
-                    phi -= levels[R_gate_i.lev_b][z_tags]
-
-        old_phi = R_gate_i.phi
-
-        new_phi = newMod( old_phi + phi )
-
-        fixed_sequence.append( R(R_gate_i.theta, new_phi, R_gate_i.lev_a, R_gate_i.lev_b, R_gate_i.dimension) )
-
-    fixed_sequence
-
-    return fixed_sequence
-
-
-# ----------------------------------------------------------------------------
-
-def propagate_Z_forward(QC, line_num):
-    line = QC.qreg[line_num]
-
-    tags = tag_generator(line)
-
-    list_of_Zrots = []
-    list_of_XYrots = []
-    fixed_sequence = []
-
-    for gate_index in range(len(line)):
-
-        if (isinstance(line[gate_index], Rz)):
-
-            list_of_Zrots.append((line[gate_index], tags[gate_index]))
-
-        elif (isinstance(line[gate_index], R)):
-
-            list_of_XYrots.append((line[gate_index], tags[gate_index]))
-
-    levels = {}
-
-    for Rz_gate_i, Rz_gate_tag in reversed(list_of_Zrots):
-
-        key1 = Rz_gate_i.lev
-        key2 = Rz_gate_tag
-
-        if key1 in levels:
-            if key2 in levels[key1]:
-
-                for tag in levels[key1]:
-                    if (tag > key2):
-                        levels[key1][tag] = newMod( levels[key1][tag] + Rz_gate_i.theta )
-
-                        levels[key1][key2] += Rz_gate_i.theta
-            else:
-                for tag in levels[key1]:
-                    if (tag > key2):
-                        levels[key1][tag] = newMod( levels[key1][tag] + Rz_gate_i.theta )
-
-                        levels[key1][key2] = Rz_gate_i.theta
-
+        if(back):
+            for z_tag in list(levels):
+                # where propagation happens
+                if z_tag > R_gate_tag:
+                    if R_gate_i.lev_a in levels[z_tag]:
+                        phi = Pi_mod(phi - levels[z_tag][R_gate_i.lev_a])
+                    if R_gate_i.lev_b in levels[z_tag]:
+                        phi = Pi_mod(phi + levels[z_tag][R_gate_i.lev_b])
         else:
-            levels[key1] = {}
-            levels[key1][key2] = Rz_gate_i.theta
-
-    for R_gate_i, R_gate_tag in reversed(list_of_XYrots):
-
-        phi = 0
-
-        if (R_gate_i.lev_a in levels):
-            for z_tags in levels[R_gate_i.lev_a]:
-                if (z_tags < R_gate_tag):
-                    phi += levels[R_gate_i.lev_a][z_tags]
-
-        if (R_gate_i.lev_b in levels):
-            for z_tags in levels[R_gate_i.lev_b]:
-                if (z_tags < R_gate_tag):
-                    phi -= levels[R_gate_i.lev_b][z_tags]
+            for z_tag in reversed(list(levels)):
+                # where propagation happens
+                if z_tag <= R_gate_tag:
+                    if R_gate_i.lev_a in levels[z_tag]:
+                        phi = Pi_mod(phi + levels[z_tag][R_gate_i.lev_a])
+                    if R_gate_i.lev_b in levels[z_tag]:
+                        phi = Pi_mod(phi - levels[z_tag][R_gate_i.lev_b])
 
         old_phi = R_gate_i.phi
+        new_phi = Pi_mod(old_phi + phi)
 
-        new_phi = newMod( old_phi + phi )
+        fixed_sequence.append(R(R_gate_i.theta, new_phi, R_gate_i.lev_a, R_gate_i.lev_b, R_gate_i.dimension))
 
-        fixed_sequence.append( R(R_gate_i.theta, new_phi, R_gate_i.lev_a, R_gate_i.lev_b, R_gate_i.dimension) )
+    aggregated_Z = {}
 
-    
+    for z_tag in list(levels):
+        for level in list(levels[z_tag]):
+            if level in list(aggregated_Z):
+                aggregated_Z[level] = Pi_mod(aggregated_Z[level] + levels[z_tag][level])
+            else:
+                aggregated_Z[level] = Pi_mod(levels[z_tag][level])
 
-    return fixed_sequence
+    Zseq = []
+    for e_lev in list(aggregated_Z):
+        Zseq.append(Rz(aggregated_Z[e_lev], e_lev, QC.dimension))
 
-# ----------------------------------------------------------------------------
+    return fixed_sequence, Zseq
+
+
 
 def remove_Z(QC, back=True):
-
-    if(back):
-        for num_line in range(len(QC.qreg)):
-            QC.qreg[num_line] = propagate_Z_backward(QC, num_line)
-    else:
-        for num_line in range(len(QC.qreg)):
-            QC.qreg[num_line] = propagate_Z_forward(QC, num_line)
+    for num_line in range(len(QC.qreg)):
+        fixed_seq, z_tail = propagate_Z(QC, num_line, back)
+        if back:
+            QC.qreg[num_line] = z_tail + fixed_seq
+        else:
+            QC.qreg[num_line] = fixed_seq + z_tail
 
     return
-
-

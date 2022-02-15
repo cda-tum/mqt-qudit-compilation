@@ -1,20 +1,18 @@
-from src.evaluation.Clifford_Generator import Clifford_Generator
-from src.evaluation.Pauli import H, S, X
-from src.evaluation.Verifier import Verifier
+import gc
+import glob
+import time
+
 from src.decomposition.Adaptive_decomposition import *
 from src.decomposition.QR_decomp import *
+from src.evaluation.Clifford_Generator import Clifford_Generator
 from src.evaluation.Evaluation_Graphs import *
-import time
-import glob
-import gc
-
-from csv import DictWriter
+from src.evaluation.Pauli import H, S, X
+from src.evaluation.Verifier import Verifier
 
 path_data = "/home/k3vn/Documents/Compiler/binq/data/"
 
-
 # GENERATE LL CLIFFORD BEFORE TESTING
-#Clifford_Generator.generate_all_3_5_7(path)
+# Clifford_Generator.generate_all_3_5_7(path)
 
 ################################################
 
@@ -47,8 +45,8 @@ for file in files_to_read:
     X1 = X(dimension)
     #########################################################
 
-    operation = Custom_Unitary( matrix_to_analyze, dimension)
-    #operation = X1
+    operation = Custom_Unitary(matrix_to_analyze, dimension)
+    # operation = X1
     #############################################################
 
     #                        EXECUTION
@@ -62,7 +60,7 @@ for file in files_to_read:
     endqr = time.time()
 
     ###############################################################
-    Adaptive = Adaptive_decomposition(operation, graph_to_use, (1.1*algorithmic_cost, 1.1*total_cost), dimension)
+    Adaptive = Adaptive_decomposition(operation, graph_to_use, (1.1 * algorithmic_cost, 1.1 * total_cost), dimension)
 
     start = time.time()
     matrices_decomposed, best_cost, final_graph = Adaptive.execute()
@@ -114,14 +112,14 @@ for file in files_to_read:
               'algoCostQR': algorithmic_cost, 'algoCostADA': ada_algo, 'decoCostQR': total_cost,
               'decoCostADA': ada_cost, 'numRzQR': numRzQR, 'numRzADA': numRzADA, 'succQR': V1r, 'succADA': V2r}
 
-    #with open("/evaluation_2/" + "dim" + str(dimension) + "/" + "eval" + str(graph_combo) + ".csv", 'a') as f_object:
+    # with open("/evaluation_2/" + "dim" + str(dimension) + "/" + "eval" + str(graph_combo) + ".csv", 'a') as f_object:
 
     #    dictwriter_object = DictWriter(f_object, fieldnames=field_names)
 
-        # Pass the dictionary as an argument to the Writerow()
+    # Pass the dictionary as an argument to the Writerow()
     #    dictwriter_object.writerow(record)
 
-        # Close the file object
+    # Close the file object
     #    f_object.close()
 
     gc.collect()

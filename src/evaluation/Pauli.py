@@ -1,4 +1,5 @@
 import itertools
+
 import numpy as np
 
 
@@ -7,14 +8,12 @@ class H:
     def __init__(self, dimension):
         l = [list(range(dimension)), list(range(dimension))]
 
-
         ret = np.outer([0 for x in range(dimension)], [0 for x in range(dimension)])
 
         for e0, e1 in itertools.product(*l):
             omega = np.mod(2 / dimension * (e0 * e1), 2)
             omega = omega * np.pi * 1j
             omega = np.e ** omega
-
 
             l1 = [0 for x in range(dimension)]
             l2 = [0 for x in range(dimension)]
@@ -26,13 +25,12 @@ class H:
 
             result = omega * np.outer(array1, array2)
 
-
             ret = ret + result
 
         ret = (1 / np.sqrt(dimension)) * ret
 
-
         self.matrix = ret
+
 
 class Z:
     def __init__(self, dimension):
@@ -45,7 +43,6 @@ class Z:
             omega = omega * np.pi * 1j
             omega = np.e ** omega
 
-
             l1 = [0 for x in range(dimension)]
             l2 = [0 for x in range(dimension)]
             l1[el] = 1
@@ -56,11 +53,10 @@ class Z:
 
             result = omega * np.outer(array1, array2)
 
-
             ret = ret + result
 
-
         self.matrix = ret
+
 
 class X:
     def __init__(self, dimension):
@@ -98,7 +94,6 @@ class S:
             omega = omega * np.pi * 1j
             omega = np.e ** omega
 
-
             l1 = [0 for x in range(dimension)]
             l2 = [0 for x in range(dimension)]
             l1[el] = 1
@@ -112,4 +107,3 @@ class S:
             ret = ret + result
 
         self.matrix = ret
-

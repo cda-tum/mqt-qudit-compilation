@@ -1,11 +1,11 @@
-from random import  randint, shuffle
+from random import randint, shuffle
+
 import numpy as np
-
-from numpy import savetxt
 from numpy import loadtxt
+from numpy import savetxt
 
-from src.evaluation.Pauli import S
 from src.evaluation.Pauli import H
+from src.evaluation.Pauli import S
 from src.utils.r_utils import matmul
 
 
@@ -20,12 +20,11 @@ class Clifford_Generator:
 
     def numerical_comparison(self, matrix):
         for elem in self.database:
-            if(elem.size == matrix.size):
-                if( (abs(matrix-elem)<1e-12).all() ):
+            if (elem.size == matrix.size):
+                if ((abs(matrix - elem) < 1e-12).all()):
                     return True
 
         return False
-
 
     def random_string_gen(self, limit):
         zero_count = randint(0, limit)
@@ -37,14 +36,13 @@ class Clifford_Generator:
         shuffle(string)
         shuffle(string)
 
-
         return string
 
     def strings_gen_random(self):
         for i in range(1, self.power):
             for j in range(1000000):
                 sequ = self.random_string_gen(i)
-                if( not( sequ in self.stringsdb )):
+                if (not (sequ in self.stringsdb)):
                     self.stringsdb.append(sequ)
 
     def genbin(self, n, l, bs=[]):
@@ -58,9 +56,8 @@ class Clifford_Generator:
         for i in range(2, self.power + 2):
             self.genbin(i, self.stringsdb)
 
-
     def generate(self):
-        if(not self.power):
+        if (not self.power):
             return
 
         self.strings_gen_fixed()
@@ -68,14 +65,14 @@ class Clifford_Generator:
         Sm = S(self.dimension)
 
         for s in self.stringsdb:
-            matrix = np.identity(self.dimension , dtype='complex')
+            matrix = np.identity(self.dimension, dtype='complex')
             for bit in s:
-                if(bit):
+                if (bit):
                     matrix = matmul(Hm.matrix, matrix)
                 else:
                     matrix = matmul(Sm.matrix, matrix)
 
-            if( not self.numerical_comparison(matrix)):
+            if (not self.numerical_comparison(matrix)):
                 self.database.append(matrix)
                 self.save_to_csv(matrix, s)
 
@@ -83,11 +80,13 @@ class Clifford_Generator:
 
     def save_to_csv(self, matrix, name):
         name = " ".join(str(x) for x in name)
-        savetxt(self.saving_path+"dim"+str(self.dimension)+"/"+str(name)+".csv", matrix, fmt='%.12e', delimiter=',')
+        savetxt(self.saving_path + "dim" + str(self.dimension) + "/" + str(name) + ".csv", matrix, fmt='%.12e',
+                delimiter=',')
 
     @staticmethod
     def load_from_csv(path):
-        data = loadtxt(path, delimiter=',',dtype=complex, converters={0: lambda s: complex(s.decode().replace('+-', '-'))})
+        data = loadtxt(path, delimiter=',', dtype=complex,
+                       converters={0: lambda s: complex(s.decode().replace('+-', '-'))})
         return data
 
     @staticmethod

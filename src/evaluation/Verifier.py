@@ -1,8 +1,8 @@
 import numpy as np
+from numpy.linalg import inv
 
 from src.utils.r_utils import matmul
 
-from numpy.linalg import inv
 
 class Verifier:
 
@@ -13,7 +13,6 @@ class Verifier:
         self.permutation_matrix_initial = self.get_perm_matrix(nodes, initial_map)
         self.permutation_matrix_final = self.get_perm_matrix(nodes, final_map)
         self.target = matmul(self.permutation_matrix_initial, self.target)
-
 
     def get_perm_matrix(self, nodes, mapping):
         perm = np.zeros((self.dimension, self.dimension))
@@ -33,14 +32,10 @@ class Verifier:
         target = self.target.copy()
 
         for rotation in self.decomposition:
-
             target = matmul(rotation.matrix, target)
-
 
         target = matmul(inv(self.permutation_matrix_final), target)
 
-        res = ( abs(target - np.identity(self.dimension , dtype='complex'))<10e-6 ).all()
+        res = (abs(target - np.identity(self.dimension, dtype='complex')) < 10e-6).all()
 
         return res
-
-
