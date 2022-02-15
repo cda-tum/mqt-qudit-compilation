@@ -29,7 +29,7 @@ class QR_decomp:
 
             for r in l[:diag_index]:
 
-                if (abs(U_[r, c]) > 1.0e-8):
+                if abs(U_[r, c]) > 1.0e-8:
 
                     theta = 2 * np.arctan2(abs(U_[r, c]), abs(U_[r - 1, c]))
 
@@ -46,7 +46,7 @@ class QR_decomp:
 
                     decomp += pi_pulses_routing
 
-                    if (temp_placement.nodes[r - 1]['lpmap'] > temp_placement.nodes[r]['lpmap']):
+                    if temp_placement.nodes[r - 1]['lpmap'] > temp_placement.nodes[r]['lpmap']:
                         phi = phi * -1
 
                     physical_rotation = R(theta, phi, temp_placement.nodes[r - 1]['lpmap'],
@@ -66,7 +66,7 @@ class QR_decomp:
 
         for i in range(dimension):
 
-            if (abs(np.angle(diag_U[i])) > 1.0e-4):
+            if abs(np.angle(diag_U[i])) > 1.0e-4:
                 phy_n_i = self.graph.nodes[i]['lpmap']
 
                 phase_gate = Rz(np.angle(diag_U[i]), phy_n_i, dimension)

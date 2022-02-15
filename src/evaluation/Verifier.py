@@ -15,6 +15,7 @@ class Verifier:
         self.target = matmul(self.permutation_matrix_initial, self.target)
 
     def get_perm_matrix(self, nodes, mapping):
+        # sum ( |phy> <log| )
         perm = np.zeros((self.dimension, self.dimension))
 
         for i in range(self.dimension):

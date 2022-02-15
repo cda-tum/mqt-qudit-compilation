@@ -1,4 +1,5 @@
 import gc
+import json
 
 from circuit.Z_prop_shallow import remove_Z
 from decomposition.QR_decomp import QR_decomp
@@ -19,7 +20,7 @@ class QuantumCircuit:
 
     def R(self, qudit_line, theta, phi, lev_a, lev_b):
 
-        self.qreg[qudit_line].append( R(theta, phi, lev_a, lev_b, self.dimension) )
+        self.qreg[qudit_line].append(R(theta, phi, lev_a, lev_b, self.dimension))
 
     def Rz(self, qudit_line, theta, lev):
 
@@ -47,6 +48,31 @@ class QuantumCircuit:
                     custom_counter = custom_counter + 1
 
             print("---=||")
+
+    def to_json(self, absolute_path, name="QCjsoned"):
+        repr_as_dict = {}
+        temp = []
+
+        for i, e in enumerate(list(self.energy_level_graph.edges)):
+            temp.append((str(e), i))
+        temp = dict(temp)
+
+        repr_as_dict['0'] = dict(temp)
+        counter = 1
+
+        for j, line in enumerate(self.qreg):
+            for gate in line:
+                if isinstance(gate, Rz):
+                    repr_as_dict[str(counter)] = {"theta": gate.theta, "carrier": gate.lev, "particle": j, "type": 'z'}
+
+
+                elif isinstance(gate, R):
+                    repr_as_dict[str(counter)] = {"theta": gate.theta, "phi": gate.phi, "carrier": temp[str((gate.lev_a, gate.lev_b))], "particle": j , "type": 'g'}
+
+                counter += 1
+
+        with open( absolute_path+name+'.json', 'w') as fp:
+            json.dump(repr_as_dict, fp)
 
     ####################################################################
     #

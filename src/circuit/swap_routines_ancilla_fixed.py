@@ -1,6 +1,3 @@
-# TODO TO INTEGRATE WITH QUANTUM CIRCUIT CLASS
-# TODO TO FIX AND INTEGRATE
-
 import networkx as nx
 import numpy as np
 
@@ -8,6 +5,8 @@ from src.Exceptions.Exceptions import RoutingException
 from src.circuit.Rotations import R
 from utils.cost_functions import rotation_cost_calc
 
+
+# WARNING OBSOLETE FILE
 
 def swap_assignment(a, b):
     return b, a
@@ -29,7 +28,7 @@ def pi_swap_routine(path, i, next, placement, dimension):
     trace.reverse()
     index = 0
 
-    while (index < len(trace) - 1):
+    while index < len(trace) - 1:
         pi_gate = R(np.pi, 0, path[trace[index]], path[trace[index + 1]], dimension)
         swapping_list.append(pi_gate)
         cost += rotation_cost_calc(pi_gate, placement)
@@ -40,7 +39,7 @@ def pi_swap_routine(path, i, next, placement, dimension):
         index += 1
 
     index -= 1
-    while (index > 0):
+    while index > 0:
         pi_gate = R(np.pi, 0, path[trace[index - 1]], path[trace[index]], dimension)
         swapping_list.append(pi_gate)
         cost += rotation_cost_calc(pi_gate, placement)
@@ -49,13 +48,13 @@ def pi_swap_routine(path, i, next, placement, dimension):
         path = swap_elements(path, trace[index - 1], trace[index])
         index -= 1
 
-    return (cost, swapping_list, placement, path)
+    return cost, swapping_list, placement, path
 
 
 def find_next_available(i, lista):
     counter = i - 1
-    while (counter >= 0):
-        if (lista[counter] >= 0):
+    while counter >= 0:
+        if lista[counter] >= 0:
             return counter
         counter -= 1
 
@@ -72,7 +71,7 @@ def rotate_over_ancilla(path, source, target, placement, dimension):
     sensitivity_source = [placement.get_edge_sensitivity(path[source], node) for node in neighbours_source]
     sensitivity_target = [placement.get_edge_sensitivity(path[target], node) for node in neighbours_target]
 
-    if (len(sensitivity_source) > 0):
+    if len(sensitivity_source) > 0:
         invert = False
         best_n_s_index = np.argmin(sensitivity_source)
         node_to_go_s = neighbours_source[best_n_s_index]
@@ -83,7 +82,7 @@ def rotate_over_ancilla(path, source, target, placement, dimension):
 
         placement = placement.swap_nodes(path[source], node_to_go_s)
 
-    elif (len(sensitivity_target) > 0):
+    elif len(sensitivity_target) > 0:
         invert = True
         best_n_t_index = np.argmin(sensitivity_target)
         node_to_go_t = neighbours_target[best_n_t_index]
@@ -96,7 +95,7 @@ def rotate_over_ancilla(path, source, target, placement, dimension):
     else:
         raise RoutingException
 
-    return (cost, swapping_list, placement, invert)
+    return cost, swapping_list, placement, invert
 
 
 def route_states2rotate_ancilla_fixed(gate, orig_placement):
@@ -114,9 +113,9 @@ def route_states2rotate_ancilla_fixed(gate, orig_placement):
 
     i = len(path) - 2
 
-    while (i > 0):
+    while i > 0:
 
-        if (path[i] >= 0):
+        if path[i] >= 0:
             pi_gate = R(np.pi, 0, path[i], path[i + 1], dimension)
             pi_pulses_routing.append(pi_gate)
             cost_of_pi_pulses += rotation_cost_calc(pi_gate, placement)
@@ -125,11 +124,11 @@ def route_states2rotate_ancilla_fixed(gate, orig_placement):
             path = swap_elements(path, i + 1, i)
 
             i -= 1
-        elif (path[i] < 0):
+        elif path[i] < 0:
 
             next_swap = find_next_available(i, path)
 
-            if (next_swap == 0 and path[next_swap] == source):
+            if next_swap == 0 and path[next_swap] == source:
 
                 routine_cost, sequence, placement, invert_routing = rotate_over_ancilla(path, next_swap, i, placement,
                                                                                         dimension)
@@ -143,7 +142,7 @@ def route_states2rotate_ancilla_fixed(gate, orig_placement):
                 i = len(path) - 2
 
             else:
-                if (next_swap > 0):
+                if next_swap > 0:
                     routine_cost, sequence, placement, path = pi_swap_routine(path, i, next_swap, placement, dimension)
                     pi_pulses_routing += sequence
                     cost_of_pi_pulses += routine_cost
@@ -155,4 +154,4 @@ def route_states2rotate_ancilla_fixed(gate, orig_placement):
 
                 i = next_swap - 1
 
-    return (cost_of_pi_pulses, pi_pulses_routing, placement)
+    return cost_of_pi_pulses, pi_pulses_routing, placement

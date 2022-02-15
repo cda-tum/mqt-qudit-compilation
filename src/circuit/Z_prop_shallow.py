@@ -1,12 +1,8 @@
 #############################################################
-
 #            Z GATES PROPAGATION
-
 #############################################################
-from .Rotations import R, Rz
 from utils.r_utils import Pi_mod
-
-
+from .Rotations import R, Rz
 
 
 def tag_generator(gates):
@@ -17,7 +13,7 @@ def tag_generator(gates):
     for g in gates:
         # BASED ON EAFP
         try:
-            blev = g.lev_b
+            test_for_type_by_EAFP = g.lev_b
             is_reset = True
 
         except AttributeError:
@@ -30,11 +26,9 @@ def tag_generator(gates):
     return tags
 
 
-######################################
-#####################################
+# ----------------------------------------------------------------
 
-
-def propagate_Z(QC, line_num, back):
+def propagate_z(QC, line_num, back):
     line = QC.qreg[line_num]
 
     tags = tag_generator(line)
@@ -44,11 +38,17 @@ def propagate_Z(QC, line_num, back):
     fixed_sequence = []
 
     for gate_index in range(len(line)):
-
-        if(isinstance(line[gate_index], R)):
+        try:
+            test_for_type_by_EAFP = line[gate_index].lev_b
+            # object is R
             list_of_XYrots.append((line[gate_index], tags[gate_index]))
-        else:
-            list_of_Zrots.append((line[gate_index], tags[gate_index]))
+        except AttributeError:
+            try:
+                test_for_type_by_EAFP_2 = line[gate_index].lev
+                # object is Rz
+                list_of_Zrots.append((line[gate_index], tags[gate_index]))
+            except AttributeError:
+                pass
 
     levels = {}
 
@@ -68,26 +68,28 @@ def propagate_Z(QC, line_num, back):
 
     for R_gate_i, R_gate_tag in list_of_XYrots:
 
-        phi = 0
-        if(back):
+        delta_phi = 0
+
+        # respects commutation rules
+        if back:
             for z_tag in list(levels):
                 # where propagation happens
                 if z_tag > R_gate_tag:
                     if R_gate_i.lev_a in levels[z_tag]:
-                        phi = Pi_mod(phi - levels[z_tag][R_gate_i.lev_a])
+                        delta_phi = Pi_mod(delta_phi - levels[z_tag][R_gate_i.lev_a])
                     if R_gate_i.lev_b in levels[z_tag]:
-                        phi = Pi_mod(phi + levels[z_tag][R_gate_i.lev_b])
+                        delta_phi = Pi_mod(delta_phi + levels[z_tag][R_gate_i.lev_b])
         else:
             for z_tag in reversed(list(levels)):
                 # where propagation happens
                 if z_tag <= R_gate_tag:
                     if R_gate_i.lev_a in levels[z_tag]:
-                        phi = Pi_mod(phi + levels[z_tag][R_gate_i.lev_a])
+                        delta_phi = Pi_mod(delta_phi + levels[z_tag][R_gate_i.lev_a])
                     if R_gate_i.lev_b in levels[z_tag]:
-                        phi = Pi_mod(phi - levels[z_tag][R_gate_i.lev_b])
+                        delta_phi = Pi_mod(delta_phi - levels[z_tag][R_gate_i.lev_b])
 
         old_phi = R_gate_i.phi
-        new_phi = Pi_mod(old_phi + phi)
+        new_phi = Pi_mod(old_phi + delta_phi)
 
         fixed_sequence.append(R(R_gate_i.theta, new_phi, R_gate_i.lev_a, R_gate_i.lev_b, R_gate_i.dimension))
 
@@ -107,10 +109,9 @@ def propagate_Z(QC, line_num, back):
     return fixed_sequence, Zseq
 
 
-
 def remove_Z(QC, back=True):
     for num_line in range(len(QC.qreg)):
-        fixed_seq, z_tail = propagate_Z(QC, num_line, back)
+        fixed_seq, z_tail = propagate_z(QC, num_line, back)
         if back:
             QC.qreg[num_line] = z_tail + fixed_seq
         else:

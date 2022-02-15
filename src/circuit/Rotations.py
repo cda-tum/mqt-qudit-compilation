@@ -1,18 +1,9 @@
 from src.circuit.Gellman import *
 
-# TODO:                             DISCLAIMER!!!!!!
-
-# TODO: WE CAN BUILD TEST CASES FOR THIS, BUT I SWEATED ALREADY TOO MUCH ON THIS.
-# TODO: BE CAREFUL IF YOU MAKE ANY CHANGES AND TEST IT CAREFULLY
-# TODO: -------------only the properties have been tested-------------
-
-## Pay attention : inputs to classes are always in radians
-## cost functions in this class take input radians but work on units of pi, the rest is taken care automatically
-
-####################### ROTATION MATRICES
-from utils.cost_functions import phi_cost, theta_cost
+from utils.cost_functions import phi_cost, theta_cost, theta_corrector
 
 
+# Pay attention : inputs to classes are always in radians
 class Custom_Unitary:
 
     def __init__(self, matrix, dimension):
@@ -24,38 +15,29 @@ class Custom_Unitary:
 
 
 class R:
-
     @staticmethod
-    def theta_corrector(angle):
-        theta_in_units_of_pi = np.mod(abs(angle / np.pi), 4)
-        if (angle < 0):
-            theta_in_units_of_pi = theta_in_units_of_pi * -1
-        if (abs(theta_in_units_of_pi) < 0.2):
-            theta_in_units_of_pi += 4.0
-
-        return (theta_in_units_of_pi * np.pi)
+    def regulate_theta(angle):
+        return theta_corrector(angle)
 
     @staticmethod
     def levels_setter(la, lb, dimension):
-        if (la == lb):
+        if la == lb:
             raise Exception
-        if (la < 0):
+        if la < 0:
             la = dimension + la
-        if (lb < 0):
+        if lb < 0:
             lb = dimension + lb
-
-        if (la < lb):
+        if la < lb:
             return la, lb
         else:
             return lb, la
 
     def __init__(self, theta, phi, o_lev_a, o_lev_b, dimension):
-
         self.original_lev_a = o_lev_a
         self.original_lev_b = o_lev_b
         self.lev_a, self.lev_b = self.levels_setter(o_lev_a, o_lev_b, dimension)
 
-        self.theta = self.theta_corrector(theta)
+        self.theta = self.regulate_theta(theta)
         self.phi = phi
 
         self.dimension = dimension
@@ -71,8 +53,6 @@ class R:
                        (np.sin(phi) * GellMann(self.lev_a, self.lev_b, 'a', dimension).matrix +
                         np.cos(phi) * GellMann(self.lev_a, self.lev_b, 's', dimension).matrix))
 
-        """control if the matrix is actually correct because different from the slides of Martin, 
-            but works as in example"""
         self.shape = self.matrix.shape
 
     @property
@@ -85,31 +65,24 @@ class R:
 
     def __str__(self):
         return str("R " + "Theta " + str(self.theta) + "phi " + str(
-            self.phi) + "O lev a " + self.original_lev_a + "O lev b " + self.original_lev_b)
+            self.phi) + " lev a " + self.original_lev_a + " lev b " + self.original_lev_b)
 
 
 class Rz:
 
     @staticmethod
-    def theta_corrector(angle):
-        theta_in_units_of_pi = np.mod(abs(angle / np.pi), 4)
-        if (angle < 0):
-            theta_in_units_of_pi = theta_in_units_of_pi * -1
-        if (abs(theta_in_units_of_pi) < 0.2):
-            theta_in_units_of_pi += 4.0
-
-        return (theta_in_units_of_pi * np.pi)
+    def regulate_theta(angle):
+        return theta_corrector(angle)
 
     @staticmethod
     def levels_setter(lev, dimension):
-        if (lev < 0):
+        if lev < 0:
             return dimension + lev
         else:
             return lev
 
     def __init__(self, theta, o_lev, dimension):
-
-        self.theta = self.theta_corrector(theta)  # TODO DISCUSS IF THIS SHOULD GO THROUGH THE CORRECTOR
+        self.theta = self.regulate_theta(theta)
         self.lev = self.levels_setter(o_lev, dimension)
 
         self.dimension = dimension
@@ -122,7 +95,7 @@ class Rz:
         self.shape = self.matrix.shape
 
     def __str__(self):
-        return str("R " + "Theta " + str(self.theta) + "O lev a " + self.lev)
+        return str("R " + "Theta " + str(self.theta) + " lev a " + self.lev)
 
     @property
     def dag(self):

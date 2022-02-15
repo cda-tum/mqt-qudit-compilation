@@ -1,6 +1,7 @@
 import copy
 
 import networkx as nx
+import numpy as np
 
 from circuit.Rotations import Rz
 
@@ -14,12 +15,12 @@ class level_Graph(nx.Graph):
 
         self.add_nodes_from(self.logic_nodes)
 
-        if (nodes_physical_mapping):
+        if nodes_physical_mapping:
             self.logic_physical_map(nodes_physical_mapping)
 
         self.add_edges_from(edges)
 
-        if (initialization_nodes):
+        if initialization_nodes:
             inreach_nodes = [x for x in nodes if x not in initialization_nodes]
             self.define__states(initialization_nodes, inreach_nodes)
 
@@ -146,7 +147,7 @@ class level_Graph(nx.Graph):
         node_b = res_list.index(node_b)
 
         inode = self._1stInode
-        if ('phase_storage' in self.nodes[inode]):
+        if 'phase_storage' in self.nodes[inode]:
             phi_a = self.nodes[node_a]["phase_storage"]
             phi_b = self.nodes[node_b]["phase_storage"]
             self.nodes[node_a]["phase_storage"] = phi_b
@@ -180,7 +181,7 @@ class level_Graph(nx.Graph):
         for node in self.nodes:
             node_dict = self.nodes[node]
             if 'phase_storage' in node_dict:
-                if (node_dict['phase_storage'] < 1e-3 or np.mod(node_dict['phase_storage'], 2 * np.pi) < 1e-3):
+                if node_dict['phase_storage'] < 1e-3 or np.mod(node_dict['phase_storage'], 2 * np.pi) < 1e-3:
                     phy_n_i = self.nodes[node]['lpmap']
 
                     phase_gate = Rz(node_dict['phase_storage'], phy_n_i, len(list(self.nodes)))
@@ -198,7 +199,7 @@ class level_Graph(nx.Graph):
         return totalsensibility
 
     def get_edge_sensitivity(self, node_a, node_b):
-        # todo add try catch in case not there
+        # TODO add try catch in case not there
         return self[node_a][node_b]["sensitivity"]
 
     @property

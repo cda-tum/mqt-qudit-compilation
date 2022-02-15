@@ -9,6 +9,6 @@ def cost_calculator(gate, placement, non_zeros):
 
     total_costing = (gate_cost + cost_of_pi_pulses) * non_zeros
 
-    return (total_costing, pi_pulses_routing, new_placement, cost_of_pi_pulses, gate_cost)
+    return total_costing, pi_pulses_routing, new_placement, cost_of_pi_pulses, gate_cost
 
 ##########################################

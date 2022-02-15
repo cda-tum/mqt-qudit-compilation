@@ -9,9 +9,9 @@ def newMod(a, b=2 * np.pi):
 def Pi_mod(a):
     a = newMod(a)
 
-    if (a > 0 and a > np.pi):
+    if a > 0 and a > np.pi:
         a = a - 2 * np.pi
-    elif (a < 0 and abs(a) > np.pi):
+    elif a < 0 and abs(a) > np.pi:
         a = 2 * np.pi + a
     return a
 
@@ -19,7 +19,7 @@ def Pi_mod(a):
 def matmul(f, s):
     dim = f.shape[1]
     rows_s = s.shape[0]
-    if (dim != rows_s):
+    if dim != rows_s:
         raise Exception('not matching dims')
 
     mat = [[] for x in range(dim)]

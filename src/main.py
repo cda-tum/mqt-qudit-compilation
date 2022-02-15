@@ -1,9 +1,6 @@
 from circuit.QuantumCircuit import QuantumCircuit
-import numpy as np
-
-from evaluation.Pauli import H, S, X
-
 from evaluation.Evaluation_Graphs import graph_3_3
+from evaluation.Pauli import H, S, X
 
 dimension = 3
 
@@ -31,7 +28,10 @@ QC.Rz(0, 1, 0)
 
 QC.draw()
 
+QC.DFS_decompose()
+print("Zprop")
 QC.Z_prop(back=True)
 
 QC.draw()
+#QC.to_json("/home/k3vn/Desktop/")
 print("DONE")

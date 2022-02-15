@@ -23,17 +23,9 @@ class Node:
 
         new_node = Node(new_key, rotation, U_of_level, graph_current, current_cost, current_decomp_cost, max_cost,
                         pi_pulses, self.key)
-        if (self.children == None):
+        if self.children is None:
             self.children = []
-        """
-        index = -1
-        
-        for i in range(self.size):
-            if(self.children[i].current_cost >= new_node.current_cost):
-                index = i
-        
-        self.children.insert(index, new_node)
-        """
+
         self.children.append(new_node)
 
         self.size += 1
@@ -55,23 +47,23 @@ class N_ary_Tree:
 
         # TODO TO TEST FOR CORRECTNESS
 
-        if parent_key == None:
+        if parent_key is None:
             self.root = Node(new_key, rotation, U_of_level, graph_current, current_cost, current_decomp_cost, max_cost,
                              pi_pulses, parent_key)
             self.size = 1
         else:
             parent_node = self.find_node(self.root, parent_key)
-            if not (parent_node):
+            if not parent_node:
                 raise NodeNotFoundException('No element was found with the informed parent key.')
             parent_node.add(new_key, rotation, U_of_level, graph_current, current_cost, current_decomp_cost, max_cost,
                             pi_pulses)
             self.size += 1
 
     def find_node(self, node, key):
-        if node == None or node.key == key:
+        if node is None or node.key is key:
             return node
 
-        if (node.children != None):
+        if node.children is not None:
             for child in node.children:
                 return_node = self.find_node(child, key)
                 if return_node:
@@ -79,14 +71,14 @@ class N_ary_Tree:
         return None
 
     def depth(self, key):
-        ## GIVES DEPTH FROM THE KEY NODE to LEAVES
+        # GIVES DEPTH FROM THE KEY NODE to LEAVES
         node = self.find_node(self.root, key)
         if not (node):
             raise NodeNotFoundException('No element was found with the informed parent key.')
         return self.max_depth(node)
 
     def max_depth(self, node):
-        if not (node.children):
+        if not node.children:
             return 0
         children_max_depth = []
         for child in node.children:
@@ -94,7 +86,7 @@ class N_ary_Tree:
         return 1 + max(children_max_depth)
 
     def size_refresh(self, node):
-        if (node.size == 0):
+        if node.size == 0:
             return 0
         else:
             children_size = 0
@@ -104,26 +96,25 @@ class N_ary_Tree:
             return children_size
 
     def found_checker(self, node):
-        # print("found_checker")
-        if not (node.children):
+        if not node.children:
             return node.finished
 
         children_checking = []
         for child in node.children:
             children_checking.append(self.found_checker(child))
-        if (True in children_checking):
+        if True in children_checking:
             node.finished = True
 
         return node.finished
 
     def min_cost_decomp(self, node):
-        if (not (node.children)):
+        if not node.children:
             return [node], (node.current_cost, node.current_decomp_cost), node.graph
         else:
             children_cost = []
 
             for child in node.children:
-                if (child.finished):
+                if child.finished:
                     children_cost.append(self.min_cost_decomp(child))
 
             minimum_child, best_cost, final_graph = min(children_cost, key=lambda t: t[1][0])
@@ -133,7 +124,7 @@ class N_ary_Tree:
     def retrieve_decomposition(self, node):
         self.found_checker(node)
 
-        if (not node.finished):
+        if not node.finished:
             decomp_nodes = []
             from numpy import inf
             best_cost = inf
@@ -152,12 +143,12 @@ class N_ary_Tree:
 
     def print_tree(self, node, str_aux):
 
-        if node == None: return "Empty tree"
+        if node is None: return "Empty tree"
         f = ""
-        if (node.finished):
+        if node.finished:
             f = "-Finished-"
         str_aux += "N" + str(node) + f + "("
-        if (node.children != None):
+        if node.children != None:
             str_aux += "\n\t"
             for i in range(len(node.children)):
                 child = node.children[i]
