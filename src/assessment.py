@@ -16,13 +16,35 @@ path_data = "/home/k3vn/Documents/Compiler/binq/data/"
 
 ################################################
 
-# CHOICE OF GRAPH FOR TESTING
-dimension = 5
-graph_combo = "g5_3"
-graph_to_use = graph_5_3
-nodes_to_use = nodes_5_3
-nmap_to_use = nmap5_3
+
+
+
+
+
 ################################################
+# EXAMPLE OF GRAPH WITH PHASES ALREADY ENCODED
+edgesx = [(1, 0, {"delta_m": 0, "sensitivity": 3}),
+             (0, 2, {"delta_m": 0, "sensitivity": 3}),
+         ]
+
+nodesx = [0, 1, 2]
+nmapx = [2, 1, 0]
+
+
+graphx = level_Graph(edgesx, nodesx, nmapx, [1])
+graphx.phase_storing_setup()
+graphx.nodes[0]['phase_storage'] = np.pi
+# --------------------------------------------------------
+# CHOICE OF GRAPH FOR TESTING
+dimension = 3
+graph_combo = "g5_3"
+graph_to_use = graphx
+nodes_to_use = nodesx
+nmap_to_use = nmapx
+################################################
+
+
+
 
 
 # GOES IN DATA FOLDER OF PROJECT AND PICKS UP MATRICES
@@ -46,7 +68,7 @@ for file in files_to_read:
     #########################################################
 
     operation = Custom_Unitary(matrix_to_analyze, dimension)
-    # operation = X1
+    operation = H1
     #############################################################
 
     #                        EXECUTION
@@ -84,14 +106,75 @@ for file in files_to_read:
     numRzADA = sum(isinstance(x, Rz) for x in matrices_decomposed)
     print("numRz QR   ", numRzQR)
     print("numRz ADA  ", numRzADA, "\n")
+
+
+
+
+
+
+
+
+
     ################################################################################################
 
-    ########  VERIFICATION  #########################
+    #      VERIFICATION         #
+
+    ################################################################################################
 
     final_map = final_graph.lpmap
 
+    ################################################
+    # EXAMPLE OF GRAPH WITH PHASES ALREADY ENCODED
+    edgesx = [(1, 0, {"delta_m": 0, "sensitivity": 3}),
+              (0, 2, {"delta_m": 0, "sensitivity": 3}),
+              ]
+
+    nodesx = [0, 1, 2]
+    nmapx = [2, 1, 0]
+
+    graphx = level_Graph(edgesx, nodesx, nmapx, [1])
+    graphx.phase_storing_setup()
+    graphx.nodes[0]['phase_storage'] = np.pi
+    # --------------------------------------------------------
+    # CHOICE OF GRAPH FOR TESTING
+    dimension = 3
+    graph_combo = "g5_3"
+    graph_to_use = graphx
+    nodes_to_use = nodesx
+    nmap_to_use = nmapx
+
+    # WE HAVE TO MULTIPLY THE ACCUMULATED PHASES TO THE ORIGINAL OPERATION SINCE THE ALGORITHM UNROLLS THE ACCUMULATED PHASES IN A FIRST PHASE
+    # AND ARE APPENDEDS THEM IN THE HEAD, THESE RESULT AS PREVIOUS PHASES-DAG APPLIED TO THE ORIGINAL OPERATION
+    ################################################
+
+    # EXAMPLE OF GRAPH WITH PHASES ALREADY ENCODED
+    edgesx = [(1, 0, {"delta_m": 0, "sensitivity": 3}),
+              (0, 2, {"delta_m": 0, "sensitivity": 3}),
+              ]
+
+    nodesx = [0, 1, 2]
+    nmapx = [2, 1, 0]
+
+    graphx = level_Graph(edgesx, nodesx, nmapx, [1])
+    graphx.phase_storing_setup()
+    graphx.nodes[0]['phase_storage'] = np.pi
+    ################################################
+
+    inode = graph_to_use._1stInode
+    if 'phase_storage' in graph_to_use.nodes[inode]:
+        for i in range(len(list(graph_to_use.nodes))):
+            thetaZ = newMod(graph_to_use.nodes[i]['phase_storage'])
+            if abs(thetaZ) > 1.0e-4:
+                phase_gate = Rz(-thetaZ, i, dimension) # logical rotation
+                operation = Custom_Unitary(matmul(phase_gate.matrix, operation.matrix), dimension)
+
     V1 = Verifier(decomp, operation, nodes_to_use, nmap_to_use, nmap_to_use, dimension)
+
+    # WE CAN USE THE ORIGINAL OPERATION SINCE THE DYNAMIC ALGORITHM KEEPS TRACK OF THE PHASES ACCUMULATED
+    operation = H1
     V2 = Verifier(matrices_decomposed, operation, nodes_to_use, nmap_to_use, final_map, dimension)
+
+
     V1r = V1.verify()
     V2r = V2.verify()
 

@@ -34,6 +34,7 @@ class Verifier:
 
         for rotation in self.decomposition:
             target = matmul(rotation.matrix, target)
+            deb = target.round(2)
 
         target = matmul(inv(self.permutation_matrix_final), target)
 

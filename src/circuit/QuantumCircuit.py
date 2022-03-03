@@ -3,13 +3,14 @@ import json
 
 from circuit.Z_prop_shallow import remove_Z
 from decomposition.QR_decomp import QR_decomp
+from evaluation.Verifier import Verifier
 from src.decomposition.Adaptive_decomposition import *
 from .Rotations import Rz, R, Custom_Unitary
 
 
 class QuantumCircuit:
 
-    def __init__(self, qudits, bits, dimension, graph):
+    def __init__(self, qudits, bits, dimension, graph, verify = False):
 
         self.qudits = list(range(qudits))
         self.bits = list(range(bits))
@@ -17,6 +18,7 @@ class QuantumCircuit:
         self.reg = [[] for _ in range(bits)]
         self.dimension = dimension
         self.energy_level_graph = graph
+        self.verify = verify
 
     def R(self, qudit_line, theta, phi, lev_a, lev_b):
 
@@ -91,15 +93,29 @@ class QuantumCircuit:
 
             clean_line = []
 
+
             for gate in line:
+                ini_lpmap = list(self.energy_level_graph.lpmap)
+
                 QR = QR_decomp(gate, self.energy_level_graph)
 
                 decomp, algorithmic_cost, total_cost = QR.execute()
 
-                Adaptive = Adaptive_decomposition(gate, self.energy_level_graph, (algorithmic_cost, total_cost),
+                Adaptive = Adaptive_decomposition(gate, self.energy_level_graph, (1.1 * algorithmic_cost, 1.1 * total_cost),
                                                   self.dimension)
 
-                matrices_decomposed, best_cost, final_graph = Adaptive.execute()
+                matrices_decomposed, best_cost, self.energy_level_graph = Adaptive.execute()
+
+                if self.verify:
+                    nodes = list(self.energy_level_graph.nodes)
+                    lpmap = list(self.energy_level_graph.lpmap)
+
+                    V = Verifier(matrices_decomposed, gate, nodes, ini_lpmap, lpmap , self.dimension)
+                    Vr = V.verify()
+
+                    if not Vr:
+                        raise Exception
+
 
                 clean_line = clean_line + matrices_decomposed
                 gc.collect()

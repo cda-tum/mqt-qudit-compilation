@@ -100,6 +100,8 @@ class Adaptive_decomposition:
                         if abs(thetaZ) > 1.0e-4:
                             phase_gate = Rz(thetaZ, placement.nodes[i]['lpmap'], dimension)
                             matrices.append(phase_gate)
+                        #reset the node
+                        placement.nodes[i]['phase_storage'] = 0
 
             return matrices, placement
 

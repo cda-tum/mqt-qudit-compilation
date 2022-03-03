@@ -6,19 +6,34 @@ from src.utils.r_utils import *
 
 class QR_decomp:
 
-    def __init__(self, gate, graph_orig):
+    def __init__(self, gate, graph_orig, Z_prop = False):
 
         self.U = gate.matrix
         self.graph = graph_orig
+        self.phase_propagation = Z_prop
 
     def execute(self):
-
         decomp = []
         total_cost = 0
         algorithmic_cost = 0
 
         U_ = self.U
         dimension = self.U.shape[0]
+        #
+        # GRAPH PHASES - REMOVE ANY REMAINING
+        if not self.phase_propagation:
+
+            inode = self.graph._1stInode
+            if 'phase_storage' in self.graph.nodes[inode]:
+                for i in range(len(list(self.graph.nodes))):
+                    thetaZ = newMod(self.graph.nodes[i]['phase_storage'])
+                    if abs(thetaZ) > 1.0e-4:
+                        phase_gate = Rz(thetaZ, self.graph.nodes[i]['lpmap'], dimension)
+                        decomp.append(phase_gate)
+                    # reset the node
+                    self.graph.nodes[i]['phase_storage'] = 0
+        #
+
 
         l = list(range(self.U.shape[0]))
         l.reverse()
