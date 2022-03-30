@@ -121,6 +121,13 @@ class level_Graph(nx.Graph):
         node_a = self.index(nodelistcopy, node_a)
         node_b = self.index(nodelistcopy, node_b)
 
+        dict_attr_inode = nodelistcopy[0][1]
+        for attr in list(dict_attr_inode.keys()):
+            attr_a = nodelistcopy[node_a][1][attr]
+            attr_b = nodelistcopy[node_b][1][attr]
+            nodelistcopy[node_a][1][attr] = attr_b
+            nodelistcopy[node_b][1][attr] = attr_a
+        """
         level_a = nodelistcopy[node_a][1]["level"]
         level_b = nodelistcopy[node_b][1]["level"]
         nodelistcopy[node_a][1]["level"] = level_b
@@ -130,13 +137,14 @@ class level_Graph(nx.Graph):
         lp_b = nodelistcopy[node_b][1]["lpmap"]
         nodelistcopy[node_a][1]["lpmap"] = lp_b
         nodelistcopy[node_b][1]["lpmap"] = lp_a
-
+        
         inode = self._1stInode
         if ('phase_storage' in self.nodes[inode]):
             phi_a = nodelistcopy[node_a][1]["phase_storage"]
             phi_b = nodelistcopy[node_b][1]["phase_storage"]
             nodelistcopy[node_a][1]["phase_storage"] = phi_b
             nodelistcopy[node_b][1]["phase_storage"] = phi_a
+        """
 
         return nodelistcopy
 

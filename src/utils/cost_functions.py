@@ -31,6 +31,7 @@ def rotation_cost_calc(gate, placement):
 
     gate_cost = gate.cost
 
+
     if placement.is_irnode(source) or placement.is_irnode(target):
         SP_PENALTY = min(placement.distance_nodes(placement._1stInode, source),
                          placement.distance_nodes(placement._1stInode, target)) + 1

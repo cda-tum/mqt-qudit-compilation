@@ -6,7 +6,7 @@ from decomposition.QR_decomp import QR_decomp
 from evaluation.Verifier import Verifier
 from src.decomposition.Adaptive_decomposition import *
 from .Rotations import Rz, R, Custom_Unitary
-
+from copy import deepcopy
 
 class QuantumCircuit:
 
@@ -95,7 +95,16 @@ class QuantumCircuit:
 
 
             for gate in line:
+
                 ini_lpmap = list(self.energy_level_graph.lpmap)
+
+                if self.verify:
+                    recover_dict = {}
+                    inode = self.energy_level_graph._1stInode
+                    if 'phase_storage' in self.energy_level_graph.nodes[inode]:
+                        for i in range(len(list(self.energy_level_graph.nodes))):
+                            thetaZ = newMod(self.energy_level_graph.nodes[i]['phase_storage'])
+                            recover_dict[i] = thetaZ
 
                 QR = QR_decomp(gate, self.energy_level_graph)
 
@@ -110,7 +119,16 @@ class QuantumCircuit:
                     nodes = list(self.energy_level_graph.nodes)
                     lpmap = list(self.energy_level_graph.lpmap)
 
-                    V = Verifier(matrices_decomposed, gate, nodes, ini_lpmap, lpmap , self.dimension)
+                    Vgate = deepcopy(gate)
+                    inode = self.energy_level_graph._1stInode
+
+                    if 'phase_storage' in self.energy_level_graph.nodes[inode]:
+                        for i in range(len(recover_dict)):
+                            if abs(recover_dict[i]) > 1.0e-4:
+                                phase_gate = Rz(-recover_dict[i], i, self.dimension)  # logical rotation
+                                Vgate = Custom_Unitary(matmul(phase_gate.matrix, Vgate.matrix), self.dimension)
+
+                    V = Verifier(matrices_decomposed, Vgate, nodes, ini_lpmap, lpmap, self.dimension)
                     Vr = V.verify()
 
                     if not Vr:

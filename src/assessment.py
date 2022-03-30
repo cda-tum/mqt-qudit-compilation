@@ -15,37 +15,27 @@ path_data = "/home/k3vn/Documents/Compiler/binq/data/"
 # Clifford_Generator.generate_all_3_5_7(path)
 
 ################################################
-
-
-
-
-
-
-################################################
 # EXAMPLE OF GRAPH WITH PHASES ALREADY ENCODED
+
 edgesx = [(1, 0, {"delta_m": 0, "sensitivity": 3}),
              (0, 2, {"delta_m": 0, "sensitivity": 3}),
          ]
 
 nodesx = [0, 1, 2]
-nmapx = [2, 1, 0]
-
+nmapx = [2, 0, 1]
 
 graphx = level_Graph(edgesx, nodesx, nmapx, [1])
 graphx.phase_storing_setup()
 graphx.nodes[0]['phase_storage'] = np.pi
+
 # --------------------------------------------------------
 # CHOICE OF GRAPH FOR TESTING
 dimension = 3
-graph_combo = "g5_3"
+graph_combo = "-"
 graph_to_use = graphx
 nodes_to_use = nodesx
 nmap_to_use = nmapx
 ################################################
-
-
-
-
 
 # GOES IN DATA FOLDER OF PROJECT AND PICKS UP MATRICES
 files_to_read = glob.glob(path_data + "dim" + str(dimension) + "/*.csv")
@@ -67,7 +57,7 @@ for file in files_to_read:
     X1 = X(dimension)
     #########################################################
 
-    operation = Custom_Unitary(matrix_to_analyze, dimension)
+    #operation = Custom_Unitary(matrix_to_analyze, dimension)
     operation = H1
     #############################################################
 
@@ -82,11 +72,21 @@ for file in files_to_read:
     endqr = time.time()
 
     ###############################################################
+    graphx = level_Graph(edgesx, nodesx, nmapx, [1])
+    graphx.phase_storing_setup()
+    graphx.nodes[0]['phase_storage'] = np.pi
+    graph_to_use = graphx
+
+    initial_map = graph_to_use.lpmap
+
     Adaptive = Adaptive_decomposition(operation, graph_to_use, (1.1 * algorithmic_cost, 1.1 * total_cost), dimension)
+
 
     start = time.time()
     matrices_decomposed, best_cost, final_graph = Adaptive.execute()
     end = time.time()
+
+    final_map = final_graph.lpmap
     ###################################################################
 
     print("QR elapsed time")
@@ -108,40 +108,11 @@ for file in files_to_read:
     print("numRz ADA  ", numRzADA, "\n")
 
 
-
-
-
-
-
-
-
     ################################################################################################
 
     #      VERIFICATION         #
 
     ################################################################################################
-
-    final_map = final_graph.lpmap
-
-    ################################################
-    # EXAMPLE OF GRAPH WITH PHASES ALREADY ENCODED
-    edgesx = [(1, 0, {"delta_m": 0, "sensitivity": 3}),
-              (0, 2, {"delta_m": 0, "sensitivity": 3}),
-              ]
-
-    nodesx = [0, 1, 2]
-    nmapx = [2, 1, 0]
-
-    graphx = level_Graph(edgesx, nodesx, nmapx, [1])
-    graphx.phase_storing_setup()
-    graphx.nodes[0]['phase_storage'] = np.pi
-    # --------------------------------------------------------
-    # CHOICE OF GRAPH FOR TESTING
-    dimension = 3
-    graph_combo = "g5_3"
-    graph_to_use = graphx
-    nodes_to_use = nodesx
-    nmap_to_use = nmapx
 
     # WE HAVE TO MULTIPLY THE ACCUMULATED PHASES TO THE ORIGINAL OPERATION SINCE THE ALGORITHM UNROLLS THE ACCUMULATED PHASES IN A FIRST PHASE
     # AND ARE APPENDEDS THEM IN THE HEAD, THESE RESULT AS PREVIOUS PHASES-DAG APPLIED TO THE ORIGINAL OPERATION
@@ -158,6 +129,13 @@ for file in files_to_read:
     graphx = level_Graph(edgesx, nodesx, nmapx, [1])
     graphx.phase_storing_setup()
     graphx.nodes[0]['phase_storage'] = np.pi
+
+    # CHOICE OF GRAPH FOR TESTING
+    dimension = 3
+    graph_combo = "g5_3"
+    graph_to_use = graphx
+    nodes_to_use = nodesx
+    nmap_to_use = nmapx
     ################################################
 
     inode = graph_to_use._1stInode
@@ -171,8 +149,8 @@ for file in files_to_read:
     V1 = Verifier(decomp, operation, nodes_to_use, nmap_to_use, nmap_to_use, dimension)
 
     # WE CAN USE THE ORIGINAL OPERATION SINCE THE DYNAMIC ALGORITHM KEEPS TRACK OF THE PHASES ACCUMULATED
-    operation = H1
-    V2 = Verifier(matrices_decomposed, operation, nodes_to_use, nmap_to_use, final_map, dimension)
+    #operation = H1
+    V2 = Verifier(matrices_decomposed, operation, nodes_to_use, initial_map, final_map, dimension)
 
 
     V1r = V1.verify()

@@ -20,9 +20,9 @@ class QR_decomp:
         U_ = self.U
         dimension = self.U.shape[0]
         #
-        # GRAPH PHASES - REMOVE ANY REMAINING
+        # GRAPH PHASES - REMOVE ANY REMAINING AND SAVE FOR RESTORING AT THE END OF ALGORITHM
         if not self.phase_propagation:
-
+            recover_dict = {}
             inode = self.graph._1stInode
             if 'phase_storage' in self.graph.nodes[inode]:
                 for i in range(len(list(self.graph.nodes))):
@@ -30,6 +30,8 @@ class QR_decomp:
                     if abs(thetaZ) > 1.0e-4:
                         phase_gate = Rz(thetaZ, self.graph.nodes[i]['lpmap'], dimension)
                         decomp.append(phase_gate)
+                    recover_dict[i] = thetaZ
+
                     # reset the node
                     self.graph.nodes[i]['phase_storage'] = 0
         #
@@ -87,5 +89,11 @@ class QR_decomp:
                 phase_gate = Rz(np.angle(diag_U[i]), phy_n_i, dimension)
 
                 decomp.append(phase_gate)
+
+        if not self.phase_propagation:
+            inode = self.graph._1stInode
+            if 'phase_storage' in self.graph.nodes[inode]:
+                for i in range(len(list(self.graph.nodes))):
+                    self.graph.nodes[i]['phase_storage'] = recover_dict[i]
 
         return decomp, algorithmic_cost, total_cost
