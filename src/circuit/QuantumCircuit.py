@@ -153,7 +153,7 @@ class QuantumCircuit:
             clean_line = []
 
             for gate in line:
-                QR = QR_decomp(gate, self.energy_level_graph)
+                QR = QR_decomp(gate, self.energy_level_graph, not_stand_alone = False)
 
                 decomp, algorithmic_cost, total_cost = QR.execute()
 

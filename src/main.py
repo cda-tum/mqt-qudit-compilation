@@ -23,7 +23,7 @@ nmap3_3 = [0, 1, 2]
 graph_3_3 = level_Graph(edges_3_3, nodes_3_3, nmap3_3, [1])
 
 graph_3_3.phase_storing_setup()
-graph_3_3.nodes[0]['phase_storage'] = np.pi
+graph_3_3.nodes[0]['phase_storage'] = 0
 
 
 QC = QuantumCircuit(1, 0, dimension, graph_3_3, verify = True)
@@ -67,12 +67,12 @@ print()
 print("Zprop")
 
 
-QC.Z_prop(back = True)
+QC.Z_prop(back = False)
 
 V2 = Verifier(QC.qreg[0], H2, nodes_3_3, nmap3_3, QC.energy_level_graph.lpmap, dimension)
 V2rZ = V2.verify()
 
 print()
 QC.draw()
-#QC.to_json("/home/k3vn/Desktop/")
+QC.to_json("/home/k3vn/Desktop/")
 print("DONE")

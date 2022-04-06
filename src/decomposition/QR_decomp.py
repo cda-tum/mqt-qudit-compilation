@@ -6,11 +6,12 @@ from src.utils.r_utils import *
 
 class QR_decomp:
 
-    def __init__(self, gate, graph_orig, Z_prop = False):
+    def __init__(self, gate, graph_orig, Z_prop = False, not_stand_alone = True):
 
         self.U = gate.matrix
         self.graph = graph_orig
         self.phase_propagation = Z_prop
+        self.not_stand_alone = not_stand_alone
 
     def execute(self):
         decomp = []
@@ -90,10 +91,11 @@ class QR_decomp:
 
                 decomp.append(phase_gate)
 
-        if not self.phase_propagation:
-            inode = self.graph._1stInode
-            if 'phase_storage' in self.graph.nodes[inode]:
-                for i in range(len(list(self.graph.nodes))):
-                    self.graph.nodes[i]['phase_storage'] = recover_dict[i]
+        if self.not_stand_alone:
+            if not self.phase_propagation:
+                inode = self.graph._1stInode
+                if 'phase_storage' in self.graph.nodes[inode]:
+                    for i in range(len(list(self.graph.nodes))):
+                        self.graph.nodes[i]['phase_storage'] = recover_dict[i]
 
         return decomp, algorithmic_cost, total_cost
