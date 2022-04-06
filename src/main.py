@@ -74,5 +74,5 @@ V2rZ = V2.verify()
 
 print()
 QC.draw()
-QC.to_json("/home/k3vn/Desktop/")
+#QC.to_json("/home/k3vn/Desktop/")
 print("DONE")
