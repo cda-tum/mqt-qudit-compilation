@@ -59,10 +59,6 @@ for indx, matrix_to_analyze in enumerate(GROUP):
 
     final_map = list(final_graph.lpmap)
 
-    ###################################################################
-    #                   UPDATE GRAPH
-    graph_to_use = final_graph
-    ###################################################################
 
     print("QR elapsed time")
     QR_time = endqr - startqr
@@ -81,7 +77,7 @@ for indx, matrix_to_analyze in enumerate(GROUP):
 
     ################################################################################################
 
-    V1 = Verifier(decomp, operation, nodes_to_use, nmap_to_use, nmap_to_use, dimension)
+    V1 = Verifier(decomp, operation, nodes_to_use, ini_lpmap, ini_lpmap, dimension)
 
     V2 = Verifier(matrices_decomposed, operation, nodes_to_use, ini_lpmap, final_map, dimension)
 
@@ -109,7 +105,7 @@ for indx, matrix_to_analyze in enumerate(GROUP):
         qr_decomp = qr_decomp + z_tail
         ADA_decomp = ADA_decomp + z_tailADA
 
-    V1 = Verifier(qr_decomp, operation, nodes_to_use, nmap_to_use, nmap_to_use, dimension)
+    V1 = Verifier(qr_decomp, operation, nodes_to_use, ini_lpmap, ini_lpmap, dimension)
 
     V2 = Verifier(ADA_decomp, operation, nodes_to_use, ini_lpmap, final_map, dimension)
 
@@ -165,6 +161,12 @@ for indx, matrix_to_analyze in enumerate(GROUP):
                                               "type": 'g'}
 
         counter += 1
+
+
+    ###################################################################
+    #                   UPDATE GRAPH
+    graph_to_use = final_graph
+    ###################################################################
 
     gc.collect()
 ##############################
