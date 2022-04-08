@@ -5,12 +5,13 @@ from evaluation.Pauli import H
 from src.decomposition.QR_decomp import *
 from src.evaluation.Evaluation_Graphs import *
 from src.evaluation.Verifier import Verifier
-from Zprop_alone import alone_propagate_z
+from src.randomized_benchmarking.Zprop_alone import alone_propagate_z
+
+DIAGNOSE = False
 
 
-
-def RB_QR(dimension, path, edges_MAP, graph_combo_in, graph_to_use_in, nodes_to_use_in, back):
-
+def RB_QR(dimension, path, graph_to_use_in, nodes_to_use_in, back):
+    GLOBAL_SEQUENCE_QR_dag = []
     GLOBAL_SEQUENCE_QR = []
 
     GLOBAL_FUNCTION = np.identity(dimension, dtype=complex)
@@ -23,7 +24,6 @@ def RB_QR(dimension, path, edges_MAP, graph_combo_in, graph_to_use_in, nodes_to_
     ################################################
 
     GROUP = np.load(path, allow_pickle=True)
-
 
     for indx, matrix_to_analyze in enumerate(GROUP):
 
@@ -42,11 +42,11 @@ def RB_QR(dimension, path, edges_MAP, graph_combo_in, graph_to_use_in, nodes_to_
         decomp, algorithmic_cost, total_cost = QR.execute()
         endqr = time.time()
 
-        print("QR elapsed time")
+        #print("QR elapsed time")
         QR_time = endqr - startqr
-        print(QR_time, "\n")
+        #print(QR_time, "\n")
 
-        print("COST QR,   ", (algorithmic_cost, total_cost))
+        #print("COST QR,   ", (algorithmic_cost, total_cost))
 
         ###############################################################################################
 
@@ -58,12 +58,27 @@ def RB_QR(dimension, path, edges_MAP, graph_combo_in, graph_to_use_in, nodes_to_
 
         V1r = V1.verify()
 
-        print(V1r)
+        #print(V1r)
 
         if (V1r == False):
             raise Exception
 
+        rev_decomp = []
+        for gate in reversed(decomp):
+            try:
+                test_for_type_by_EAFP = gate.lev_b
+                # object is R
+                rev_decomp.append(['R', gate.theta, gate.phi+np.pi, (gate.lev_a, gate.lev_b)])
+            except AttributeError:
+                try:
+                    test_for_type_by_EAFP_2 = gate.lev
+                    rev_decomp.append(['RZ', gate.theta, (-1, gate.lev)])
 
+                except AttributeError:
+                    pass
+
+
+        GLOBAL_SEQUENCE_QR_dag = GLOBAL_SEQUENCE_QR_dag + rev_decomp
         GLOBAL_SEQUENCE_QR = GLOBAL_SEQUENCE_QR + decomp
         gc.collect()
     ###############################################################################################
@@ -99,20 +114,38 @@ def RB_QR(dimension, path, edges_MAP, graph_combo_in, graph_to_use_in, nodes_to_
 
             except AttributeError:
                 pass
-    return return_list
 
+    if DIAGNOSE:
+        u = np.identity(3)
+        print("--- BINQ COMPILATION FINISHED ---\n ----->> PRINT UNITARIES!\n")
+        for i, g in enumerate(fin_qr[::-1]):
+            flt = g.matrix.flatten()
+            re = np.asarray([np.around(np.real(f), 2) for f in flt])
+            im = np.asarray([np.around(np.imag(f), 2) for f in flt])
+            mat = np.reshape(re + 1j * im, (3, 3))
+            print(f"U{i}:\n{mat}")
+            u = np.dot(g.matrix, u)
+        print("-----> FINAL: ")
+        flt = u.flatten()
+        re = np.asarray([np.around(np.real(f), 2) for f in flt])
+        im = np.asarray([np.around(np.imag(f), 2) for f in flt])
+        mat = np.reshape(re + 1j * im, (3, 3))
+        print(mat)
 
-edges_3_1 = [(1, 2, {"delta_m": 0, "sensitivity": 3}),
-             (0, 2, {"delta_m": 0, "sensitivity": 3}),
-             ]
-nodes_3_1 = [0, 1, 2]
-nmap3_1 = [2, 0, 1]
+    #return return_list
+    return GLOBAL_SEQUENCE_QR_dag
 
+# edges_3_1 = [(1, 2, {"delta_m": 0, "sensitivity": 3}),
+#              (0, 2, {"delta_m": 0, "sensitivity": 3}),
+#              ]
+# nodes_3_1 = [0, 1, 2]
+# nmap3_1 = [2, 0, 1]
+#
 graph_3_1 = level_Graph(edges_3_1, nodes_3_1, nmap3_1, [0])
-
-edges_MAP = None
-dimension = 3
-back = True
-
-
-RB_QR(dimension, "/home/k3vn/Downloads/unitaries_dim_3.npy", None, "", graph_3_1, nodes_3_1, True)
+#
+# edges_MAP = None
+# dimension = 3
+# back = True
+#
+#
+# RB_QR(dimension, "/home/k3vn/Downloads/unitaries_dim_3.npy", graph_3_1, nodes_3_1, True)

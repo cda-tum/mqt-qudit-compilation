@@ -64,9 +64,7 @@ class R:
         return theta_cost(self.theta)
 
     def __str__(self):
-        return str("R " + "Theta " + str(self.theta) + "phi " + str(
-            self.phi) + " lev a " + self.original_lev_a + " lev b " + self.original_lev_b)
-
+        return str(f"R Theta {self.theta} phi {self.phi} lev a {self.original_lev_b} lev b {self.original_lev_b}")
 
 class Rz:
 
@@ -95,7 +93,7 @@ class Rz:
         self.shape = self.matrix.shape
 
     def __str__(self):
-        return str("R " + "Theta " + str(self.theta) + " lev a " + self.lev)
+        return str(f"R Theta {self.theta}  lev a {self.lev}")
 
     @property
     def dag(self):
