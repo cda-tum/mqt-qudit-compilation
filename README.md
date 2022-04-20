@@ -1,7 +1,7 @@
 ![OS](https://img.shields.io/badge/os-linux%20%7C%20macos%20%7C%20windows-blue?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Bindings](https://img.shields.io/github/workflow/status/cda-tum/ddsim/Deploy%20to%20PyPI?style=flat-square&logo=github&label=python)]()
-<!--- [![Documentation](https://img.shields.io/readthedocs/ddsim?logo=readthedocs&style=flat-square)]() -->
+<!--- [![Bindings](https://img.shields.io/github/workflow/status/cda-tum/ddsim/Deploy%20to%20PyPI?style=flat-square&logo=github&label=python)]()
+<!--- [![Documentation](https://img.shields.io/readthedocs/ddsim?logo=readthedocs&style=flat-square)]() 
 <!---  [![codecov](https://img.shields.io/codecov/c/github/cda-tum/)]() -->
 
 # MQT Qudits - Adaptive Compilation of Multi-Level Quantum Operations
