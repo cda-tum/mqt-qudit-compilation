@@ -3,7 +3,7 @@ import copy
 import networkx as nx
 import numpy as np
 
-from circuit.Rotations import Rz
+from src.circuit.Rotations import Rz
 
 
 class level_Graph(nx.Graph):

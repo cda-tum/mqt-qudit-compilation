@@ -1,10 +1,10 @@
-from architecture_graph.level_Graph import level_Graph
-from circuit.QuantumCircuit import QuantumCircuit
-from circuit.Rotations import Custom_Unitary
-from evaluation.Evaluation_Graphs import graph_3_3, nodes_3_3, nmap3_3, graph_5_3,  nodes_5_3, nmap5_3
-from evaluation.Pauli import H, S, X
-from evaluation.Verifier import Verifier
-from utils.r_utils import matmul
+from src.architecture_graph.level_Graph import level_Graph
+from src.circuit.QuantumCircuit import QuantumCircuit
+from src.circuit.Rotations import Custom_Unitary
+from src.evaluation.Evaluation_Graphs import graph_3_3, nodes_3_3, nmap3_3, graph_5_3,  nodes_5_3, nmap5_3
+from src.evaluation.Pauli import H, S, X
+from src.evaluation.Verifier import Verifier
+from src.utils.r_utils import matmul
 import numpy as np
 
 dimension = 3
@@ -67,12 +67,12 @@ print()
 print("Zprop")
 
 
-QC.Z_prop(back = False)
+QC.Z_prop(back = True)
 
 V2 = Verifier(QC.qreg[0], H2, nodes_3_3, nmap3_3, QC.energy_level_graph.lpmap, dimension)
 V2rZ = V2.verify()
 
 print()
 QC.draw()
-#QC.to_json("/home/k3vn/Desktop/")
+QC.to_json("/home/k3vn/Desktop/")
 print("DONE")

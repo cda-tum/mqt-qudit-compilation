@@ -1,11 +1,11 @@
 import gc
 import json
 
-from circuit.Z_prop_shallow import remove_Z
-from decomposition.QR_decomp import QR_decomp
-from evaluation.Verifier import Verifier
+from src.circuit.Z_prop_shallow import remove_Z
+from src.decomposition.QR_decomp import QR_decomp
+from src.evaluation.Verifier import Verifier
 from src.decomposition.Adaptive_decomposition import *
-from .Rotations import Rz, R, Custom_Unitary
+from src.circuit.Rotations import Rz, R, Custom_Unitary
 from copy import deepcopy
 
 class QuantumCircuit:
@@ -56,6 +56,7 @@ class QuantumCircuit:
         temp = []
 
         for i, e in enumerate(list(self.energy_level_graph.edges)):
+            e = tuple( sorted((self.energy_level_graph.nodes[e[0]]['lpmap'], self.energy_level_graph.nodes[e[1]]['lpmap'] )) )
             temp.append((str(e), i))
         temp = dict(temp)
 

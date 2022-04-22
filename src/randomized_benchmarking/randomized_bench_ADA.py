@@ -1,12 +1,12 @@
 import gc
 import time
 
-from evaluation.Pauli import H
+from src.evaluation.Pauli import H
 from src.decomposition.Adaptive_decomposition import *
 from src.decomposition.QR_decomp import *
 from src.evaluation.Evaluation_Graphs import *
 from src.evaluation.Verifier import Verifier
-from Zprop_alone import alone_propagate_z
+from src.randomized_benchmarking.Zprop_alone import alone_propagate_z
 
 
 

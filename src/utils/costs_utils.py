@@ -1,5 +1,5 @@
 from src.circuit.swap_routines_basic import route_states2rotate_basic
-from utils.cost_functions import rotation_cost_calc
+from src.utils.cost_functions import rotation_cost_calc
 
 
 def cost_calculator(gate, placement, non_zeros):

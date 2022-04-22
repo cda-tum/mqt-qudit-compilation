@@ -1,11 +1,11 @@
 import gc
 import time
 
-from evaluation.Pauli import H
+from src.evaluation.Pauli import H
 from src.decomposition.QR_decomp import *
 from src.evaluation.Evaluation_Graphs import *
 from src.evaluation.Verifier import Verifier
-from Zprop_alone import alone_propagate_z
+from src.randomized_benchmarking.Zprop_alone import alone_propagate_z
 
 
 def RB_QR(dimension, path, edges_MAP, graph_combo_in, graph_to_use_in, nodes_to_use_in, back):

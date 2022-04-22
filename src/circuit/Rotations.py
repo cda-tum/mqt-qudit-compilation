@@ -1,6 +1,6 @@
 from src.circuit.Gellman import *
 
-from utils.cost_functions import phi_cost, theta_cost, theta_corrector
+from src.utils.cost_functions import phi_cost, theta_cost, theta_corrector
 
 
 # Pay attention : inputs to classes are always in radians

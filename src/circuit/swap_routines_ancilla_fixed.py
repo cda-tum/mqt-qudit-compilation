@@ -3,7 +3,7 @@ import numpy as np
 
 from src.Exceptions.Exceptions import RoutingException
 from src.circuit.Rotations import R
-from utils.cost_functions import rotation_cost_calc
+from src.utils.cost_functions import rotation_cost_calc
 
 
 # WARNING OBSOLETE FILE

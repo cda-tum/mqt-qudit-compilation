@@ -1,8 +1,8 @@
 #############################################################
 #            Z GATES PROPAGATION
 #############################################################
-from utils.r_utils import Pi_mod
-from .Rotations import R, Rz
+from src.utils.r_utils import Pi_mod
+from src.circuit.Rotations import R, Rz
 
 
 def tag_generator(gates):
