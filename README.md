@@ -42,7 +42,7 @@ edges = [
 nodes = [0, 1, 2]
 
 # declare physical levels in order of maping of the logic states just declared .
-# i.e. here we will have Logic 0 -> Phys. 0, have Logic 1 -> Phys. 1, have Logic 1 -> Phys. 1 .
+# i.e. here we will have Logic 0 -> Phys. 0, have Logic 1 -> Phys. 1, have Logic 2 -> Phys. 2 .
 
 nmap = [0, 1, 2]
 
