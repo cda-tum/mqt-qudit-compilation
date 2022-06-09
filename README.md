@@ -74,7 +74,7 @@ QC.Z_prop(back = True)
 QC.draw()
 
 # Save the results to json .
-path = "/"
+path = "./"
 QC.to_json(path)
 
 
