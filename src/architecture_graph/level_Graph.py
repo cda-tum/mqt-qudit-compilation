@@ -201,13 +201,12 @@ class level_Graph(nx.Graph):
         neighbs = [n for n in self.neighbors(node)]
 
         totalsensibility = 0
-        for i in range(len(neighbs) - 1):
+        for i in range(len(neighbs)):
             totalsensibility += self[node][neighbs[i]]["sensitivity"]
 
         return totalsensibility
 
     def get_edge_sensitivity(self, node_a, node_b):
-        # TODO add try catch in case not there
         return self[node_a][node_b]["sensitivity"]
 
     @property

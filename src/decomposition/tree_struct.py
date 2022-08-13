@@ -86,10 +86,10 @@ class N_ary_Tree:
         return 1 + max(children_max_depth)
 
     def size_refresh(self, node):
-        if node.size == 0:
+        if node.children is None or len(node.children) == 0:
             return 0
         else:
-            children_size = 0
+            children_size = len(node.children)
             for child in node.children:
                 children_size = children_size + self.size_refresh(child)
 
@@ -139,7 +139,8 @@ class N_ary_Tree:
 
     @property
     def total_size(self):
-        return self.size
+        self.size = self.size_refresh( self.root)
+        return self.size+1
 
     def print_tree(self, node, str_aux):
 

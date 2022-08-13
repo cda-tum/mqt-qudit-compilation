@@ -4,8 +4,8 @@ import time
 
 from src.decomposition.Adaptive_decomposition import *
 from src.decomposition.QR_decomp import *
-from src.evaluation.Clifford_Generator import Clifford_Generator
-from src.evaluation.Evaluation_Graphs import *
+from data.Clifford_Generator import Clifford_Generator
+from data.Evaluation_Graphs import *
 from src.evaluation.Pauli import H, S, X
 from src.evaluation.Verifier import Verifier
 

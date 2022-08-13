@@ -1,9 +1,7 @@
 from unittest import TestCase
 
-from src.circuit.Rotations import R
-from src.architecture_graph.level_Graph import level_Graph
+
 from src.utils.r_utils import *
-from utils.cost_functions import rotation_cost_calc
 
 
 class Testr_utils(TestCase):
@@ -18,11 +16,16 @@ class Testr_utils(TestCase):
         self.assertTrue(np.array_equal(expected, result))
 
 
+    def test_pi_mod(self):
+        res = Pi_mod(3*np.pi/2)
+        self.assertEqual(res, -np.pi/2)
+
+        res = Pi_mod(-3*np.pi/2)
+        self.assertEqual(res, np.pi/2)
 
     def test_new_mod(self):
-        self.fail()
+        res = newMod(-5*np.pi/2)
+        self.assertEqual(res, -np.pi/2)
 
-
-    class Test(TestCase):
-        def test_pi_mod(self):
-            self.fail()
+        res = newMod(5*np.pi/2)
+        self.assertEqual(res, np.pi/2)

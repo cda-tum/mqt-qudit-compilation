@@ -18,12 +18,6 @@ class TestQuantumCircuit(TestCase):
     def test_energy_level_graph(self):
         self.fail()
 
-    def test_tag_generator(self):
-        self.fail()
-
-    def test_propagate_z(self):
-        self.fail()
-
     def test_remove_z(self):
         self.fail()
 

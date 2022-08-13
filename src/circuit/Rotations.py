@@ -10,8 +10,11 @@ class Custom_Unitary:
         self.d = dimension
         self.matrix = matrix
 
+    @property
     def cost(self):
-        return np.NAN
+        return float(np.NAN)
+    def __mul__(self, x):
+        return Custom_Unitary(np.inner(self.matrix, x.matrix), self.dimension)
 
 
 class R:
@@ -63,6 +66,9 @@ class R:
     def cost(self):
         return theta_cost(self.theta)
 
+    def __mul__(self, x):
+        return Custom_Unitary(np.inner(self.matrix, x.matrix), self.dimension)
+
     def __str__(self):
         return str("R " + "Theta " + str(self.theta) + "phi " + str(
             self.phi) + " lev a " + self.original_lev_a + " lev b " + self.original_lev_b)
@@ -93,6 +99,9 @@ class Rz:
         self.matrix = Identity
 
         self.shape = self.matrix.shape
+
+    def __mul__(self, x):
+        return Custom_Unitary(np.inner(self.matrix, x.matrix), self.dimension)
 
     def __str__(self):
         return str("R " + "Theta " + str(self.theta) + " lev a " + self.lev)
