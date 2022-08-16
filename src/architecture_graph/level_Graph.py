@@ -116,7 +116,7 @@ class level_Graph(nx.Graph):
         return None
 
     def swap_node_attributes(self, node_a, node_b):
-        # TODO REMOVE HARDCODING
+
         nodelistcopy = self.deep_copy_func(list(self.nodes(data=True)))
         node_a = self.index(nodelistcopy, node_a)
         node_b = self.index(nodelistcopy, node_b)
@@ -127,24 +127,6 @@ class level_Graph(nx.Graph):
             attr_b = nodelistcopy[node_b][1][attr]
             nodelistcopy[node_a][1][attr] = attr_b
             nodelistcopy[node_b][1][attr] = attr_a
-        """
-        level_a = nodelistcopy[node_a][1]["level"]
-        level_b = nodelistcopy[node_b][1]["level"]
-        nodelistcopy[node_a][1]["level"] = level_b
-        nodelistcopy[node_b][1]["level"] = level_a
-
-        lp_a = nodelistcopy[node_a][1]["lpmap"]
-        lp_b = nodelistcopy[node_b][1]["lpmap"]
-        nodelistcopy[node_a][1]["lpmap"] = lp_b
-        nodelistcopy[node_b][1]["lpmap"] = lp_a
-        
-        inode = self._1stInode
-        if ('phase_storage' in self.nodes[inode]):
-            phi_a = nodelistcopy[node_a][1]["phase_storage"]
-            phi_b = nodelistcopy[node_b][1]["phase_storage"]
-            nodelistcopy[node_a][1]["phase_storage"] = phi_b
-            nodelistcopy[node_b][1]["phase_storage"] = phi_a
-        """
 
         return nodelistcopy
 
@@ -189,7 +171,7 @@ class level_Graph(nx.Graph):
         for node in self.nodes:
             node_dict = self.nodes[node]
             if 'phase_storage' in node_dict:
-                if node_dict['phase_storage'] < 1e-3 or np.mod(node_dict['phase_storage'], 2 * np.pi) < 1e-3:
+                if node_dict['phase_storage'] > 1e-3 or np.mod(node_dict['phase_storage'], 2 * np.pi) > 1e-3:
                     phy_n_i = self.nodes[node]['lpmap']
 
                     phase_gate = Rz(node_dict['phase_storage'], phy_n_i, len(list(self.nodes)))

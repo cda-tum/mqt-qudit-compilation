@@ -4,7 +4,6 @@ import numpy as np
 from src.circuit.Rotations import R, Rz, Custom_Unitary
 
 
-
 class Testcustom_Unitary(TestCase):
 
     def test_cost(self):
@@ -94,14 +93,16 @@ class TestRz(TestCase):
         self.assertTrue(np.allclose(self.RZ1.dag, RZ1_test_dag))
 
     def test_regulate_theta(self):
-        self.RZ1 = Rz(0.01*np.pi, 1, 4)
+        self.RZ1 = Rz(0.01 * np.pi, 1, 4)
         self.assertAlmostEqual(round(self.RZ1.theta, 4), 12.5978)
 
     def test_levels_setter(self):
-        self.RZ1 = Rz(0.01*np.pi, -1, 4)
+        self.RZ1 = Rz(0.01 * np.pi, -1, 4)
         self.assertEqual(self.RZ1.lev, 3)
-
 
     def test_cost(self):
         self.RZ1 = Rz(0.01 * np.pi, 1, 4)
         self.assertEqual(round(self.RZ1.cost, 4), 0.0004)
+
+
+

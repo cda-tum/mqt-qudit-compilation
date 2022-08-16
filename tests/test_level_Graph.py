@@ -3,34 +3,48 @@ from src.architecture_graph.level_Graph import *
 
 
 class Testlevel_Graph(TestCase):
-
     def setUp(self) -> None:
-        test_sample_edges_1 = [(0, 5, {"delta_m": 0, "sensitivity": 1}),
-                               (0, 4, {"delta_m": 0, "sensitivity": 1}),
-                               (0, 3, {"delta_m": 1, "sensitivity": 3}),
-                               (0, 2, {"delta_m": 1, "sensitivity": 3}),
-                               (1, 5, {"delta_m": 0, "sensitivity": 1}),
-                               (1, 4, {"delta_m": 0, "sensitivity": 1}),
-                               (1, 3, {"delta_m": 1, "sensitivity": 3}),
-                               (1, 2, {"delta_m": 1, "sensitivity": 3})
-                               ]
+        test_sample_edges = [(0, 4, {"delta_m": 0, "sensitivity": 1}),
+                             (0, 3, {"delta_m": 1, "sensitivity": 3}),
+                             (0, 2, {"delta_m": 1, "sensitivity": 3}),
+                             (1, 4, {"delta_m": 0, "sensitivity": 1}),
+                             (1, 3, {"delta_m": 1, "sensitivity": 3}),
+                             (1, 2, {"delta_m": 1, "sensitivity": 3})
+                             ]
+        test_sample_nodes = [0, 1, 2, 3, 4]
+        test_sample_nodes_map = [3, 2, 4, 1, 0]
 
-        test_sample_nodes_1 = [0, 1, 2, 3, 4, 5]
-        test_sample_nmap_1 = [0, 1, 2, 3, 4, 5]
-
-        self.graph_1 = level_Graph(test_sample_edges_1, test_sample_nodes_1, test_sample_nmap_1, [1])
+        self.graph_1 = level_Graph(test_sample_edges, test_sample_nodes, test_sample_nodes_map, [0])
+        self.graph_1.phase_storing_setup()
 
     def test_phase_storing_setup(self):
         self.graph_1.phase_storing_setup()
-        self.assertEqual(self.graph_1.nodes[0]['phase_storage'], 0.0)
+        for i in range(len(self.graph_1.nodes)):
+            self.assertEqual(self.graph_1.nodes[i]['phase_storage'], 0.0)
 
     def test_distance_nodes(self):
         self.assertEqual(self.graph_1.distance_nodes(2, 3), 2)
+        self.assertEqual(self.graph_1.distance_nodes(2, 4), 2)
 
     def test_distance_nodes_pi_pulses_fixed_ancilla(self):
         self.assertEqual(self.graph_1.distance_nodes_pi_pulses_fixed_ancilla(0, 1), 1)
+        self.assertEqual(self.graph_1.distance_nodes_pi_pulses_fixed_ancilla(2, 4), 1)
+
+    def test_logic_physical_map(self):
+        self.assertEqual(self.graph_1.lpmap, [3, 2, 4, 1, 0])
 
     def test_define__states(self):
+        test_sample_edges = [(0, 4, {"delta_m": 0, "sensitivity": 1}),
+                             (0, 3, {"delta_m": 1, "sensitivity": 3}),
+                             (0, 2, {"delta_m": 1, "sensitivity": 3}),
+                             (1, 4, {"delta_m": 0, "sensitivity": 1}),
+                             ]
+        test_sample_nodes = [0, 1, 2, 3, 4]
+        test_sample_nodes_map = [3, 2, 4, 1, 0]
+
+        self.graph_1 = level_Graph(test_sample_edges, test_sample_nodes, test_sample_nodes_map, [0])
+        self.assertEqual(self.graph_1._1stInode, 0)
+        self.graph_1 = level_Graph(test_sample_edges, test_sample_nodes, test_sample_nodes_map, [1])
         self.assertEqual(self.graph_1._1stInode, 1)
 
     def test_update_list(self):
@@ -40,11 +54,68 @@ class Testlevel_Graph(TestCase):
         self.assertEqual(self.graph_1.update_list(graph_1_list, 0, 5),
                          [(5, 0), (5, 4), (5, 3), (5, 2), (1, 0), (1, 4), (1, 3), (1, 2)])
 
+    def test_deep_copy_func(self):
+        graph_1_list = [(0, 5), (0, 4), (0, 3), (0, 2), (1, 5), (1, 4), (1, 3), (1, 2)]
+        new_list = self.graph_1.deep_copy_func(graph_1_list)
+        self.assertEqual(new_list, graph_1_list)
+
+    def test_index(self):
+        graph_1_list = [(0, 5), (0, 4), (0, 3), (0, 2), (1, 5), (1, 4), (1, 3), (1, 2)]
+        i = self.graph_1.index(graph_1_list, 0)
+        self.assertEqual(i, 0)
+
+    def test_swap_node_attributes(self):
+        test_sample_edges = [(0, 2, {"delta_m": 0, "sensitivity": 1}),
+                             (1, 2, {"delta_m": 0, "sensitivity": 1}),
+                             ]
+        test_sample_nodes = [0, 1, 2]
+        test_sample_nodes_map = [1, 0, 2]
+
+        self.graph_1 = level_Graph(test_sample_edges, test_sample_nodes, test_sample_nodes_map, [0])
+        self.graph_1.phase_storing_setup()
+        self.graph_1.nodes[0]['phase_storage'] = 0.0
+        self.graph_1.nodes[1]['phase_storage'] = 1.0
+        self.graph_1.nodes[2]['phase_storage'] = 2.0
+
+        liste = self.graph_1.swap_node_attributes(0,1)
+        self.assertEqual(liste[0][1]['phase_storage'], 1.0)
+        self.assertEqual(liste[1][1]['phase_storage'], 0.0)
+
+    def test_swap_node_attr_simple(self):
+        test_sample_edges = [(0, 2, {"delta_m": 0, "sensitivity": 1}),
+                             (1, 2, {"delta_m": 0, "sensitivity": 1}),
+                             ]
+        test_sample_nodes = [0, 1, 2]
+        test_sample_nodes_map = [1, 0, 2]
+
+        self.graph_1 = level_Graph(test_sample_edges, test_sample_nodes, test_sample_nodes_map, [0])
+        self.graph_1.phase_storing_setup()
+        self.graph_1.nodes[0]['phase_storage'] = 0.0
+        self.graph_1.nodes[1]['phase_storage'] = 1.0
+        self.graph_1.nodes[2]['phase_storage'] = 2.0
+        self.graph_1.swap_node_attr_simple(0,1)
+        self.assertEqual(self.graph_1.nodes[0]['phase_storage'], 1.0)
+        self.assertEqual(self.graph_1.nodes[1]['phase_storage'], 0.0)
+
+
     def test_swap_nodes(self):
+        test_sample_edges = [  (0, 5, {"delta_m": 0, "sensitivity": 1}),
+                               (0, 4, {"delta_m": 0, "sensitivity": 1}),
+                               (0, 3, {"delta_m": 1, "sensitivity": 3}),
+                               (0, 2, {"delta_m": 1, "sensitivity": 3}),
+                               (1, 5, {"delta_m": 0, "sensitivity": 1}),
+                               (1, 4, {"delta_m": 0, "sensitivity": 1}),
+                               (1, 3, {"delta_m": 1, "sensitivity": 3}),
+                               (1, 2, {"delta_m": 1, "sensitivity": 3})
+                               ]
+        test_sample_nodes = [0, 1, 2, 3, 4, 5]
+        test_sample_nodes_map = [3, 2, 4, 1, 0, 5]
+
+        self.graph_1 = level_Graph(test_sample_edges, test_sample_nodes, test_sample_nodes_map, [0])
+        self.graph_1.phase_storing_setup()
         list_1 = [(5, 0), (5, 4), (5, 3), (5, 2), (1, 0), (1, 4), (1, 3), (1, 2)]
         list_2 = [(0, 5), (0, 4), (0, 3), (0, 2), (1, 5), (1, 4), (1, 3), (1, 2)]
 
-        #self.graph_1.define__states([1], [0], [2, 3, 4, 5])
         nodes = list(self.graph_1.nodes)
         edges = list(self.graph_1.edges)
 
@@ -78,44 +149,50 @@ class Testlevel_Graph(TestCase):
 
         self.assertTrue(bool2)
 
+    def test_get_rz_gates(self):
+        self.graph_1.nodes[0]['phase_storage'] = 1.0
+        self.graph_1.nodes[1]['phase_storage'] = 1.0
+        rzs = self.graph_1.get_Rz_gates()
+        self.assertEqual(len(rzs),2)
+        self.assertEqual(rzs[0].lev, 3)
+        self.assertEqual(rzs[1].lev, 2)
+        self.assertEqual(rzs[0].theta, 1)
+        self.assertEqual(rzs[1].theta, 1)
+
+
     def test_get_node_sensitivity_cost(self):
         sensitivity = self.graph_1.get_node_sensitivity_cost(0)
-        self.assertEqual(sensitivity, 8)
+        self.assertEqual(sensitivity, 7)
+        sensitivity = self.graph_1.get_node_sensitivity_cost(2)
+        self.assertEqual(sensitivity, 6)
+
 
     def test_get_edge_sensitivity(self):
         sensitivity = self.graph_1.get_edge_sensitivity(1, 2)
         self.assertEqual(sensitivity, 3)
+        sensitivity = self.graph_1.get_edge_sensitivity(0, 4)
+        self.assertEqual(sensitivity, 1)
 
 
+    def test__1stRnode(self):
+        self.assertEqual(self.graph_1._1stRnode, 1 )
 
+    def test__1stInode(self):
+        self.assertEqual(self.graph_1._1stInode, 0 )
 
-    def test_logic_physical_map(self):
-        self.fail()
+    def test_is_Inode(self):
+        self.assertTrue(self.graph_1.is_Inode(0))
+        self.assertFalse(self.graph_1.is_Inode(1))
+        self.assertFalse(self.graph_1.is_Inode(2))
+        self.assertFalse(self.graph_1.is_Inode(3))
+        self.assertFalse(self.graph_1.is_Inode(4))
 
-    def test_deep_copy_func(self):
-        self.fail()
-
-    def test_index(self):
-        self.fail()
-
-    def test_swap_node_attributes(self):
-        self.fail()
-
-    def test_swap_node_attr_simple(self):
-        self.fail()
-
-    def test_get_rz_gates(self):
-        self.fail()
-
-
-    def test__1st_rnode(self):
-        self.fail()
-
-    def test__1st_inode(self):
-        self.fail()
-
-    def test_is_inode(self):
-        self.fail()
+    def test_is_irnode(self):
+        self.assertTrue(self.graph_1.is_irnode(1))
+        self.assertTrue(self.graph_1.is_irnode(2))
+        self.assertTrue(self.graph_1.is_irnode(3))
+        self.assertTrue(self.graph_1.is_irnode(4))
+        self.assertFalse(self.graph_1.is_irnode(0))
 
     def test_lpmap(self):
-        self.fail()
+        self.assertEqual(self.graph_1.lpmap, [3, 2, 4, 1, 0])

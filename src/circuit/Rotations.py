@@ -4,6 +4,9 @@ from src.utils.cost_functions import phi_cost, theta_cost, theta_corrector
 
 
 # Pay attention : inputs to classes are always in radians
+from utils.r_utils import matmul
+
+
 class Custom_Unitary:
 
     def __init__(self, matrix, dimension):
@@ -14,7 +17,7 @@ class Custom_Unitary:
     def cost(self):
         return float(np.NAN)
     def __mul__(self, x):
-        return Custom_Unitary(np.inner(self.matrix, x.matrix), self.dimension)
+        return Custom_Unitary( matmul(self.matrix, x.matrix), self.dimension)
 
 
 class R:
@@ -67,7 +70,7 @@ class R:
         return theta_cost(self.theta)
 
     def __mul__(self, x):
-        return Custom_Unitary(np.inner(self.matrix, x.matrix), self.dimension)
+        return Custom_Unitary( matmul(self.matrix, x.matrix), self.dimension)
 
     def __str__(self):
         return str("R " + "Theta " + str(self.theta) + "phi " + str(
@@ -101,7 +104,7 @@ class Rz:
         self.shape = self.matrix.shape
 
     def __mul__(self, x):
-        return Custom_Unitary(np.inner(self.matrix, x.matrix), self.dimension)
+        return Custom_Unitary( matmul(self.matrix, x.matrix), self.dimension)
 
     def __str__(self):
         return str("R " + "Theta " + str(self.theta) + " lev a " + self.lev)
