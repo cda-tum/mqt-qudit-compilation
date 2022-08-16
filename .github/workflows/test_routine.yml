@@ -25,9 +25,9 @@ jobs:
         run:  |
               pip install -U pip setuptools wheel
               pip install -r requirements.txt
-              
+
       - name: Test package
-        run: unittest test/python
+        run: python -m unittest tests/
 
 
 
