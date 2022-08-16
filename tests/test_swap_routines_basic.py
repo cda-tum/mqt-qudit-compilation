@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from circuit.swap_routines_basic import find_logic_from_phys, graph_rule_update, graph_rule_ongate, \
+from src.circuit.swap_routines_basic import find_logic_from_phys, graph_rule_update, graph_rule_ongate, \
     gate_chain_condition, route_states2rotate_basic
 from src.circuit.swap_routines_ancilla_fixed import *
 from src.architecture_graph.level_Graph import level_Graph

@@ -1,13 +1,13 @@
 from unittest import TestCase
 
-from architecture_graph.level_Graph import level_Graph
-from circuit.QuantumCircuit import QuantumCircuit
+from src.architecture_graph.level_Graph import level_Graph
+from src.circuit.QuantumCircuit import QuantumCircuit
 import numpy as np
 
-from circuit.Rotations import R
-from evaluation.Pauli import H
-from evaluation.Verifier import Verifier
-from utils.r_utils import matmul
+from src.circuit.Rotations import R
+from src.evaluation.Pauli import H
+from src.evaluation.Verifier import Verifier
+from src.utils.r_utils import matmul
 
 
 class TestQuantumCircuit(TestCase):

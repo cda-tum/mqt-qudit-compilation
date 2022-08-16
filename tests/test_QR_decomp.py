@@ -1,9 +1,9 @@
 from unittest import TestCase
 
-from architecture_graph.level_Graph import level_Graph
-from decomposition.QR_decomp import QR_decomp
-from evaluation.Pauli import H
-from evaluation.Verifier import Verifier
+from src.architecture_graph.level_Graph import level_Graph
+from src.decomposition.QR_decomp import QR_decomp
+from src.evaluation.Pauli import H
+from src.evaluation.Verifier import Verifier
 
 
 class TestQR_decomp(TestCase):

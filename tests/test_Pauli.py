@@ -1,7 +1,7 @@
 from unittest import TestCase
 import numpy as np
 
-from evaluation.Pauli import H, Z, X, S
+from src.evaluation.Pauli import H, Z, X, S
 
 class Test_Pauli(TestCase):
 

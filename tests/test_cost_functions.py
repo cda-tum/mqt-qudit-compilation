@@ -1,9 +1,9 @@
 from unittest import TestCase
 import numpy as np
 
-from architecture_graph.level_Graph import level_Graph
-from circuit.Rotations import R
-from utils.cost_functions import rotation_cost_calc, theta_cost, phi_cost, theta_corrector
+from src.architecture_graph.level_Graph import level_Graph
+from src.circuit.Rotations import R
+from src.utils.cost_functions import rotation_cost_calc, theta_cost, phi_cost, theta_corrector
 
 
 class Test(TestCase):

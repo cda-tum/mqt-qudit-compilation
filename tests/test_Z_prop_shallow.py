@@ -1,9 +1,9 @@
 from unittest import TestCase
 import numpy as np
 
-from circuit.QuantumCircuit import QuantumCircuit
+from src.circuit.QuantumCircuit import QuantumCircuit
 from src.circuit.Rotations import R, Rz
-from circuit.Z_prop_shallow import tag_generator, propagate_z, remove_Z
+from src.circuit.Z_prop_shallow import tag_generator, propagate_z, remove_Z
 
 
 class Test(TestCase):
