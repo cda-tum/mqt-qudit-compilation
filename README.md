@@ -98,4 +98,4 @@ Building (and running) is continuously tested under Linux, macOS, and Windows us
 
 ## References
 
-K. Mato, M. Ringbauer, S. Hillmich and R. Wille, "Adaptive Compilation of Multi-Level Quantum Operations," 2022 IEEE International Conference on Quantum Computing and Engineering (QCE), Broomfield, CO, USA, 2022, pp. 484-491, doi: 10.1109/QCE53715.2022.00070.
+K. Mato, M. Ringbauer, S. Hillmich and R. Wille, "[Adaptive Compilation of Multi-Level Quantum Operations](https://www.cda.cit.tum.de/files/eda/2022_qce_adaptive_compilation_of_multi_level_quantum_operations.pdf)," 2022 IEEE International Conference on Quantum Computing and Engineering (QCE), Broomfield, CO, USA, 2022, pp. 484-491, doi: 10.1109/QCE53715.2022.00070.
