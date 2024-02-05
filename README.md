@@ -4,6 +4,13 @@
  [![Documentation](https://img.shields.io/readthedocs/ddsim?logo=readthedocs&style=flat-square)]() 
  [![codecov](https://img.shields.io/codecov/c/github/cda-tum/)]() -->
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cda-tum/qmap/main/docs/source/_static/mqt_light.png" width="60%">
+    <img src="https://raw.githubusercontent.com/cda-tum/qmap/main/docs/source/_static/mqt_dark.png" width="60%">
+  </picture>
+</p>
+
 # MQT Qudits - Adaptive Compilation of Multi-Level Quantum Operations
 
 A tool for the compilation of arbitrary d-dimensional single qudit unitaries into error-efficient sequences of two-level operations by [Chair for Design Automation](https://www.cda.cit.tum.de/).
@@ -91,4 +98,4 @@ Building (and running) is continuously tested under Linux, macOS, and Windows us
 
 ## References
 
-No References.
+K. Mato, M. Ringbauer, S. Hillmich and R. Wille, "[Adaptive Compilation of Multi-Level Quantum Operations](https://www.cda.cit.tum.de/files/eda/2022_qce_adaptive_compilation_of_multi_level_quantum_operations.pdf)," 2022 IEEE International Conference on Quantum Computing and Engineering (QCE), Broomfield, CO, USA, 2022, pp. 484-491, doi: 10.1109/QCE53715.2022.00070.
